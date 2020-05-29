@@ -1,7 +1,7 @@
 $(function() {
   const defaultDistance = 400;
   const defaultHideTime = 1500;
-  const defaultWatchCount = 6;
+  const defaultWatchCount = 8;
   const status = {};
   let watchCount;
   let random;
@@ -12,7 +12,7 @@ $(function() {
   let hideID;
 
   function getStart () {
-    random = 500 + Math.floor(Math.random() * 2500);
+    random = 500 + Math.floor(Math.random() * 3500);
     checkID = setTimeout(getStart, random);
     $('#parentStatus[name="watch"]').toggle();
     $('#parentStatus[name="hide"]').toggle();

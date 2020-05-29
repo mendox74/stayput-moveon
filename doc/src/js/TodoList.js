@@ -3,6 +3,10 @@ import { observer } from "mobx-react";
 
 @observer
 export default class TodoList extends React.Component {
+  start() {
+    console.log('OK');
+  }
+
   createNew(e) {
     if (e.which === 13) {
       this.props.store.createTodo(e.target.value);
@@ -22,22 +26,28 @@ export default class TodoList extends React.Component {
   }
 
   render() {
-    
-    // const { clearComplete, filter, filteredTodos, todos } = this.props.store;
+    const defaultDistance = 400;
+    const defaultHideTime = 1500;
+    const defaultWatchCount = 8;
+    const status = {};
+    let watchCount;
+    let random;
+    let moveFlg = false;
+    let endFlg;
+    let checkID;
+    let moveID;
+    let hideID;
+    let child = 'statue';
+    let parent = 'hide';
 
-    // const todoList = filteredTodos.map(todo => (
-    //   <li key={todo.id}>
-    //     <input type="checkbox" onChange={this.toggleComplete.bind(this, todo)} value={todo.complete} checked={todo.complete} />{todo.value}
-    //   </li>
-    // ));
     return <div>
       <div id="watchCount"></div>
       <div id="hideTime"></div>
       <div id="distance"></div>
-      <div><button id="child">statue</button></div>
-      <div id="parentStatus" name="watch">watch</div>
-      <div id="parentStatus" name="hide" hidden>hide</div>
-      <div><button id="start">実行</button></div>
+      <div><button id="child">{child}</button></div>
+      <div id="parentStatus" name="watch">{parent}</div>
+      <div id="parentStatus" name="hide" hidden>{parent}</div>
+      <div><button id="start" onClick={this.start.bind()}>実行</button></div>
     </div>;
   };
 }
