@@ -4,17 +4,22 @@ class StatusStore {
   defaultDistance = 400;
   defaultHideTime = 1500;
   defaultWatchCount = 6;
-  status = {};
-  watchCount;
-  random;
-  moveFlg = false;
-  endFlg;
-  checkID;
-  moveID;
-  hideID;
+  @observable status = {hideTime:400, distance:1500};
+  @observable watchCount = 8;
+  @observable random;
+  @observable moveFlg = false;
+  @observable endFlg;
+  @observable checkID;
+  @observable moveID;
+  @observable hideID;
+  @observable child = 'statue';
+  @observable parent = 'hide';
   start() {
     random = 500 + Math.floor(Math.random() * 2500);
     checkID = setTimeout(getStart, random);
+  }
+  countDown() {
+    this.status.hideTime -= 1
   }
 
 }
