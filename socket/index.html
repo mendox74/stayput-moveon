@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+  <html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./static/css/style.css">
+    <title>Socket.IO chatRoom</title>
+  </head>
+  <body>
+    <div id="myName"></div>
+    <div id="roomNumber"></div>
+    <div id="roomMenber"></div>
+    <button id="login">入室</button>
+    <button id="logout">退室</button>
+    <ul id="messages"></ul>
+    <form action="">
+      <input id="m" autocomplete="off" /><button>Send</button>
+    </form>
+    
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+    <script src="./static/js/main.js"></script>
+  </body>
+</html>
