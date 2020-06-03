@@ -10,60 +10,69 @@ app.get('/', (req, res) => {
 
 app.use('/static', express.static('public'));
 
+let rooms = {};
+let countId;
+let count = 0;
 io.on('connection', (socket) => {
   // 接続切断処理
   socket.on('disconnect', () => {
-    console.log("disconnect");
+    console.log("disconnect", socket.userName);
+  });
+  socket.on('countStart', () => {
+    countId = setInterval(() => {
+      count += 1;
+      console.log(count)
+    }, 1000);
+  });
+
+  socket.on('countStop', () => {
+    clearInterval(countId);
   });
 
   socket.on('login', () => {
-    if(socket.roomId) return;
-    // 待機中のプレイヤーが居る
-    if(io.waitPlayer){
-      // 待機中の部屋IDにjoin
-      socket.join(io.tmpRoomId, () => {
-        socket.roomId = io.tmpRoomId;
-        console.log(socket.roomId, socket.rooms.id);
-      });
-
-      io.of('/').in(io.tmpRoomId).clients((error, clients) => {
-        console.log(clients.userName);
-      });
-
-      io.waitPlayer = false;
-      io.to(io.tmpRoomId).emit('roomNumber', io.tmpRoomId)
-      io.to(io.tmpRoomId).emit('roomMenber', socket.userName);
-    } else {
-      io.tmpRoomId = '';
-      io.waitPlayer = true;
-
-      io.tmpRoomId = Math.floor( Math.random() * 100 );
-      socket.join(io.tmpRoomId, () => {
-        socket.roomId = io.tmpRoomId;
-        console.log(socket.roomId);
-      });
-
-      io.of('/').in(io.tmpRoomId).clients((error, clients) => {
-        console.log(clients);
-        
-      });
-
-      io.to(io.tmpRoomId).emit('roomNumber', io.tmpRoomId);
-      io.to(io.tmpRoomId).emit('roomMenber', socket.userName);
+    if(socket.roomId)return;
+    io.to(socket.id).emit('delete');
+    let room;
+    // 部屋の有無を判定
+    if(Object.keys(rooms).length >= 1){
+      room = Object.keys(rooms).find(key => rooms[key].length === 1);
     }
-  })
+    // 待機中を検索
+    if(room){
+      // 待機中の部屋IDにjoin
+      socket.join(room);
+      rooms[room].push(socket.userName);
+      socket.roomId = room;
 
-  socket.on('logout', () => {
-    io.to(socket.roomId).emit('delete');
-    socket.leave(socket.roomId, () => {
-      io.to(socket.roomId).emit('chat message', socket.userName　+　'さんが退室されました。');
-      io.waitPlayer = io.waitPlayer === true ? false : true ;
-    });
+      io.to(socket.id).emit('roomNumber', room)
+      io.to(room).emit('roomMenber', rooms[room]);
+      io.to(room).emit('chat message', socket.userName　+　'さんが入室されました。');
+    } else {
+      room =  Math.floor( Math.random() * 1000 );
+      socket.join(room);
+      rooms[room] = [socket.userName];
+      socket.roomId = room;
+
+      io.to(socket.id).emit('roomNumber', room);
+      io.to(room).emit('roomMenber', rooms[room]);
+      io.to(room).emit('chat message', socket.userName　+　'さんが入室されました。');
+    }
   });
 
+  socket.on('logout', () => {
+    socket.leave(socket.roomId, () => {
+      io.to(socket.roomId).emit('chat message', socket.userName　+　'さんが退室されました。');
+      io.to(socket.roomId).emit('roomMenber', rooms[socket.roomId]);
+      io.to(socket.id).emit('delete');
+      let index = rooms[socket.roomId].indexOf(socket.userName);
+      rooms[socket.roomId].splice(index,1);
+      delete socket.roomId;
+    });
+    console.log(rooms);
+  });
 
   socket.on('chat message', (msg) => {
-    io.to(socket.roomId).emit('chat message', socket.userName +': ' + msg);
+    io.to(socket.roomId).emit('chat message', socket.userName + ': ' + msg);
   });
 
   socket.on('setUserName',  (userName) => {
