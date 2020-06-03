@@ -18,11 +18,12 @@ io.on('connection', (socket) => {
   socket.on('disconnect', () => {
     console.log("disconnect", socket.userName);
   });
+
   socket.on('countStart', () => {
     countId = setInterval(() => {
       count += 1;
-      console.log(count)
-    }, 1000);
+      io.to(socket.roomId).emit('count', count);
+    }, 100);
   });
 
   socket.on('countStop', () => {
@@ -44,6 +45,9 @@ io.on('connection', (socket) => {
       rooms[room].push(socket.userName);
       socket.roomId = room;
 
+      console.log(io.rooms);
+      
+      io.to(socket.id).emit('myName', socket.userName);
       io.to(socket.id).emit('roomNumber', room)
       io.to(room).emit('roomMenber', rooms[room]);
       io.to(room).emit('chat message', socket.userName　+　'さんが入室されました。');
@@ -53,6 +57,9 @@ io.on('connection', (socket) => {
       rooms[room] = [socket.userName];
       socket.roomId = room;
 
+      console.log(io.rooms);
+
+      io.to(socket.id).emit('myName', socket.userName);
       io.to(socket.id).emit('roomNumber', room);
       io.to(room).emit('roomMenber', rooms[room]);
       io.to(room).emit('chat message', socket.userName　+　'さんが入室されました。');
@@ -78,7 +85,6 @@ io.on('connection', (socket) => {
   socket.on('setUserName',  (userName) => {
     if(!userName) {userName = '匿名';}
     socket.userName = userName;
-    io.to(socket.id).emit('myName', userName);
   });
 
 });

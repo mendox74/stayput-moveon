@@ -7,8 +7,17 @@
     <title>Socket.IO chatRoom</title>
   </head>
   <body>
+    
+    <div id="watchCount"></div>
+    <div id="hideTime"></div>
+    <div id="distance"></div>
+    <div><button id="child">statue</button></div>
+    <div id="parentStatus" name="watch">watch</div>
+    <div id="parentStatus" name="hide" hidden>hide</div>
+    <div><button id="start">実行</button></div>
+
     <button id="start">start</button>
-    <button id="stop">stop</button>
+    <button id="stop" hidden>stop</button>
     <div id="myName"></div>
     <div id="roomNumber"></div>
     <div id="roomMenber"></div>
@@ -17,6 +26,8 @@
     <ul id="messages"></ul>
     <input id="m" autocomplete="off" /><button id="send">Send</button>
     
+    <div id="count"></div>
+
     <script src="/socket.io/socket.io.js"></script>
     <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
     <script src="./static/js/main.js"></script>
