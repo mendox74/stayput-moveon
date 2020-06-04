@@ -8,8 +8,6 @@ $(function () {
   let moveFlg = false;
   let endFlg;
   let checkID;
-  let moveID;
-  let hideID;
 //======================================================================================================
 // イベント
   $('#start').click(() => {
@@ -37,10 +35,6 @@ $(function () {
     socket.emit('setUserName', userName);
   });
 
-  socket.on('distance', (count) => {
-    $('#distance').text(count);
-  });
-
   socket.on('chat message', (msg) => {
     $('#messages').append($('<li>').text(msg));
   });
@@ -65,11 +59,38 @@ $(function () {
   });
 
   socket.on('set start', (status, watchCount) => {
+    endFlg = false;
     $('#watchCount').text(watchCount);
     $('#hideTime').text(status.hideTime);
     $('#distance').text(status.distance);
     $('#start').hide();
-    // getStart();
+    getStart();
+  });
+
+  socket.on('distance', (count) => {
+    $('#distance').text(count);
+  });
+
+  socket.on('hideTime', (count) => {
+    $('#hideTime').text(count);
+  });
+
+  socket.on('watch count', (watchCount) => {
+    $('#watchCount').text(watchCount);
+  });
+
+  socket.on('result', (name) => {
+    endFlg = true;
+    clearInterval(checkID);
+    $('#' + name).text('');
+    $('#parentStatus[name="hide"]').hide();
+    $('#parentStatus[name="watch"]').show();
+    $('#start').show();
+    if(name === 'distance'){
+      $('#' + name).append('<span>touch</span>');
+    } else {
+      $('#' + name).append('<span>protect</span>');
+    }
   });
 
 //======================================================================================================
@@ -79,24 +100,16 @@ $(function () {
     checkID = setTimeout(getStart, random);
     $('#parentStatus[name="watch"], #parentStatus[name="hide"]').toggle();
     if($('#parentStatus[name="hide"]').is(':visible')){
-      hideID = setInterval(() => {
-        countdown(status.hideTime -1, 'hideTime', 'protect');
-      }, 10);
+      socket.emit('hide');
       if(watchCount === 0){
         clearInterval(checkID);
       }
     } else {
-      watchCount -= 1;
-      $('#watchCount').text(watchCount);
-      clearInterval(hideID);
-    }
-    if(moveFlg){
-      if($('#parentStatus[name="watch"]').is(':visible')){
-        $('#child').text('out');
-        console.log('out');
-        countdown(defaultDistance, 'distance', 'touch');
-        moveFlg = false;
-        clearInterval(moveID);
+      socket.emit('watch count');
+      if(moveFlg){
+          $('#child').text('out');
+          socket.emit('distance reset');
+          moveFlg = false;
       }
     }
   }
@@ -105,45 +118,21 @@ $(function () {
     if(moveFlg){ $('#child').text('statue'); }
       moveFlg = false;
       socket.emit('moveStop');
-      // clearInterval(moveID);
   }).mousedown(() => {
-    // if(endFlg)return;
-    // if($('#parentStatus[name="watch"]').is(':visible')){
-    //   $('#child').text('out'); 
-    //   console.log('out');
-    //   countdown(defaultDistance, 'distance', 'touch');
-      // moveFlg = false;
-      // socket.emit('countStop');
-      // clearInterval(moveID);
-    // } else {
+    if(endFlg)return;
+    if($('#parentStatus[name="watch"]').is(':visible')){
+      $('#child').text('out'); 
+      moveFlg = false;
+      socket.emit('distance reset');
+    } else {
       $('#child').text('move');
       moveFlg = true;
       socket.emit('moveStart');
-    //   moveID = setInterval(() => {
-    //     countdown(status.distance -1, 'distance', 'touch');}, 10);
-    // }
+    }
   }).mouseout(() => {
     if(moveFlg){ $('#child').text('statue'); }
     moveFlg = false;
     socket.emit('moveStop');
-    // clearInterval(moveID);
   });
-
-  function countdown (sub, name, result) {
-    status[name] = sub;
-    $('#' + name).text(status[name]);
-    if(status[name] === 0 ){
-      endFlg = true;
-      moveFlg = false;
-      clearInterval(moveID);
-      clearInterval(hideID);
-      clearInterval(checkID);
-      $('#' + name).text('');
-      $('#' + name).append('<span>' + result + '</span>');
-      $('#parentStatus[name="hide"]').hide();
-      $('#parentStatus[name="watch"]').show();
-      $('#start').show();
-    }
-  }
 
 });

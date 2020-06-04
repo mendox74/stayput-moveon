@@ -34,14 +34,27 @@ io.on('connection', (socket) => {
   });
 
   socket.on('moveStart', () => {
-    moveID = setInterval(() => {
-      countDown('distance');
-      io.to(socket.roomId).emit('distance', status.distance);
-    }, 10);
+    moveID = setInterval(() => {countDown('distance');}, 10);
   });
 
   socket.on('moveStop', () => {
     clearInterval(moveID);
+  });
+
+  socket.on('distance reset', () => {
+    clearInterval(moveID);
+    status.distance = defaultDistance;
+    io.to(socket.roomId).emit('distance', status.distance);
+  });
+
+  socket.on('hide', () => {
+    hideID = setInterval(() => {countDown('hideTime');}, 10);
+  });
+
+  socket.on('watch count', () => {
+    watchCount -= 1;
+    io.to(socket.roomId).emit('watch count', watchCount);
+    clearInterval(hideID);
   });
 
   socket.on('login', () => {
@@ -105,13 +118,16 @@ io.on('connection', (socket) => {
     return id.map(id => io.sockets.sockets[id].userName);
   }
 
-  socket.on('count down', (name) => {
-    
-
-  });
-
   function countDown (name) {
     status[name] -= 1;
+    io.to(socket.roomId).emit(name, status[name]);
+    if(status[name] === 0 ){
+      endFlg = true;
+      moveFlg = false;
+      clearInterval(moveID);
+      clearInterval(hideID);
+      io.to(socket.roomId).emit('result', name);
+    }
   }
 
 });
