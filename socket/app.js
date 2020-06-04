@@ -10,75 +10,79 @@ app.get('/', (req, res) => {
 
 app.use('/static', express.static('public'));
 
-let rooms = {};
-let countId;
+const defaultDistance = 400;
+const defaultHideTime = 1500;
+const defaultWatchCount = 8;
+const status = {};
+let watchCount;
+let random;
+let moveFlg = false;
+let endFlg;
+let checkID;
+let moveID;
+let hideID;
+
+let rooms = [];
 let count = 0;
 io.on('connection', (socket) => {
   // 接続切断処理
   socket.on('disconnect', () => {
-    console.log("disconnect", socket.userName);
+    if(!io.sockets.adapter.rooms[socket.roomId]){
+      rooms.splice(rooms.indexOf(socket.roomId), 1);
+    };
+    console.log("disconnect", socket.userName, rooms);
   });
 
-  socket.on('countStart', () => {
-    countId = setInterval(() => {
-      count += 1;
-      io.to(socket.roomId).emit('count', count);
-    }, 100);
+  socket.on('moveStart', () => {
+    moveID = setInterval(() => {
+      countDown('distance');
+      io.to(socket.roomId).emit('distance', status.distance);
+    }, 10);
   });
 
-  socket.on('countStop', () => {
-    clearInterval(countId);
+  socket.on('moveStop', () => {
+    clearInterval(moveID);
   });
 
   socket.on('login', () => {
     if(socket.roomId)return;
     io.to(socket.id).emit('delete');
-    let room;
     // 部屋の有無を判定
-    if(Object.keys(rooms).length >= 1){
-      room = Object.keys(rooms).find(key => rooms[key].length === 1);
+    if(rooms.length >= 1){
+      // 人数が1人の部屋を検索
+      socket.roomId = rooms.find(key => io.sockets.adapter.rooms[key].length === 1);
     }
-    // 待機中を検索
-    if(room){
-      // 待機中の部屋IDにjoin
-      socket.join(room);
-      rooms[room].push(socket.userName);
-      socket.roomId = room;
+    if(!socket.roomId){
+      // 新しく部屋番号を生成
+      socket.roomId =  Math.floor( Math.random() * 1000);
+      rooms.push(socket.roomId);
+    } 
+    socket.join(socket.roomId);
 
-      console.log(io.rooms);
-      
-      io.to(socket.id).emit('myName', socket.userName);
-      io.to(socket.id).emit('roomNumber', room)
-      io.to(room).emit('roomMenber', rooms[room]);
-      io.to(room).emit('chat message', socket.userName　+　'さんが入室されました。');
-    } else {
-      room =  Math.floor( Math.random() * 1000 );
-      socket.join(room);
-      rooms[room] = [socket.userName];
-      socket.roomId = room;
+    console.log(io.sockets.sockets[socket.id].roomId, io.sockets.sockets[socket.id].userName);
 
-      console.log(io.rooms);
-
-      io.to(socket.id).emit('myName', socket.userName);
-      io.to(socket.id).emit('roomNumber', room);
-      io.to(room).emit('roomMenber', rooms[room]);
-      io.to(room).emit('chat message', socket.userName　+　'さんが入室されました。');
-    }
+    io.to(socket.id).emit('myName', socket.userName);
+    io.to(socket.id).emit('roomNumber', socket.roomId);
+    io.to(socket.roomId).emit('roomMenber', getRoomMenberName());
+    io.to(socket.roomId).emit('chat message', socket.userName　+　'さんが入室されました。');
   });
 
   socket.on('logout', () => {
     socket.leave(socket.roomId, () => {
+      if(!io.sockets.adapter.rooms[socket.roomId]){
+        rooms.splice(rooms.indexOf(socket.roomId), 1);
+      }
+      io.to(socket.roomId).emit('roomMenber', getRoomMenberName());
       io.to(socket.roomId).emit('chat message', socket.userName　+　'さんが退室されました。');
-      io.to(socket.roomId).emit('roomMenber', rooms[socket.roomId]);
       io.to(socket.id).emit('delete');
-      let index = rooms[socket.roomId].indexOf(socket.userName);
-      rooms[socket.roomId].splice(index,1);
+      delete socket.userName;
       delete socket.roomId;
+      console.log(socket.roomId, socket.userName, rooms);
     });
-    console.log(rooms);
   });
 
   socket.on('chat message', (msg) => {
+    if(!socket.roomId)return;
     io.to(socket.roomId).emit('chat message', socket.userName + ': ' + msg);
   });
 
@@ -86,6 +90,29 @@ io.on('connection', (socket) => {
     if(!userName) {userName = '匿名';}
     socket.userName = userName;
   });
+
+  socket.on('set start', () => {
+    endFlg = false;
+    watchCount = defaultWatchCount;
+    status.hideTime = defaultHideTime;
+    status.distance = defaultDistance;
+    io.to(socket.roomId).emit('set start', status, watchCount);
+  });
+
+  function getRoomMenberName () {
+    if(!io.sockets.adapter.rooms[socket.roomId])return;
+    let id = Object.keys(io.sockets.adapter.rooms[socket.roomId].sockets);
+    return id.map(id => io.sockets.sockets[id].userName);
+  }
+
+  socket.on('count down', (name) => {
+    
+
+  });
+
+  function countDown (name) {
+    status[name] -= 1;
+  }
 
 });
 
