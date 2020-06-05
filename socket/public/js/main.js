@@ -4,19 +4,18 @@ $(function () {
   let userName;
   let socket = io({autoConnect:false});
 
-  let random;
-  let moveFlg = false;
-  let endFlg;
-  let checkID;
 //======================================================================================================
 // イベント
   $('#start').click(() => {
-    socket.emit('set start');
+    socket.emit('start');
   });
 
-  $('#send').click(() => {
-    socket.emit('chat message', $('#m').val());
-    $('#m').val('');
+  $('#auto').click(() => {
+    socket.emit('auto');
+  });
+
+  $('#reset').click(() => {
+    socket.emit('reset');
   });
 
   $('#login').on('click', () => {
@@ -28,15 +27,27 @@ $(function () {
     socket.emit('logout');
   });
 
+  $('#child').mouseup(() => {
+    socket.emit('stop');
+  }).mousedown(() => {
+    socket.emit('move');
+  }).mouseout(() => {
+    socket.emit('stop');
+  });
+
+  $('#parent').mouseup(() => {
+    socket.emit('hide');
+  }).mousedown(() => {
+    socket.emit('watch');
+  }).mouseout(() => {
+    socket.emit('hide');
+  });
+
 //======================================================================================================
-// socket通信処理
+// 通信処理
   socket.on('connect', function () {
     userName = prompt('ユーザー名を入力してください');
     socket.emit('setUserName', userName);
-  });
-
-  socket.on('chat message', (msg) => {
-    $('#messages').append($('<li>').text(msg));
   });
 
   socket.on('roomNumber', (key) => {
@@ -52,19 +63,24 @@ $(function () {
   });
 
   socket.on('delete', () => {
-    $('#myName').text('');
+    $('#watchCount').text('');
+    $('#hideTime').text('');
+    $('#distance').text('');
     $('#roomNumber').text('');
     $('#roomMenber').text('');
-    $('#messages').children().remove();
   });
 
-  socket.on('set start', (status, watchCount) => {
-    endFlg = false;
+  socket.on('set', (status, watchCount) => {
     $('#watchCount').text(watchCount);
     $('#hideTime').text(status.hideTime);
     $('#distance').text(status.distance);
+    $('#start').show();
+    $('#auto').show();
+  });
+
+  socket.on('start', () => {
     $('#start').hide();
-    getStart();
+    $('#auto').hide();
   });
 
   socket.on('distance', (count) => {
@@ -75,17 +91,28 @@ $(function () {
     $('#hideTime').text(count);
   });
 
-  socket.on('watch count', (watchCount) => {
-    $('#watchCount').text(watchCount);
+  socket.on('hide', () => {
+    $('#parent').text('hide');
   });
 
+  socket.on('watch', (watchCount) => {
+    $('#watchCount').text(watchCount);
+    $('#parent').text('watch');
+  });
+
+  socket.on('move', () => {
+    $('#child').text('move');
+  });
+  socket.on('stop', () => {
+    $('#child').text('stop');
+  });
+  socket.on('out', () => {
+    $('#child').text('out');
+  });
+  
   socket.on('result', (name) => {
-    endFlg = true;
-    clearInterval(checkID);
     $('#' + name).text('');
-    $('#parentStatus[name="hide"]').hide();
-    $('#parentStatus[name="watch"]').show();
-    $('#start').show();
+    $('#child').text('stop');
     if(name === 'distance'){
       $('#' + name).append('<span>touch</span>');
     } else {
@@ -95,44 +122,4 @@ $(function () {
 
 //======================================================================================================
 // ローカル関数
-  function getStart () {
-    random = 500 + Math.floor(Math.random() * 3500);
-    checkID = setTimeout(getStart, random);
-    $('#parentStatus[name="watch"], #parentStatus[name="hide"]').toggle();
-    if($('#parentStatus[name="hide"]').is(':visible')){
-      socket.emit('hide');
-      if(watchCount === 0){
-        clearInterval(checkID);
-      }
-    } else {
-      socket.emit('watch count');
-      if(moveFlg){
-          $('#child').text('out');
-          socket.emit('distance reset');
-          moveFlg = false;
-      }
-    }
-  }
-
-  $('#child').mouseup(() => {
-    if(moveFlg){ $('#child').text('statue'); }
-      moveFlg = false;
-      socket.emit('moveStop');
-  }).mousedown(() => {
-    if(endFlg)return;
-    if($('#parentStatus[name="watch"]').is(':visible')){
-      $('#child').text('out'); 
-      moveFlg = false;
-      socket.emit('distance reset');
-    } else {
-      $('#child').text('move');
-      moveFlg = true;
-      socket.emit('moveStart');
-    }
-  }).mouseout(() => {
-    if(moveFlg){ $('#child').text('statue'); }
-    moveFlg = false;
-    socket.emit('moveStop');
-  });
-
 });

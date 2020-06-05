@@ -17,44 +17,26 @@ const status = {};
 let watchCount;
 let random;
 let moveFlg = false;
-let endFlg;
-let checkID;
+let hideFlg = true;
+let endFlg = true;
+let autoID;
 let moveID;
 let hideID;
 
 let rooms = [];
-let count = 0;
 io.on('connection', (socket) => {
   // 接続切断処理
   socket.on('disconnect', () => {
     if(!io.sockets.adapter.rooms[socket.roomId]){
       rooms.splice(rooms.indexOf(socket.roomId), 1);
+      endFlg = true;
+      moveFlg = false;
+      hideFlg = true;
+      clearInterval(moveID);
+      clearInterval(hideID);
+      clearInterval(autoID);
     };
     console.log("disconnect", socket.userName, rooms);
-  });
-
-  socket.on('moveStart', () => {
-    moveID = setInterval(() => {countDown('distance');}, 10);
-  });
-
-  socket.on('moveStop', () => {
-    clearInterval(moveID);
-  });
-
-  socket.on('distance reset', () => {
-    clearInterval(moveID);
-    status.distance = defaultDistance;
-    io.to(socket.roomId).emit('distance', status.distance);
-  });
-
-  socket.on('hide', () => {
-    hideID = setInterval(() => {countDown('hideTime');}, 10);
-  });
-
-  socket.on('watch count', () => {
-    watchCount -= 1;
-    io.to(socket.roomId).emit('watch count', watchCount);
-    clearInterval(hideID);
   });
 
   socket.on('login', () => {
@@ -74,10 +56,10 @@ io.on('connection', (socket) => {
 
     console.log(io.sockets.sockets[socket.id].roomId, io.sockets.sockets[socket.id].userName);
 
-    io.to(socket.id).emit('myName', socket.userName);
+    // io.to(socket.id).emit('myName', socket.userName);
     io.to(socket.id).emit('roomNumber', socket.roomId);
     io.to(socket.roomId).emit('roomMenber', getRoomMenberName());
-    io.to(socket.roomId).emit('chat message', socket.userName　+　'さんが入室されました。');
+    // io.to(socket.roomId).emit('chat message', socket.userName　+　'さんが入室されました。');
   });
 
   socket.on('logout', () => {
@@ -86,30 +68,68 @@ io.on('connection', (socket) => {
         rooms.splice(rooms.indexOf(socket.roomId), 1);
       }
       io.to(socket.roomId).emit('roomMenber', getRoomMenberName());
-      io.to(socket.roomId).emit('chat message', socket.userName　+　'さんが退室されました。');
       io.to(socket.id).emit('delete');
-      delete socket.userName;
+      io.to(socket.id).emit('start');
       delete socket.roomId;
-      console.log(socket.roomId, socket.userName, rooms);
     });
-  });
-
-  socket.on('chat message', (msg) => {
-    if(!socket.roomId)return;
-    io.to(socket.roomId).emit('chat message', socket.userName + ': ' + msg);
   });
 
   socket.on('setUserName',  (userName) => {
     if(!userName) {userName = '匿名';}
     socket.userName = userName;
+    io.to(socket.id).emit('myName', socket.userName);
   });
 
-  socket.on('set start', () => {
+  socket.on('move', () => {
+    if(endFlg)return;
+    if(hideFlg){
+      moveFlg = true;
+      moveCount();
+      io.to(socket.roomId).emit('move');
+    } else {
+      out();
+    }
+  });
+
+  socket.on('stop', () => {
+    if(endFlg)return;
+    moveFlg = false;
+    clearInterval(moveID);
+    io.to(socket.roomId).emit('stop');
+  });
+
+  socket.on('hide', () => {
+    hide();
+  });
+
+  socket.on('watch', () => {
+    watch();
+  });
+
+  socket.on('start', () => {
     endFlg = false;
+    io.to(socket.roomId).emit('start');
+    hide();
+  });
+
+  socket.on('auto', () => {
+    endFlg = false;
+    hideFlg = false;
+    io.to(socket.roomId).emit('start');
+    auto();
+  });
+
+  socket.on('reset', () => {
+    endFlg = true;
+    moveFlg = false;
+    hideFlg = true;
+    clearInterval(moveID);
+    clearInterval(hideID);
+    clearInterval(autoID);
     watchCount = defaultWatchCount;
     status.hideTime = defaultHideTime;
     status.distance = defaultDistance;
-    io.to(socket.roomId).emit('set start', status, watchCount);
+    io.to(socket.roomId).emit('set', status, watchCount);
   });
 
   function getRoomMenberName () {
@@ -124,11 +144,64 @@ io.on('connection', (socket) => {
     if(status[name] === 0 ){
       endFlg = true;
       moveFlg = false;
+      hideFlg = true;
       clearInterval(moveID);
       clearInterval(hideID);
+      clearInterval(autoID);
       io.to(socket.roomId).emit('result', name);
     }
   }
+
+  function moveCount () {
+    if(endFlg)return;
+    moveID = setTimeout(moveCount, 10);
+    countDown('distance');
+  }
+
+  function hideCount () {
+    if(endFlg)return;
+    hideID = setTimeout(hideCount, 10);
+    countDown('hideTime');
+  }
+
+  function hide () {
+    if(endFlg)return;
+    hideFlg = true;
+    hideCount();
+    io.to(socket.roomId).emit('hide');
+  }
+
+  function watch () {
+    if(endFlg || watchCount === 0)return;
+    hideFlg = false;
+    clearInterval(hideID);
+    watchCount -= 1;
+    io.to(socket.roomId).emit('watch', watchCount);
+    if(moveFlg){
+      out();
+    }
+  }
+
+  function out () {
+    moveFlg = false;
+    clearInterval(moveID);
+    status.distance = defaultDistance;
+    io.to(socket.roomId).emit('distance', status.distance); 
+    io.to(socket.roomId).emit('out');     
+  }
+
+  function auto () {
+    random = 500 + Math.floor(Math.random() * 3500);
+    autoID = setTimeout(auto, random);
+    if(hideFlg){
+      watch();
+    } else {
+      hide();
+      if(watchCount === 0){
+        clearInterval(autoID);
+      }
+    }
+  };
 
 });
 

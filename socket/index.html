@@ -11,21 +11,18 @@
     <div id="watchCount"></div>
     <div id="hideTime"></div>
     <div id="distance"></div>
-    <div><button id="child">statue</button></div>
-    <div id="parentStatus" name="watch">watch</div>
-    <div id="parentStatus" name="hide" hidden>hide</div>
-    <div><button id="start">実行</button></div>
+    <div><button id="child" class="btn-square">stop</button></div>
+    <div><button id="parent" class="btn-square">hide</button></div>
+    <div><button id="reset" class="btn-square">reset</button></div>
+    <div><button id="start" class="btn-square" hidden >start</button></div>
+    <div><button id="auto" class="btn-square" hidden >auto</button></div>
 
     <div id="myName"></div>
     <div id="roomNumber"></div>
     <div id="roomMenber"></div>
-    <button id="login">入室</button>
-    <button id="logout">退室</button>
-    <ul id="messages"></ul>
-    <input id="m" autocomplete="off" /><button id="send">Send</button>
+    <button id="login" class="btn-square">入室</button>
+    <button id="logout" class="btn-square">退室</button>
     
-    <div id="count"></div>
-
     <script src="/socket.io/socket.io.js"></script>
     <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
     <script src="./static/js/main.js"></script>
