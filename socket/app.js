@@ -10,8 +10,8 @@ app.get('/', (req, res) => {
 
 app.use('/static', express.static('public'));
 
-const defaultDistance = 400;
-const defaultHideTime = 1500;
+const defaultDistance = 4000;
+const defaultHideTime = 15000;
 const defaultWatchCount = 8;
 const status = {};
 let watchCount;
@@ -45,7 +45,7 @@ io.on('connection', (socket) => {
     // 部屋の有無を判定
     if(rooms.length >= 1){
       // 人数が1人の部屋を検索
-      socket.roomId = rooms.find(key => io.sockets.adapter.rooms[key].length === 1);
+      socket.roomId = rooms.find(key => io.sockets.adapter.rooms[key]);
     }
     if(!socket.roomId){
       // 新しく部屋番号を生成
@@ -77,6 +77,7 @@ io.on('connection', (socket) => {
   socket.on('setUserName',  (userName) => {
     if(!userName) {userName = '匿名';}
     socket.userName = userName;
+    console.log (userName);
     io.to(socket.id).emit('myName', socket.userName);
   });
 
@@ -139,7 +140,7 @@ io.on('connection', (socket) => {
   }
 
   function countDown (name) {
-    status[name] -= 1;
+    status[name] -= 100;
     io.to(socket.roomId).emit(name, status[name]);
     if(status[name] === 0 ){
       endFlg = true;
@@ -154,13 +155,13 @@ io.on('connection', (socket) => {
 
   function moveCount () {
     if(endFlg)return;
-    moveID = setTimeout(moveCount, 10);
+    moveID = setTimeout(moveCount, 100);
     countDown('distance');
   }
 
   function hideCount () {
     if(endFlg)return;
-    hideID = setTimeout(hideCount, 10);
+    hideID = setTimeout(hideCount, 100);
     countDown('hideTime');
   }
 

@@ -27,25 +27,25 @@ $(function () {
     socket.emit('logout');
   });
 
-  $('#child').mouseup(() => {
+  $('#child').on('touchend mouseup', () => {
     socket.emit('stop');
-  }).mousedown(() => {
+  }).on('touchstart mousedown', () => {
     socket.emit('move');
-  }).mouseout(() => {
+  }).on('touchcancel mouseout', () => {
     socket.emit('stop');
   });
 
-  $('#parent').mouseup(() => {
+  $('#parent').on('touchend mouseup', () => {
     socket.emit('hide');
-  }).mousedown(() => {
+  }).on('touchstart mousedown', () => {
     socket.emit('watch');
-  }).mouseout(() => {
+  }).on('touchcancel mouseout', () => {
     socket.emit('hide');
   });
 
 //======================================================================================================
 // 通信処理
-  socket.on('connect', function () {
+  socket.on('connect', () => {
     userName = prompt('ユーザー名を入力してください');
     socket.emit('setUserName', userName);
   });
