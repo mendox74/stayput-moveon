@@ -5,6 +5,9 @@ import io from 'socket.io-client';
 
 const socket = io('http://192.168.11.7:8080', {transports: ['websocket']} );
 
+const hideTimeID;
+const distanceID;
+
 function Display() {
   const [distance, setDistance] = useState();
   const [hideTime, setHideTime] = useState();
@@ -17,6 +20,7 @@ function Display() {
     setHideTime(count);
   });
   socket.on('watch', (count) => {
+    clearInterval(hideTimeID);
     setWatchCount(count);
   });
   socket.on('result', (name) => {
@@ -26,6 +30,23 @@ function Display() {
       setHideTime('WATCHER-WIN');
     }
   });
+
+  socket.on('hide', () => {
+    displayHideTime();
+  });
+  socket.on('move', () => {
+    displayDistance();
+  });
+
+  function displayHideTime () {
+    setHideTime(hideTime - 100);
+    hideTimeID = setTimeout(displayHideTime, 10);
+  }
+
+  function displayDistance () {
+    setDistance(distance - 100);
+    distanceID = setTimeout(displayDistance, 10);
+  }
 
   socket.on('set', (status, watchCount) => {
     setWatchCount(watchCount);
@@ -49,7 +70,7 @@ function Display() {
 
 function Player() {
   const [toucher, setToucher] = useState('STOP');
-  const [watcher, setWatcher] = useState('HIDE');
+  const [watcher, setWatcher] = useState('WATCH');
 
   socket.on('hide', () => {
     setWatcher('HIDE');
@@ -61,21 +82,26 @@ function Player() {
     setToucher('MOVE');
   });
   socket.on('stop', () => {
+    if(toucher === 'move'){clearInterval(distanceID);};
     setToucher('STOP');
   });
   socket.on('out', () => {
+    if(toucher === 'move'){clearInterval(distanceID);};
     setToucher('OUT');
   });
   socket.on('result', () => {
+    if(toucher === 'move'){clearInterval(distanceID);};
+    if(watcher === 'hide'){clearInterval(hideTimeID);};
     setToucher('STOP');
+    setWatcher('WATCH');
   });
 
   return(
     <View>
       <Button
         title={watcher}
-        onPressIn={() => socket.emit('watch')}
-        onPressOut={() => socket.emit('hide')}
+        onPressIn={() => socket.emit('hide')}
+        onPressOut={() => socket.emit('watch')}
       />
       <Button
         title={toucher}

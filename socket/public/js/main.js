@@ -2,6 +2,8 @@ $(function () {
 //======================================================================================================
 // 変数
   let userName;
+  let hideTime;
+  let distance;
   let socket = io({autoConnect:false});
 
 //======================================================================================================
@@ -36,11 +38,11 @@ $(function () {
   });
 
   $('#parent').on('touchend mouseup', () => {
-    socket.emit('hide');
-  }).on('touchstart mousedown', () => {
     socket.emit('watch');
-  }).on('touchcancel mouseout', () => {
+  }).on('touchstart mousedown', () => {
     socket.emit('hide');
+  }).on('touchcancel mouseout', () => {
+    socket.emit('watch');
   });
 
 //======================================================================================================
@@ -76,6 +78,8 @@ $(function () {
     $('#distance').text(status.distance);
     $('#start').show();
     $('#auto').show();
+    hideTime = status.hideTime;
+    distance = status.distance;
   });
 
   socket.on('start', () => {
@@ -85,34 +89,44 @@ $(function () {
 
   socket.on('distance', (count) => {
     $('#distance').text(count);
+    distance = count;
   });
 
   socket.on('hideTime', (count) => {
     $('#hideTime').text(count);
+    hideTime = count;
   });
 
   socket.on('hide', () => {
+    displayHideTime();
     $('#parent').text('hide');
   });
 
   socket.on('watch', (watchCount) => {
+    clearInterval(hideTimeID);
     $('#watchCount').text(watchCount);
     $('#parent').text('watch');
   });
 
   socket.on('move', () => {
+    displayDistance();
     $('#child').text('move');
   });
   socket.on('stop', () => {
+    if($('#child').text() === 'move' ){clearInterval(distanceID)};
     $('#child').text('stop');
   });
   socket.on('out', () => {
+    if($('#child').text() === 'move' ){clearInterval(distanceID)};
     $('#child').text('out');
   });
   
   socket.on('result', (name) => {
-    $('#' + name).text('');
+    if($('#parent').text() === 'hide') clearInterval(hideTimeID);
+    if($('#child').text() === 'move'){clearInterval(distanceID)};
     $('#child').text('stop');
+    $('#parent').text('watch');
+    $('#' + name).text('');
     if(name === 'distance'){
       $('#' + name).append('<span>touch</span>');
     } else {
@@ -122,4 +136,16 @@ $(function () {
 
 //======================================================================================================
 // ローカル関数
+  function displayHideTime () {
+    hideTime -= 10;
+    $('#hideTime').text(hideTime);
+    hideTimeID = setTimeout(displayHideTime, 10);
+  }
+
+  function displayDistance () {
+    distance -= 10;
+    $('#distance').text(distance);
+    distanceID = setTimeout(displayDistance, 10);
+  }
+
 });
