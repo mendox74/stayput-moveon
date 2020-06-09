@@ -1,17 +1,30 @@
-import React, { PureComponent, useState } from "react";
+import React, { PureComponent, useState, useEffect } from "react";
 import { StyleSheet, View } from "react-native";
 import { Button, Text, ThemeProvider } from 'react-native-elements';
 import io from 'socket.io-client';
 
 const socket = io('http://192.168.11.7:8080', {transports: ['websocket']} );
 
-const hideTimeID;
-const distanceID;
-
 function Display() {
   const [distance, setDistance] = useState();
   const [hideTime, setHideTime] = useState();
   const [watchCount, setWatchCount] = useState();
+  const [toucher, setToucher] = useState('STOP');
+  const [watcher, setWatcher] = useState('WATCH');
+  const [moveFlg, setMoveFlg] = useState(false);
+  const [hideFlg, setHideFlg] = useState(false);
+
+  // useEffect(() => {
+  //   if(moveFlg){
+  //   setTimeout(setDistance(distance - 10), 100);
+  //   }
+  // },[distance, moveFlg]);
+
+  // useEffect(() => {
+  //   if(hideFlg){
+  //   setTimeout(setHideTime(hideTime - 10), 100);
+  //   }
+  // },[hideTime, hideFlg]);
 
   socket.on('distance', (count) => {
     setDistance(count);
@@ -20,10 +33,15 @@ function Display() {
     setHideTime(count);
   });
   socket.on('watch', (count) => {
-    clearInterval(hideTimeID);
+    setHideFlg(false);
     setWatchCount(count);
+    setWatcher('WATCH');
   });
   socket.on('result', (name) => {
+    if(toucher === 'MOVE'){setMoveFlg(false)};
+    if(watcher === 'HIDE'){setHideFlg(false)};
+    setToucher('STOP');
+    setWatcher('WATCH');
     if(name === 'distance'){
       setDistance('TOUCHER-WIN');
     } else {
@@ -32,10 +50,21 @@ function Display() {
   });
 
   socket.on('hide', () => {
-    displayHideTime();
+    setWatcher('HIDE');
+    setHideFlg(true);
   });
   socket.on('move', () => {
-    displayDistance();
+    setToucher('MOVE');
+    setMoveFlg(true);
+  });
+  socket.on('stop', (count) => {
+    if(toucher === 'MOVE'){setMoveFlg(false)};
+    setToucher('STOP');
+    setDistance(count);
+  });
+  socket.on('out', () => {
+    if(toucher === 'MOVE'){setMoveFlg(false)};
+    setToucher('OUT');
   });
 
   function displayHideTime () {
@@ -48,56 +77,36 @@ function Display() {
     distanceID = setTimeout(displayDistance, 10);
   }
 
-  socket.on('set', (status, watchCount) => {
+  socket.on('set', (hideTime, watchCount) => {
     setWatchCount(watchCount);
-    setHideTime(status.hideTime);
-    setDistance(status.distance);
+    setHideTime(hideTime);
+    setMoveFlg(false);
+    setHideFlg(false);
   });
+
+  socket.on('join', (distance) => {
+    setDistance(distance);
+    setMoveFlg(false);
+  })
+
   socket.on('delete', () => {
     setDistance();
     setHideTime();
     setWatchCount();
   });
 
+  socket.on('result player', () => {
+    if(toucher === 'move'){setMoveFlg(false)};
+    if(watcher === 'hide'){setHideFlg(false)};
+    setToucher('STOP');
+    setWatcher('WATCH');
+  });
+
   return (
     <View>
-      <Text h3>{distance}</Text>
       <Text h3>{hideTime}</Text>
       <Text h4>{watchCount}</Text>
-    </View>
-  )
-}
-
-function Player() {
-  const [toucher, setToucher] = useState('STOP');
-  const [watcher, setWatcher] = useState('WATCH');
-
-  socket.on('hide', () => {
-    setWatcher('HIDE');
-  });
-  socket.on('watch', () => {
-    setWatcher('WATCH');
-  });
-  socket.on('move', () => {
-    setToucher('MOVE');
-  });
-  socket.on('stop', () => {
-    if(toucher === 'move'){clearInterval(distanceID);};
-    setToucher('STOP');
-  });
-  socket.on('out', () => {
-    if(toucher === 'move'){clearInterval(distanceID);};
-    setToucher('OUT');
-  });
-  socket.on('result', () => {
-    if(toucher === 'move'){clearInterval(distanceID);};
-    if(watcher === 'hide'){clearInterval(hideTimeID);};
-    setToucher('STOP');
-    setWatcher('WATCH');
-  });
-
-  return(
-    <View>
+      <Text h3>{distance}</Text>
       <Button
         title={watcher}
         onPressIn={() => socket.emit('hide')}
@@ -110,6 +119,25 @@ function Player() {
       />
     </View>
   )
+}
+
+function Join() {
+  const [player, setPlayer] = useState(['test']);
+
+  socket.on('add player', (name) => {
+
+  });
+  socket.on('remove player', (name) => {
+
+  });
+  socket.on('player', (name,distance) => {
+
+  });
+  socket.on('result player', (name) => {
+
+  });
+
+  return
 }
 
 function Room() {
@@ -146,7 +174,6 @@ export default class App extends PureComponent {
   }
 
   render() {
-
     socket.on('connect', () => {
       socket.emit('setUserName');
     })
@@ -154,7 +181,6 @@ export default class App extends PureComponent {
       <View style ={styles.container}>
         <ThemeProvider theme={theme}>
           <Display />
-          <Player />
           <Button
             title="START"
             onPress={() => socket.emit('start')}
@@ -166,6 +192,10 @@ export default class App extends PureComponent {
           <Button
             title="RESET"
             onPress={() => socket.emit('reset')}
+          />
+          <Button
+            title="JOIN"
+            onPress={() => socket.emit('join')}
           />
           <Room />
           <Button
