@@ -3,7 +3,9 @@ $(function () {
 // 変数
   let userName;
   let hideTime;
+  let hideTimeID;
   let distance;
+  let distanceID;
   let socket = io({autoConnect:false});
 
 //======================================================================================================
@@ -18,6 +20,10 @@ $(function () {
 
   $('#reset').click(() => {
     socket.emit('reset');
+  });
+
+  $('#join').click(() => {
+    socket.emit('join');
   });
 
   $('#login').on('click', () => {
@@ -41,8 +47,6 @@ $(function () {
     socket.emit('watch');
   }).on('touchstart mousedown', () => {
     socket.emit('hide');
-  }).on('touchcancel mouseout', () => {
-    socket.emit('watch');
   });
 
 //======================================================================================================
@@ -61,7 +65,7 @@ $(function () {
   });
 
   socket.on('myName', (userName) => {
-    $('#myName').text(userName);
+    $('#myName').text(userName + '：');
   });
 
   socket.on('delete', () => {
@@ -70,16 +74,25 @@ $(function () {
     $('#distance').text('');
     $('#roomNumber').text('');
     $('#roomMenber').text('');
+    $('#player').empty()
+    $('#start').hide();
+    $('#auto').hide();
   });
 
-  socket.on('set', (status, watchCount) => {
+  socket.on('set', (getHideTime, watchCount) => {
     $('#watchCount').text(watchCount);
-    $('#hideTime').text(status.hideTime);
-    $('#distance').text(status.distance);
+    $('#hideTime').text(getHideTime);
     $('#start').show();
     $('#auto').show();
-    hideTime = status.hideTime;
-    distance = status.distance;
+    clearInterval(hideTimeID);
+    clearInterval(distanceID)
+    hideTime = getHideTime;
+  });
+
+  socket.on('join', (getDistance) => {
+    $('#distance').text(getDistance);
+    clearInterval(distanceID)
+    distance = getDistance;
   });
 
   socket.on('start', () => {
@@ -108,13 +121,16 @@ $(function () {
     $('#parent').text('watch');
   });
 
-  socket.on('move', () => {
+  socket.on('move', (count) => {
+    distance = count;
     displayDistance();
     $('#child').text('move');
   });
-  socket.on('stop', () => {
+  socket.on('stop', (count) => {
     if($('#child').text() === 'move' ){clearInterval(distanceID)};
+    distance = count;
     $('#child').text('stop');
+    $('#distance').text(count);
   });
   socket.on('out', () => {
     if($('#child').text() === 'move' ){clearInterval(distanceID)};
@@ -122,7 +138,7 @@ $(function () {
   });
   
   socket.on('result', (name) => {
-    if($('#parent').text() === 'hide') clearInterval(hideTimeID);
+    if($('#parent').text() === 'hide'){clearInterval(hideTimeID)};
     if($('#child').text() === 'move'){clearInterval(distanceID)};
     $('#child').text('stop');
     $('#parent').text('watch');
@@ -132,6 +148,26 @@ $(function () {
     } else {
       $('#' + name).append('<span>protect</span>');
     }
+  });
+
+  socket.on('add player', (name) => {
+    $('#player').append('<div id="' + name + '"><span>' + name + '：</span><span id="' + name + 'distance"></span></div>');
+  });
+
+  socket.on('remove player', (name) => {
+    $('#' + name + '').remove();
+  });
+
+  socket.on('player', (name, distance) => {
+    $('#' + name + 'distance').text(distance);
+  });
+
+  socket.on('result player', (name) => {
+    $('#' + name + 'distance').text('touch');
+    if($('#parent').text() === 'hide'){clearInterval(hideTimeID)};
+    if($('#child').text() === 'move'){clearInterval(distanceID)};
+    $('#child').text('stop');
+    $('#parent').text('watch');
   });
 
 //======================================================================================================

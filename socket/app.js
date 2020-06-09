@@ -16,16 +16,14 @@ const defaultWatchCount = 8;
 class roomStatus {
   constructor(
     hideTime,watchCount,random,
-    autoID,moveID,hideID,
+    autoID,hideID,
   ){
     this.hideTime = hideTime;
     this.watchCount = watchCount;
     this.random = random;
-    this.moveFlg = false;
     this.hideFlg = true;
     this.endFlg = true;
     this.autoID = autoID;
-    this.moveID = moveID;
     this.hideID = hideID;
   }
 }
@@ -34,9 +32,7 @@ io.on('connection', (socket) => {
   // 接続切断処理
   socket.on('disconnect', () => {
     if(!io.sockets.adapter.rooms[socket.roomId]){
-      let index = rooms.indexOf(socket.roomId);
-      if(index >= 0){
-        clearInterval(rooms[socket.roomId].moveID);
+      if(rooms.indexOf(socket.roomId) !== -1){
         clearInterval(rooms[socket.roomId].hideID);
         clearInterval(rooms[socket.roomId].autoID);
         rooms.splice(rooms.indexOf(socket.roomId), 1);
@@ -52,20 +48,27 @@ io.on('connection', (socket) => {
     // 部屋の有無を判定
     if(rooms.length >= 1){
       // 人数が1人の部屋を検索
-      socket.roomId = rooms.find(room => io.sockets.adapter.rooms[room]);
+      socket.roomId = rooms.find(room => io.sockets.adapter.rooms[room].length < 3);
     }
     if(!socket.roomId){
       // 新しい部屋を生成
       socket.roomId = makeKey();
       rooms.push(socket.roomId);
       rooms[socket.roomId] = new roomStatus();
-    } 
+    }
     socket.join(socket.roomId);
 
     console.log(io.sockets.sockets[socket.id].roomId, io.sockets.sockets[socket.id].userName, rooms);
+    let id = Object.keys(io.sockets.adapter.rooms[socket.roomId].sockets);
+    id.forEach(id => {
+      if(id !== socket.id){
+        io.to(socket.id).emit('add player', io.sockets.sockets[id].userName);
+      }
+    });
 
     io.to(socket.id).emit('roomNumber', socket.roomId);
     io.to(socket.roomId).emit('roomMenber', getRoomMenberName());
+    socket.broadcast.to(socket.roomId).emit('add player', socket.userName);
   });
 
   socket.on('logout', () => {
@@ -75,9 +78,9 @@ io.on('connection', (socket) => {
         rooms.splice(rooms.indexOf(socket.roomId), 1);
         delete rooms[socket.roomId];
       }
-      io.to(socket.roomId).emit('roomMenber', getRoomMenberName());
       io.to(socket.id).emit('delete');
-      io.to(socket.id).emit('start');
+      io.to(socket.roomId).emit('roomMenber', getRoomMenberName());
+      socket.broadcast.to(socket.roomId).emit('remove player', socket.userName);
       delete socket.roomId;
       console.log(rooms)
     });
@@ -91,41 +94,44 @@ io.on('connection', (socket) => {
   });
 
   socket.on('move', () => {
-    if(!rooms[socket.roomId])return;
+    if(!socket.roomId)return;
     if(rooms[socket.roomId].endFlg)return;
     if(rooms[socket.roomId].hideFlg){
-      rooms[socket.roomId].moveFlg = true;
+      socket.moveFlg = true;
+      io.to(socket.id).emit('move', socket.distance);
       moveCount();
-      io.to(socket.id).emit('move');
-      io.to(socket.id).emit('distance', socket.distance);
   } else {
       out();
     }
   });
 
   socket.on('stop', () => {
+    if(!socket.roomId)return;
     if(rooms[socket.roomId].endFlg)return;
-    rooms[socket.roomId].moveFlg = false;
-    clearInterval(rooms[socket.roomId].moveID);
-    io.to(socket.id).emit('stop');
-    io.to(socket.id).emit('distance', socket.distance);
+    socket.moveFlg = false;
+    clearInterval(socket.moveID);
+    io.to(socket.id).emit('stop', socket.distance);
+    socket.broadcast.to(socket.roomId).emit('player', socket.userName, socket.distance);
   });
 
   socket.on('hide', () => {
+    if(!socket.roomId)return;
     hide();
   });
 
   socket.on('watch', () => {
+    if(!socket.roomId)return;
     watch();
   });
 
   socket.on('start', () => {
+    if(!socket.roomId)return;
     rooms[socket.roomId].endFlg = false;
     io.to(socket.roomId).emit('start');
-    hide();
   });
 
   socket.on('auto', () => {
+    if(!socket.roomId)return;
     rooms[socket.roomId].endFlg = false;
     rooms[socket.roomId].hideFlg = false;
     io.to(socket.roomId).emit('start');
@@ -133,16 +139,22 @@ io.on('connection', (socket) => {
   });
 
   socket.on('reset', () => {
-    rooms[socket.roomId].endFlg = true;
-    rooms[socket.roomId].moveFlg = false;
+    if(!socket.roomId)return;
+    socket.moveFlg = false;
     rooms[socket.roomId].hideFlg = false;
-    clearInterval(rooms[socket.roomId].moveID);
+    rooms[socket.roomId].endFlg = true;
+    clearInterval(socket.moveID);
     clearInterval(rooms[socket.roomId].hideID);
     clearInterval(rooms[socket.roomId].autoID);
     rooms[socket.roomId].watchCount = defaultWatchCount;
     rooms[socket.roomId].hideTime = defaultHideTime;
+    io.to(socket.roomId).emit('set', rooms[socket.roomId].hideTime, rooms[socket.roomId].watchCount);
+  });
+
+  socket.on('join', () => {
     socket.distance = defaultDistance;
-    io.to(socket.roomId).emit('set', {distance: socket.distance, hideTime: rooms[socket.roomId].hideTime}, rooms[socket.roomId].watchCount);
+    io.to(socket.id).emit('join', socket.distance);
+    socket.broadcast.to(socket.roomId).emit('player', socket.userName, socket.distance);
   });
 
   function getRoomMenberName () {
@@ -154,23 +166,24 @@ io.on('connection', (socket) => {
   function distanceCountDown () {
     socket.distance -= 10;
     if(socket.distance === 0 ){
-      rooms[socket.roomId].endFlg = true;
-      rooms[socket.roomId].moveFlg = false;
+      socket.moveFlg = false;
       rooms[socket.roomId].hideFlg = true;
-      clearInterval(rooms[socket.roomId].moveID);
+      rooms[socket.roomId].endFlg = true;
+      clearInterval(socket.moveID);
       clearInterval(rooms[socket.roomId].hideID);
       clearInterval(rooms[socket.roomId].autoID);
       io.to(socket.id).emit('result', 'distance');
-    }
+      socket.broadcast.to(socket.roomId).emit('result player', socket.userName);
+  }
   }
 
   function hideTimeCountDown () {
     rooms[socket.roomId].hideTime -= 10;
     if(rooms[socket.roomId].hideTime === 0 ){
-      rooms[socket.roomId].endFlg = true;
-      rooms[socket.roomId].moveFlg = false;
+      socket.moveFlg = false;
       rooms[socket.roomId].hideFlg = true;
-      clearInterval(rooms[socket.roomId].moveID);
+      rooms[socket.roomId].endFlg = true;
+      clearInterval(socket.moveID);
       clearInterval(rooms[socket.roomId].hideID);
       clearInterval(rooms[socket.roomId].autoID);
       io.to(socket.roomId).emit('result', 'hideTime');
@@ -179,7 +192,7 @@ io.on('connection', (socket) => {
 
   function moveCount () {
     if(rooms[socket.roomId].endFlg)return;
-    rooms[socket.roomId].moveID = setTimeout(moveCount, 10);
+    socket.moveID = setTimeout(moveCount, 10);
     distanceCountDown();
   }
 
@@ -204,17 +217,18 @@ io.on('connection', (socket) => {
     rooms[socket.roomId].watchCount -= 1;
     io.to(socket.roomId).emit('watch', rooms[socket.roomId].watchCount);
     io.to(socket.roomId).emit('hideTime', rooms[socket.roomId].hideTime);
-    if(rooms[socket.roomId].moveFlg){
+    if(socket.moveFlg){
       out();
     }
   }
 
   function out () {
-    rooms[socket.roomId].moveFlg = false;
-    clearInterval(rooms[socket.roomId].moveID);
+    socket.moveFlg = false;
+    clearInterval(socket.moveID);
     socket.distance = defaultDistance;
-    io.to(socket.roomId).emit('out');     
-    io.to(socket.roomId).emit('distance', socket.distance); 
+    io.to(socket.id).emit('out');     
+    io.to(socket.id).emit('distance', socket.distance); 
+    socket.broadcast.to(socket.roomId).emit('player', socket.userName, socket.distance);
   }
 
   function auto () {
