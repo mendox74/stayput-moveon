@@ -47,7 +47,7 @@ io.on('connection', (socket) => {
     io.to(socket.id).emit('delete');
     // 部屋の有無を判定
     if(rooms.length >= 1){
-      // 人数が1人の部屋を検索
+      // 待機中の部屋を検索
       socket.roomId = rooms.find(room => io.sockets.adapter.rooms[room].length < 3);
     }
     if(!socket.roomId){

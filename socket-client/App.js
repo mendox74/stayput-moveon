@@ -14,17 +14,17 @@ function Display() {
   const [moveFlg, setMoveFlg] = useState(false);
   const [hideFlg, setHideFlg] = useState(false);
 
-  // useEffect(() => {
-  //   if(moveFlg){
-  //   setTimeout(setDistance(distance - 10), 100);
-  //   }
-  // },[distance, moveFlg]);
+  useEffect(() => {
+    if(moveFlg){
+    setTimeout(() => setDistance(distance - 10), 10);
+    }
+  },[distance, moveFlg]);
 
-  // useEffect(() => {
-  //   if(hideFlg){
-  //   setTimeout(setHideTime(hideTime - 10), 100);
-  //   }
-  // },[hideTime, hideFlg]);
+  useEffect(() => {
+    if(hideFlg){
+    setTimeout(() => setHideTime(hideTime - 10), 10);
+    }
+  },[hideTime, hideFlg]);
 
   socket.on('distance', (count) => {
     setDistance(count);
@@ -53,7 +53,8 @@ function Display() {
     setWatcher('HIDE');
     setHideFlg(true);
   });
-  socket.on('move', () => {
+  socket.on('move', (count) => {
+    setDistance(count);
     setToucher('MOVE');
     setMoveFlg(true);
   });
@@ -66,16 +67,6 @@ function Display() {
     if(toucher === 'MOVE'){setMoveFlg(false)};
     setToucher('OUT');
   });
-
-  function displayHideTime () {
-    setHideTime(hideTime - 100);
-    hideTimeID = setTimeout(displayHideTime, 10);
-  }
-
-  function displayDistance () {
-    setDistance(distance - 100);
-    distanceID = setTimeout(displayDistance, 10);
-  }
 
   socket.on('set', (hideTime, watchCount) => {
     setWatchCount(watchCount);
