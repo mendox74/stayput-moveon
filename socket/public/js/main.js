@@ -2,11 +2,15 @@ $(function () {
 //======================================================================================================
 // 変数
   let userName;
-  let hideTime;
-  let hideTimeID;
-  let distance;
-  let distanceID;
+  let roopID;
+  let roopFlg  = false;
   let socket = io({autoConnect:false});
+
+  let hide;
+  let hidef;
+  let mydist;
+  let watch;
+  let win;
 
 //======================================================================================================
 // イベント
@@ -27,19 +31,28 @@ $(function () {
   });
 
   $('#login').on('click', () => {
+    if(!roopFlg)updateRoop();
+    roopFlg = true;
     socket.connect();
     socket.emit('login');
   });
 
   $('#logout').on('click', () => {
+    roopFlg = false;
+    clearInterval(roopID);
     socket.emit('logout');
   });
 
   $('#child').on('touchend mouseup', () => {
+    $('#child').text(hidef ? 'stop':'out');
     socket.emit('stop');
   }).on('touchstart mousedown', () => {
+    $('#child').text(hidef ? 'move':'out');
     socket.emit('move');
   }).on('touchcancel mouseout', () => {
+    if($('#child').text() === 'mvoe'){
+      $('#child').text(hidef ? 'stop':'out');
+    }
     socket.emit('stop');
   });
 
@@ -51,14 +64,23 @@ $(function () {
 
 //======================================================================================================
 // 通信処理
-  socket.on('update', (hideTime,watchCount,menubarList,winner) =>{
-    console.log(hideTime,watchCount,menubarList,winner);
+  socket.on('update', (hideTime, watchCount , menbarList, winner, hideFlg) =>{
+    hide = hideTime;
+    watch = watchCount;
+    mydist = menbarList[socket.id].distance;
+    win = winner;
+    hidef = hideFlg;
   })
 
   socket.on('connect', () => {
     userName = prompt('ユーザー名を入力してください');
     socket.emit('setUserName', userName);
   });
+
+  socket.on('disconnect', () =>{
+    roopFlg = false;
+    clearInterval(roopID);
+  })
 
   socket.on('roomNumber', (key) => {
     $('#roomNumber').text(key);
@@ -84,66 +106,16 @@ $(function () {
   });
 
   socket.on('set', (getHideTime, watchCount) => {
-    $('#watchCount').text(watchCount);
-    $('#hideTime').text(getHideTime);
     $('#start').show();
     $('#auto').show();
-    clearInterval(hideTimeID);
-    clearInterval(distanceID)
-    hideTime = getHideTime;
-  });
-
-  socket.on('join', (getDistance) => {
-    $('#distance').text(getDistance);
-    clearInterval(distanceID)
-    distance = getDistance;
   });
 
   socket.on('start', () => {
     $('#start').hide();
     $('#auto').hide();
   });
-
-  socket.on('distance', (count) => {
-    $('#distance').text(count);
-    distance = count;
-  });
-
-  socket.on('hideTime', (count) => {
-    $('#hideTime').text(count);
-    hideTime = count;
-  });
-
-  socket.on('hide', () => {
-    displayHideTime();
-    $('#parent').text('hide');
-  });
-
-  socket.on('watch', (watchCount) => {
-    clearInterval(hideTimeID);
-    $('#watchCount').text(watchCount);
-    $('#parent').text('watch');
-  });
-
-  socket.on('move', (count) => {
-    distance = count;
-    displayDistance();
-    $('#child').text('move');
-  });
-  socket.on('stop', (count) => {
-    if($('#child').text() === 'move' ){clearInterval(distanceID)};
-    distance = count;
-    $('#child').text('stop');
-    $('#distance').text(count);
-  });
-  socket.on('out', () => {
-    if($('#child').text() === 'move' ){clearInterval(distanceID)};
-    $('#child').text('out');
-  });
-  
+    
   socket.on('result', (name) => {
-    if($('#parent').text() === 'hide'){clearInterval(hideTimeID)};
-    if($('#child').text() === 'move'){clearInterval(distanceID)};
     $('#child').text('stop');
     $('#parent').text('watch');
     $('#' + name).text('');
@@ -168,24 +140,23 @@ $(function () {
 
   socket.on('result player', (name) => {
     $('#' + name + 'distance').text('touch');
-    if($('#parent').text() === 'hide'){clearInterval(hideTimeID)};
-    if($('#child').text() === 'move'){clearInterval(distanceID)};
     $('#child').text('stop');
     $('#parent').text('watch');
   });
 
 //======================================================================================================
 // ローカル関数
-  function displayHideTime () {
-    hideTime -= 10;
-    $('#hideTime').text(hideTime);
-    hideTimeID = setTimeout(displayHideTime, 10);
-  }
 
-  function displayDistance () {
-    distance -= 10;
-    $('#distance').text(distance);
-    distanceID = setTimeout(displayDistance, 10);
+  function updateRoop () {
+    roopID = setInterval(() => {
+      $('#hideTime').text(hide);
+      $('#distance').text(mydist);
+      $('#watchCount').text(watch);
+      $('#parent').text(hidef? 'hide':'watch');
+      if(!hidef){
+        if($('#child').text() === 'move'){$('#child').text('out')}
+      }
+      console.log(hide, mydist, watch, win, hidef);
+    },1000/30);
   }
-
 });
