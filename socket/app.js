@@ -15,16 +15,28 @@ const defaultHideTime = 15000;
 const defaultWatchCount = 8;
 class roomStatus {
   constructor(
-    hideTime,watchCount,random,
-    autoID,hideID,
+    io, roomId,
   ){
-    this.hideTime = hideTime;
-    this.watchCount = watchCount;
-    this.random = random;
+    this.io = io;
+    this.roomId = roomId;
+    this.hideTime = undefined;
+    this.watchCount = undefined;
+    this.random = undefined;
     this.hideFlg = true;
+    this.startFlg = false;
     this.endFlg = true;
-    this.autoID = autoID;
-    this.hideID = hideID;
+    this.autoID = undefined;
+    this.hideID = undefined;
+    this.menberList = {};
+    this.winner = undefined;
+    this.roopID = setInterval(() =>{
+        io.to(this.roomId).emit('update',
+        this.hideTime,
+        this.watchCount,
+        this.menberList,
+        this.winner,
+        )
+      },1000);
   }
 }
 const rooms = []; 
@@ -35,6 +47,7 @@ io.on('connection', (socket) => {
       if(rooms.indexOf(socket.roomId) !== -1){
         clearInterval(rooms[socket.roomId].hideID);
         clearInterval(rooms[socket.roomId].autoID);
+        clearInterval(rooms[socket.roomId].roopID);
         rooms.splice(rooms.indexOf(socket.roomId), 1);
         delete rooms[socket.roomId];
       }
@@ -44,7 +57,10 @@ io.on('connection', (socket) => {
 
   socket.on('login', () => {
     if(socket.roomId)return;
+    // 旧
     io.to(socket.id).emit('delete');
+    // 新
+    socket.displayReset = true;
     // 部屋の有無を判定
     if(rooms.length >= 1){
       // 待機中の部屋を検索
@@ -54,33 +70,43 @@ io.on('connection', (socket) => {
       // 新しい部屋を生成
       socket.roomId = makeKey();
       rooms.push(socket.roomId);
-      rooms[socket.roomId] = new roomStatus();
+      rooms[socket.roomId] = new roomStatus(io, socket.roomId);
     }
     socket.join(socket.roomId);
 
     console.log(io.sockets.sockets[socket.id].roomId, io.sockets.sockets[socket.id].userName, rooms);
+
     let id = Object.keys(io.sockets.adapter.rooms[socket.roomId].sockets);
     id.forEach(id => {
       if(id !== socket.id){
         io.to(socket.id).emit('add player', io.sockets.sockets[id].userName);
       }
     });
-
+    // 旧
     io.to(socket.id).emit('roomNumber', socket.roomId);
     io.to(socket.roomId).emit('roomMenber', getRoomMenberName());
     socket.broadcast.to(socket.roomId).emit('add player', socket.userName);
+    // 新
+    rooms[socket.roomId].menberList[socket.id] = {name: io.sockets.sockets[socket.id].userName};
   });
 
   socket.on('logout', () => {
     if(!socket.roomId)return;
     socket.leave(socket.roomId, () => {
+      // 新
+      socket.displayReset = true;
+      delete rooms[socket.roomId].menberList[socket.id];
+
       if(!io.sockets.adapter.rooms[socket.roomId]){
+        clearInterval(rooms[socket.roomId].roopID);
         rooms.splice(rooms.indexOf(socket.roomId), 1);
         delete rooms[socket.roomId];
       }
+      // 旧
       io.to(socket.id).emit('delete');
       io.to(socket.roomId).emit('roomMenber', getRoomMenberName());
       socket.broadcast.to(socket.roomId).emit('remove player', socket.userName);
+
       delete socket.roomId;
       console.log(rooms)
     });
@@ -90,6 +116,7 @@ io.on('connection', (socket) => {
     if(!userName) {userName = '匿名';}
     socket.userName = userName;
     console.log (userName);
+    // 旧
     io.to(socket.id).emit('myName', socket.userName);
   });
 
@@ -98,7 +125,10 @@ io.on('connection', (socket) => {
     if(rooms[socket.roomId].endFlg)return;
     if(rooms[socket.roomId].hideFlg){
       socket.moveFlg = true;
+      // 旧
       io.to(socket.id).emit('move', socket.distance);
+      // 新
+      rooms[socket.roomId].menberList[socket.id].distance = socket.distance;
       moveCount();
   } else {
       out();
@@ -110,8 +140,11 @@ io.on('connection', (socket) => {
     if(rooms[socket.roomId].endFlg)return;
     socket.moveFlg = false;
     clearInterval(socket.moveID);
+    // 旧
     io.to(socket.id).emit('stop', socket.distance);
     socket.broadcast.to(socket.roomId).emit('player', socket.userName, socket.distance);
+    // 新
+    rooms[socket.roomId].menberList[socket.id].distance = socket.distance;
   });
 
   socket.on('hide', () => {
@@ -127,14 +160,21 @@ io.on('connection', (socket) => {
   socket.on('start', () => {
     if(!socket.roomId)return;
     rooms[socket.roomId].endFlg = false;
+    // 旧
     io.to(socket.roomId).emit('start');
+    // 新
+    rooms[socket.roomId].startFlg = true;
   });
 
   socket.on('auto', () => {
     if(!socket.roomId)return;
     rooms[socket.roomId].endFlg = false;
     rooms[socket.roomId].hideFlg = false;
+    // 旧
     io.to(socket.roomId).emit('start');
+    // 新
+    rooms[socket.roomId].startFlg = true;
+
     auto();
   });
 
@@ -148,13 +188,18 @@ io.on('connection', (socket) => {
     clearInterval(rooms[socket.roomId].autoID);
     rooms[socket.roomId].watchCount = defaultWatchCount;
     rooms[socket.roomId].hideTime = defaultHideTime;
+    // 旧
     io.to(socket.roomId).emit('set', rooms[socket.roomId].hideTime, rooms[socket.roomId].watchCount);
   });
 
   socket.on('join', () => {
     socket.distance = defaultDistance;
+    // 旧
     io.to(socket.id).emit('join', socket.distance);
     socket.broadcast.to(socket.roomId).emit('player', socket.userName, socket.distance);
+    // 新
+    rooms[socket.roomId].menberList[socket.id].distance = socket.distance;
+    console.log(rooms[socket.roomId].menberList[socket.id]);
   });
 
   function getRoomMenberName () {
@@ -172,9 +217,12 @@ io.on('connection', (socket) => {
       clearInterval(socket.moveID);
       clearInterval(rooms[socket.roomId].hideID);
       clearInterval(rooms[socket.roomId].autoID);
+      // 旧
       io.to(socket.id).emit('result', 'distance');
       socket.broadcast.to(socket.roomId).emit('result player', socket.userName);
-  }
+      // 新
+      rooms[socket.roomId].winner = socket.id;
+    }
   }
 
   function hideTimeCountDown () {
@@ -186,7 +234,10 @@ io.on('connection', (socket) => {
       clearInterval(socket.moveID);
       clearInterval(rooms[socket.roomId].hideID);
       clearInterval(rooms[socket.roomId].autoID);
+      // 旧
       io.to(socket.roomId).emit('result', 'hideTime');
+      // 新
+      rooms[socket.roomId].winner = socket.id;
     }
   }
 
@@ -205,6 +256,7 @@ io.on('connection', (socket) => {
   function hide () {
     if(rooms[socket.roomId].endFlg)return;
     rooms[socket.roomId].hideFlg = true;
+    // 旧
     io.to(socket.roomId).emit('hide');
     io.to(socket.roomId).emit('hideTime', rooms[socket.roomId].hideTime);
     hideCount();
@@ -215,6 +267,7 @@ io.on('connection', (socket) => {
     rooms[socket.roomId].hideFlg = false;
     clearInterval(rooms[socket.roomId].hideID);
     rooms[socket.roomId].watchCount -= 1;
+    // 旧
     io.to(socket.roomId).emit('watch', rooms[socket.roomId].watchCount);
     io.to(socket.roomId).emit('hideTime', rooms[socket.roomId].hideTime);
     if(socket.moveFlg){
@@ -226,9 +279,13 @@ io.on('connection', (socket) => {
     socket.moveFlg = false;
     clearInterval(socket.moveID);
     socket.distance = defaultDistance;
+    // 旧
     io.to(socket.id).emit('out');     
     io.to(socket.id).emit('distance', socket.distance); 
     socket.broadcast.to(socket.roomId).emit('player', socket.userName, socket.distance);
+    // 新
+    rooms[socket.roomId].menberList[socket.id].distance = socket.distance;
+    rooms[socket.roomId].menberList[socket.id].outFlg = true;
   }
 
   function auto () {

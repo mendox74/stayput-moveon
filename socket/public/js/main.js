@@ -51,6 +51,10 @@ $(function () {
 
 //======================================================================================================
 // 通信処理
+  socket.on('update', (hideTime,watchCount,menubarList,winner) =>{
+    console.log(hideTime,watchCount,menubarList,winner);
+  })
+
   socket.on('connect', () => {
     userName = prompt('ユーザー名を入力してください');
     socket.emit('setUserName', userName);
