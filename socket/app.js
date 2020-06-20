@@ -34,6 +34,7 @@ class roomStatus {
         this.menberList,
         this.winner,
         this.hideFlg,
+        this.roomId,
         )
       },1000/ 30);
   }
@@ -56,10 +57,6 @@ io.on('connection', (socket) => {
 
   socket.on('login', () => {
     if(socket.roomId)return;
-    // 旧
-    io.to(socket.id).emit('delete');
-    // 新
-    socket.displayReset = true;
     // 部屋の有無を判定
     if(rooms.length >= 1){
       // 待機中の部屋を検索
@@ -75,16 +72,7 @@ io.on('connection', (socket) => {
 
     console.log(io.sockets.sockets[socket.id].roomId, io.sockets.sockets[socket.id].userName, rooms);
 
-    let id = Object.keys(io.sockets.adapter.rooms[socket.roomId].sockets);
-    id.forEach(id => {
-      if(id !== socket.id){
-        io.to(socket.id).emit('add player', io.sockets.sockets[id].userName);
-      }
-    });
-    // 旧
-    io.to(socket.id).emit('roomNumber', socket.roomId);
     io.to(socket.roomId).emit('roomMenber', getRoomMenberName());
-    socket.broadcast.to(socket.roomId).emit('add player', socket.userName);
     // 新
     rooms[socket.roomId].menberList[socket.id] = {name: io.sockets.sockets[socket.id].userName};
   });
@@ -93,7 +81,6 @@ io.on('connection', (socket) => {
     if(!socket.roomId)return;
     socket.leave(socket.roomId, () => {
       // 新
-      socket.displayReset = true;
       delete rooms[socket.roomId].menberList[socket.id];
 
       if(!io.sockets.adapter.rooms[socket.roomId]){
@@ -102,8 +89,6 @@ io.on('connection', (socket) => {
         delete rooms[socket.roomId];
       }
       // 旧
-      io.to(socket.id).emit('delete');
-      io.to(socket.roomId).emit('roomMenber', getRoomMenberName());
       socket.broadcast.to(socket.roomId).emit('remove player', socket.userName);
 
       delete socket.roomId;
@@ -112,11 +97,8 @@ io.on('connection', (socket) => {
   });
 
   socket.on('setUserName',  (userName) => {
-    if(!userName) {userName = '匿名';}
     socket.userName = userName;
     console.log (userName);
-    // 旧
-    io.to(socket.id).emit('myName', socket.userName);
   });
 
   socket.on('move', () => {
@@ -135,7 +117,6 @@ io.on('connection', (socket) => {
     if(rooms[socket.roomId].endFlg)return;
     socket.moveFlg = false;
     clearInterval(socket.moveID);
-    socket.broadcast.to(socket.roomId).emit('player', socket.userName, rooms[socket.roomId].menberList[socket.id].distance);
   });
 
   socket.on('hide', () => {
@@ -184,8 +165,7 @@ io.on('connection', (socket) => {
   });
 
   socket.on('join', () => {
-    let distance = rooms[socket.roomId].menberList[socket.id].distance = defaultDistance;
-    socket.broadcast.to(socket.roomId).emit('player', socket.userName, distance);
+    rooms[socket.roomId].menberList[socket.id].distance = defaultDistance;
   });
 
   function getRoomMenberName () {
@@ -258,8 +238,7 @@ io.on('connection', (socket) => {
   function out () {
     socket.moveFlg = false;
     clearInterval(socket.moveID);
-    let distance = rooms[socket.roomId].menberList[socket.id].distance = defaultDistance;
-    socket.broadcast.to(socket.roomId).emit('player', socket.userName, distance);
+    rooms[socket.roomId].menberList[socket.id].distance = defaultDistance;
   }
 
   function auto () {
