@@ -13,6 +13,7 @@ $(function () {
   let win;
   let roomId;
   let list;
+  let endFlg;
 
 //======================================================================================================
 // イベント
@@ -71,7 +72,7 @@ $(function () {
 
 //======================================================================================================
 // 通信処理
-  socket.on('update', (hideTime, watchCount , menbarList, winner, hideFlg, id) =>{
+  socket.on('update', (hideTime, watchCount , menbarList, winner, hideFlg, id, end) =>{
     hide = hideTime;
     watch = watchCount;
     mydist = menbarList[socket.id].distance;
@@ -79,6 +80,7 @@ $(function () {
     hidef = hideFlg;
     roomId = id;
     list = menbarList;
+    endFlg = end;
   })
 
   socket.on('connect', () => {
@@ -94,20 +96,6 @@ $(function () {
     roomId = undefined;
   })
 
-  socket.on('roomMenber', (menberName) => {
-    $('#roomMenber').text(menberName);
-  });
-
-  socket.on('set', (getHideTime, watchCount) => {
-    $('#start').show();
-    $('#auto').show();
-  });
-
-  socket.on('start', () => {
-    $('#start').hide();
-    $('#auto').hide();
-  });
-    
   socket.on('result', (name) => {
     $('#child').text('stop');
     $('#parent').text('watch');
@@ -142,20 +130,42 @@ $(function () {
       if(!hidef){
         if($('#child').text() === 'move'){$('#child').text('out')}
       }
+      
+      if(endFlg){
+        if($('#start').is(':hidden')){
+          $('#start').show();
+          $('#auto').show();
+        };
+      } else {
+        if($('#start').is(':visible')){
+          $('#start').hide();
+          $('#auto').hide();
+        };
+      }
 
-    let playerList = $('#player').children();
-    if(list){
-      Object.keys(list).forEach((id) => {
-        if(id === socket.id){
-          $('#distance').text(list[id].distance);
-        } else {
-          if(!$('#' + list[id].name).length){
-            $('#player').append('<div id="' + list[id].name + '"><span>' + list[id].name + '：</span><span id="' + list[id].name + 'distance"></span></div>');
+      if(win){
+        $('#' + list[win].name + 'distance').text('touch');
+        $('#child').text('stop');
+        $('#parent').text('watch');
+      }
+
+      let playerList = $('#player').children('div');
+      if(list){
+        // 入室者取得
+        let playerName = Object.keys(list).map(id => {return list[id].name})
+        $('#roomMenber').text(playerName);
+
+        Object.keys(list).forEach((id) => {
+          if(id === socket.id){
+            $('#distance').text(list[id].distance);
+          } else {
+            if(!$('#' + list[id].name).length){
+              $('#player').append('<div id="' + list[id].name + '"><span>' + list[id].name + '：</span><span id="' + list[id].name + 'distance"></span></div>');
+            }
+            $('#' + list[id].name + 'distance').text(list[id].distance);
           }
-          $('#' + list[id].name + 'distance').text(list[id].distance);
-        }
-      });
-    }
+        });
+      }
       console.log(hide, mydist, watch, win, hidef, playerList);
     },1000/30);
   }

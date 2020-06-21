@@ -35,6 +35,7 @@ class roomStatus {
         this.winner,
         this.hideFlg,
         this.roomId,
+        this.endFlg,
         )
       },1000/ 30);
   }
@@ -71,9 +72,6 @@ io.on('connection', (socket) => {
     socket.join(socket.roomId);
 
     console.log(io.sockets.sockets[socket.id].roomId, io.sockets.sockets[socket.id].userName, rooms);
-
-    io.to(socket.roomId).emit('roomMenber', getRoomMenberName());
-    // 新
     rooms[socket.roomId].menberList[socket.id] = {name: io.sockets.sockets[socket.id].userName};
   });
 
@@ -132,21 +130,12 @@ io.on('connection', (socket) => {
   socket.on('start', () => {
     if(!socket.roomId)return;
     rooms[socket.roomId].endFlg = false;
-    // 旧
-    io.to(socket.roomId).emit('start');
-    // 新
-    rooms[socket.roomId].startFlg = true;
   });
 
   socket.on('auto', () => {
     if(!socket.roomId)return;
     rooms[socket.roomId].endFlg = false;
     rooms[socket.roomId].hideFlg = false;
-    // 旧
-    io.to(socket.roomId).emit('start');
-    // 新
-    rooms[socket.roomId].startFlg = true;
-
     auto();
   });
 
@@ -160,19 +149,12 @@ io.on('connection', (socket) => {
     clearInterval(rooms[socket.roomId].autoID);
     rooms[socket.roomId].watchCount = defaultWatchCount;
     rooms[socket.roomId].hideTime = defaultHideTime;
-    // 旧
-    io.to(socket.roomId).emit('set', rooms[socket.roomId].hideTime, rooms[socket.roomId].watchCount);
   });
 
   socket.on('join', () => {
+    if(!socket.roomId)return;
     rooms[socket.roomId].menberList[socket.id].distance = defaultDistance;
   });
-
-  function getRoomMenberName () {
-    if(!io.sockets.adapter.rooms[socket.roomId])return;
-    let id = Object.keys(io.sockets.adapter.rooms[socket.roomId].sockets);
-    return id.map(id => io.sockets.sockets[id].userName);
-  }
 
   function distanceCountDown () {
     let distance = rooms[socket.roomId].menberList[socket.id].distance -= 10;
