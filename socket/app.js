@@ -3,6 +3,7 @@ const app = express();
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
 const port = process.env.PORT || 8080;
+const Room = require('./Room');
 
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/index.html');
@@ -13,33 +14,6 @@ app.use('/static', express.static('public'));
 const defaultDistance = 4000;
 const defaultHideTime = 15000;
 const defaultWatchCount = 8;
-class roomStatus {
-  constructor(io, roomId,){
-    this.io = io;
-    this.roomId = roomId;
-    this.hideTime = 0;
-    this.watchCount = 0;
-    this.random = undefined;
-    this.hideFlg = true;
-    this.startFlg = false;
-    this.endFlg = true;
-    this.autoID = undefined;
-    this.hideID = undefined;
-    this.menberList = {};
-    this.winner = undefined;
-    this.roopID = setInterval(() =>{
-        io.to(this.roomId).emit('update',
-        this.hideTime,
-        this.watchCount,
-        this.menberList,
-        this.winner,
-        this.hideFlg,
-        this.roomId,
-        this.endFlg,
-        )
-      },1000/ 30);
-  }
-}
 const rooms = []; 
 io.on('connection', (socket) => {
   // 接続切断処理
@@ -67,18 +41,17 @@ io.on('connection', (socket) => {
       // 新しい部屋を生成
       socket.roomId = makeKey();
       rooms.push(socket.roomId);
-      rooms[socket.roomId] = new roomStatus(io, socket.roomId);
+      rooms[socket.roomId] = new Room(io, socket.roomId);
     }
     socket.join(socket.roomId);
 
-    console.log(io.sockets.sockets[socket.id].roomId, io.sockets.sockets[socket.id].userName, rooms);
-    rooms[socket.roomId].menberList[socket.id] = {name: io.sockets.sockets[socket.id].userName};
+    // console.log(io.sockets.sockets[socket.id].roomId, io.sockets.sockets[socket.id].userName, rooms);
+    rooms[socket.roomId].menberList[socket.id] = {name: socket.userName};
   });
 
   socket.on('logout', () => {
     if(!socket.roomId)return;
     socket.leave(socket.roomId, () => {
-      // 新
       delete rooms[socket.roomId].menberList[socket.id];
 
       if(!io.sockets.adapter.rooms[socket.roomId]){
@@ -86,9 +59,6 @@ io.on('connection', (socket) => {
         rooms.splice(rooms.indexOf(socket.roomId), 1);
         delete rooms[socket.roomId];
       }
-      // 旧
-      socket.broadcast.to(socket.roomId).emit('remove player', socket.userName);
-
       delete socket.roomId;
       console.log(rooms)
     });
@@ -149,6 +119,7 @@ io.on('connection', (socket) => {
     clearInterval(rooms[socket.roomId].autoID);
     rooms[socket.roomId].watchCount = defaultWatchCount;
     rooms[socket.roomId].hideTime = defaultHideTime;
+    rooms[socket.roomId].winner = undefined;
   });
 
   socket.on('join', () => {
@@ -165,10 +136,6 @@ io.on('connection', (socket) => {
       clearInterval(socket.moveID);
       clearInterval(rooms[socket.roomId].hideID);
       clearInterval(rooms[socket.roomId].autoID);
-      // 旧
-      io.to(socket.id).emit('result', 'distance');
-      socket.broadcast.to(socket.roomId).emit('result player', socket.userName);
-      // 新
       rooms[socket.roomId].winner = socket.id;
     }
   }
@@ -182,9 +149,6 @@ io.on('connection', (socket) => {
       clearInterval(socket.moveID);
       clearInterval(rooms[socket.roomId].hideID);
       clearInterval(rooms[socket.roomId].autoID);
-      // 旧
-      io.to(socket.roomId).emit('result', 'hideTime');
-      // 新
       rooms[socket.roomId].winner = socket.id;
     }
   }
@@ -236,20 +200,20 @@ io.on('connection', (socket) => {
     }
   };
 
-  function makeKey () {
-    let key = '';
-    let maxLen = 10;
-    let src = '0123456789'
-    + 'abcdefghijklmnopqrstuvwxyz'
-    + 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    
-    for (let i = 0; i < maxLen; i++) {
-      key += src[Math.floor(Math.random() * src.length)];
-    }
-    return key;
-  }
-
 });
+
+function makeKey () {
+  let key = '';
+  let maxLen = 10;
+  let src = '0123456789'
+  + 'abcdefghijklmnopqrstuvwxyz'
+  + 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  
+  for (let i = 0; i < maxLen; i++) {
+    key += src[Math.floor(Math.random() * src.length)];
+  }
+  return key;
+}
 
 http.listen(port, () => {
   console.log('listening on *:' + port);

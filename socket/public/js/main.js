@@ -43,6 +43,10 @@ $(function () {
     roopFlg = true;
   });
 
+  $('#nameChange').on('click', () => {
+    
+  });
+
   $('#logout').on('click', () => {
     socket.emit('logout');
     roopFlg = false;
@@ -96,27 +100,6 @@ $(function () {
     roomId = undefined;
   })
 
-  socket.on('result', (name) => {
-    $('#child').text('stop');
-    $('#parent').text('watch');
-    $('#' + name).text('');
-    if(name === 'distance'){
-      $('#' + name).append('<span>touch</span>');
-    } else {
-      $('#' + name).append('<span>protect</span>');
-    }
-  });
-
-  socket.on('remove player', (name) => {
-    $('#' + name + '').remove();
-  });
-
-  socket.on('result player', (name) => {
-    $('#' + name + 'distance').text('touch');
-    $('#child').text('stop');
-    $('#parent').text('watch');
-  });
-
 //======================================================================================================
 // ローカル関数
 
@@ -143,30 +126,56 @@ $(function () {
         };
       }
 
-      if(win){
-        $('#' + list[win].name + 'distance').text('touch');
-        $('#child').text('stop');
-        $('#parent').text('watch');
-      }
-
-      let playerList = $('#player').children('div');
+      // 入室者監視
+      let idList;
+      let playerList = $('#player').children('div')
+      .toArray()
+      .map((e) => {
+        return $(e).attr('id');
+      })
+      let playerName;
       if(list){
-        // 入室者取得
-        let playerName = Object.keys(list).map(id => {return list[id].name})
+        playerName = Object.keys(list).map(id => {return list[id].name})
         $('#roomMenber').text(playerName);
+        idList = Object.keys(list);
 
-        Object.keys(list).forEach((id) => {
-          if(id === socket.id){
-            $('#distance').text(list[id].distance);
-          } else {
-            if(!$('#' + list[id].name).length){
+        idList.forEach((id) => {
+            if(id !== socket.id && !$('#' + list[id].name).length){
               $('#player').append('<div id="' + list[id].name + '"><span>' + list[id].name + '：</span><span id="' + list[id].name + 'distance"></span></div>');
             }
-            $('#' + list[id].name + 'distance').text(list[id].distance);
-          }
+        });
+        playerList.forEach((e) =>{
+          if(playerName.indexOf(e) === -1){
+            $('#' + e).remove()
+          };
         });
       }
-      console.log(hide, mydist, watch, win, hidef, playerList);
+
+      // 勝利判定
+      if(win){
+        if(win === socket.id){
+          if($('#distance').text() !== 'win'){
+            $('#distance').text('win');
+          }
+        } else {
+          if($('#' + list[win].name + 'distance').text() !== 'win'){
+            $('#' + list[win].name + 'distance').text('win');
+          }
+        }
+        $('#child').text('stop');
+        $('#parent').text('watch');
+      } else {
+        if(list){
+          idList.forEach((id) => {
+            if(id === socket.id){
+              $('#distance').text(list[id].distance);
+            } else {
+              $('#' + list[id].name + 'distance').text(list[id].distance);
+            }
+          });
+        }
+      }
+      console.log(hide, mydist, watch, win, hidef, playerList, playerName);
     },1000/30);
   }
 
