@@ -30,8 +30,9 @@ io.on('connection', (socket) => {
     console.log("disconnect", socket.userName, rooms);
   });
 
-  socket.on('login', () => {
+  socket.on('login', (userName) => {
     if(socket.roomId)return;
+    socket.userName = userName;
     // 部屋の有無を判定
     if(rooms.length >= 1){
       // 待機中の部屋を検索
@@ -62,11 +63,6 @@ io.on('connection', (socket) => {
       delete socket.roomId;
       console.log(rooms)
     });
-  });
-
-  socket.on('setUserName',  (userName) => {
-    socket.userName = userName;
-    console.log (userName);
   });
 
   socket.on('move', () => {
