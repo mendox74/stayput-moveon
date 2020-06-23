@@ -22,6 +22,7 @@ class Box extends Component {
             top: y,
             width: width,
             height: height,
+            borderRadius: width / 2,
             transform: [{ rotate: angle + "rad" }],
             backgroundColor: this.props.color || "pink"
           }
@@ -52,7 +53,7 @@ class CatcherButton extends Component {
             top: y,
             width: width,
             height: height,
-            borderRadius: 40,
+            borderRadius: width / 2,
             transform: [{ rotate: angle + "rad" }],
             backgroundColor: this.props.color || "pink"
           }
