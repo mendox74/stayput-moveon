@@ -59,18 +59,12 @@ module.exports = class Game {
             socket.on('move', () => {
                 if(!socket.roomId)return;
                 if(rooms[socket.roomId].endFlg)return;
-                if(rooms[socket.roomId].hideFlg){
-                    socket.moveFlg = true;
-                    moveCount();
-                } else {
-                    out();
-                }
+                moveCount();
             });
 
             socket.on('stop', () => {
                 if(!socket.roomId)return;
                 if(rooms[socket.roomId].endFlg)return;
-                socket.moveFlg = false;
                 clearInterval(socket.moveID);
             });
 
@@ -98,7 +92,6 @@ module.exports = class Game {
 
             socket.on('reset', () => {
                 if(!socket.roomId)return;
-                socket.moveFlg = false;
                 rooms[socket.roomId].hideFlg = false;
                 rooms[socket.roomId].endFlg = true;
                 clearInterval(socket.moveID);
@@ -117,7 +110,6 @@ module.exports = class Game {
             function distanceCountDown () {
                 let distance = rooms[socket.roomId].menberList[socket.id].distance -= 10;
                 if(distance === 0 ){
-                    socket.moveFlg = false;
                     rooms[socket.roomId].hideFlg = true;
                     rooms[socket.roomId].endFlg = true;
                     clearInterval(socket.moveID);
@@ -130,7 +122,6 @@ module.exports = class Game {
             function hideTimeCountDown () {
                 rooms[socket.roomId].hideTime -= 10;
                 if(rooms[socket.roomId].hideTime === 0 ){
-                    socket.moveFlg = false;
                     rooms[socket.roomId].hideFlg = true;
                     rooms[socket.roomId].endFlg = true;
                     clearInterval(socket.moveID);
@@ -142,8 +133,12 @@ module.exports = class Game {
 
             function moveCount () {
                 if(rooms[socket.roomId].endFlg)return;
-                socket.moveID = setTimeout(moveCount, 10);
-                distanceCountDown();
+                if(rooms[socket.roomId].hideFlg){
+                    socket.moveID = setTimeout(moveCount, 10);
+                    distanceCountDown();
+                } else {
+                    out();
+                }
             }
 
             function hideCount () {
@@ -163,14 +158,9 @@ module.exports = class Game {
                 rooms[socket.roomId].hideFlg = false;
                 clearInterval(rooms[socket.roomId].hideID);
                 rooms[socket.roomId].watchCount -= 1;
-                if(socket.moveFlg){
-                    out();
-                }
             }
 
             function out () {
-                socket.moveFlg = false;
-                clearInterval(socket.moveID);
                 rooms[socket.roomId].menberList[socket.id].distance = defaultDistance;
             }
 
