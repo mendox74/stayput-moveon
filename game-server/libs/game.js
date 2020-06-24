@@ -37,7 +37,7 @@ module.exports = class Game {
                 }
                 socket.join(socket.roomId);
 
-                // console.log(io.sockets.sockets[socket.id].roomId, io.sockets.sockets[socket.id].userName, rooms);
+                console.log(io.sockets.sockets[socket.id].roomId, io.sockets.sockets[socket.id].userName, rooms);
                 rooms[socket.roomId].menberList[socket.id] = {name: socket.userName};
             });
 
@@ -59,28 +59,38 @@ module.exports = class Game {
             socket.on('move', () => {
                 if(!socket.roomId)return;
                 if(rooms[socket.roomId].endFlg)return;
+                if(rooms[socket.roomId].menberList[socket.id].watcher)return;
                 moveCount();
             });
 
             socket.on('stop', () => {
                 if(!socket.roomId)return;
                 if(rooms[socket.roomId].endFlg)return;
+                if(rooms[socket.roomId].menberList[socket.id].watcher)return;
                 clearInterval(socket.moveID);
             });
 
             socket.on('hide', () => {
                 if(!socket.roomId)return;
+                if(rooms[socket.roomId].endFlg)return;
+                if(!rooms[socket.roomId].menberList[socket.id].watcher)return;
                 hide();
             });
 
             socket.on('watch', () => {
                 if(!socket.roomId)return;
+                if(rooms[socket.roomId].endFlg)return;
+                if(!rooms[socket.roomId].menberList[socket.id].watcher)return;
                 watch();
             });
 
             socket.on('start', () => {
                 if(!socket.roomId)return;
-                rooms[socket.roomId].endFlg = false;
+                if(!rooms[socket.roomId].startFlg)return;
+                if(Object.keys(rooms[socket.roomId].menberList).every((e) => {
+                     return rooms[socket.roomId].menberList[e].join === true;})){
+                    rooms[socket.roomId].endFlg = false;
+                }
             });
 
             socket.on('auto', () => {
@@ -92,8 +102,10 @@ module.exports = class Game {
 
             socket.on('reset', () => {
                 if(!socket.roomId)return;
-                rooms[socket.roomId].hideFlg = false;
+                if(rooms[socket.roomId].startFlg)return;
+                rooms[socket.roomId].startFlg = true;
                 rooms[socket.roomId].endFlg = true;
+                rooms[socket.roomId].hideFlg = false;
                 clearInterval(socket.moveID);
                 clearInterval(rooms[socket.roomId].hideID);
                 clearInterval(rooms[socket.roomId].autoID);
@@ -104,7 +116,13 @@ module.exports = class Game {
 
             socket.on('join', () => {
                 if(!socket.roomId)return;
-                rooms[socket.roomId].menberList[socket.id].distance = defaultDistance;
+                if(rooms[socket.roomId].menberList[socket.id].join)return;
+                if(Object.keys(rooms[socket.roomId].menberList).some((e) => { return rooms[socket.roomId].menberList[e].watcher === true; })){
+                    rooms[socket.roomId].menberList[socket.id].distance = defaultDistance;
+                } else {
+                    rooms[socket.roomId].menberList[socket.id].watcher = true;
+                }
+                rooms[socket.roomId].menberList[socket.id].join = true;
             });
 
             function distanceCountDown () {
@@ -112,10 +130,14 @@ module.exports = class Game {
                 if(distance === 0 ){
                     rooms[socket.roomId].hideFlg = true;
                     rooms[socket.roomId].endFlg = true;
+                    rooms[socket.roomId].startFlg = false;
                     clearInterval(socket.moveID);
                     clearInterval(rooms[socket.roomId].hideID);
                     clearInterval(rooms[socket.roomId].autoID);
                     rooms[socket.roomId].winner = socket.id;
+                    Object.keys(rooms[socket.roomId].menberList).forEach((id) =>{
+                        rooms[socket.roomId].menberList[id].join = false;
+                    });
                 }
             }
 
@@ -124,10 +146,14 @@ module.exports = class Game {
                 if(rooms[socket.roomId].hideTime === 0 ){
                     rooms[socket.roomId].hideFlg = true;
                     rooms[socket.roomId].endFlg = true;
+                    rooms[socket.roomId].startFlg = false;
                     clearInterval(socket.moveID);
                     clearInterval(rooms[socket.roomId].hideID);
                     clearInterval(rooms[socket.roomId].autoID);
                     rooms[socket.roomId].winner = socket.id;
+                    Object.keys(rooms[socket.roomId].menberList).forEach((id) =>{
+                        rooms[socket.roomId].menberList[id].join = false;
+                    });
                 }
             }
 

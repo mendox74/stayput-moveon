@@ -93,11 +93,9 @@ class Number extends Component {
         }
       >
       <Text
-        style={
-          {
-           fontSize: 40,
-          }
-        }
+        style={{
+           fontSize: 20,
+          }}
       >{text}</Text>
       </View>
     );

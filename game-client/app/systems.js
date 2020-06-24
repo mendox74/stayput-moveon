@@ -37,7 +37,10 @@ const UpDate = (state, {screen}) => {
 		if(menberList[socket.id].name){
 			state.roomId.text = menberList[socket.id].name;
 		}
-		if(menberList[socket.id].distance){
+		if(menberList[socket.id].watcher){
+			state.number.text = hideTime;
+			delete state.box;
+		} else if(menberList[socket.id].distance){
 			state.number.text = menberList[socket.id].distance;
 			state.box.body.position.y = menberList[socket.id].distance / 8;
 		}
@@ -91,7 +94,7 @@ const CreateBox = (state, { touches, screen }) => {
 			socket.emit('login', 'TEST');
 			socket.emit('join');
 			socket.emit('reset');
-			socket.emit('auto');
+			socket.emit('start');
 		}
 	});
 
@@ -100,18 +103,23 @@ const CreateBox = (state, { touches, screen }) => {
 
 const MoveBox = (state, { touches }) => {
 	let start = touches.find(x => x.type === "start");
-
 	if (start) {
 		let startPos = [start.event.pageX, start.event.pageY];
 		let body = state.catchButton.body;
 		if(distance([body.position.x, body.position.y], startPos) < 50){
 			socket.emit('move');
+			socket.emit('hide');
 		}
 	}
 
 	let end = touches.find(x => x.type === "end");
 	if (end) {
-		socket.emit('stop');
+		let endPos = [end.event.pageX, end.event.pageY];
+		let body = state.catchButton.body;
+		if(distance([body.position.x, body.position.y], endPos) < 50){
+			socket.emit('stop');
+			socket.emit('watch');
+		}
 	}
 
 	return state;
