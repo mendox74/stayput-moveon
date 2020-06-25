@@ -1,4 +1,5 @@
 import _ from "lodash";
+import { Dimensions } from "react-native";
 import { Box } from "./renderers";
 import Matter from "matter-js";
 import io from "socket.io-client";
@@ -16,6 +17,10 @@ let hideFlg;
 let roomId = undefined;
 let endFlg;
 
+const { width, height } = Dimensions.get("window");
+const boxSize = Math.trunc(Math.max(width, height) * 0.035);
+const body = Matter.Bodies.rectangle(width / 2.5, height / 1.3, boxSize, boxSize,{ isStatic:true });
+
 socket.on('connect', () => {
 	console.log( 'connect : socket.id = %s', socket.id );
 });
@@ -31,6 +36,7 @@ socket.on('update',(ht,wc,ml,win,hf,ri,ef,) => {
 });
 
 const UpDate = (state, {screen}) => {
+	let world = state["physics"].world;
 	state.floor.size[0] = hideTime / 40;
 	state.watchCount.text = watchCount;
 	if(menberList){
@@ -44,6 +50,23 @@ const UpDate = (state, {screen}) => {
 			state.number.text = menberList[socket.id].distance;
 			state.box.body.position.y = menberList[socket.id].distance / 8;
 		}
+		Object.keys(menberList).forEach((e) =>{
+			if(e !== socket.id && !menberList[e].watcher){
+				if(!state[e]){
+					Matter.World.add(world, [body]);
+					state[e] = {
+						body: body,
+						size: [boxSize, boxSize],
+						color: "pink",
+						renderer: Box,
+					};
+				} else {
+					state[e].body.position.y = menberList[e].distance / 8;
+				}
+			}
+		});
+
+
 	}
 	return state;
 }
