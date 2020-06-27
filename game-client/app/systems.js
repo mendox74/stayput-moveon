@@ -1,6 +1,6 @@
 import _ from "lodash";
 import { Dimensions } from "react-native";
-import { Box } from "./renderers";
+import { Box, Animal } from "./renderers";
 import Matter from "matter-js";
 import io from "socket.io-client";
 
@@ -17,9 +17,10 @@ let hideFlg;
 let roomId = undefined;
 let endFlg;
 
+const defaultHideTime = 15000;
 const { width, height } = Dimensions.get("window");
-const boxSize = Math.trunc(Math.max(width, height) * 0.035);
-const body = Matter.Bodies.rectangle(width / 2.5, height / 1.3, boxSize, boxSize,{ isStatic:true });
+const animalSize = Math.trunc(Math.max(width, height) * 0.075);
+const body = Matter.Bodies.rectangle(width / 10, height / 2, animalSize, animalSize,{ isStatic:true });
 
 socket.on('connect', () => {
 	console.log( 'connect : socket.id = %s', socket.id );
@@ -37,7 +38,7 @@ socket.on('update',(ht,wc,ml,win,hf,ri,ef,) => {
 
 const UpDate = (state, {screen}) => {
 	let world = state["physics"].world;
-	state.floor.size[0] = hideTime / 40;
+	state.floor.size[1] = height * ( hideTime / defaultHideTime);
 	state.watchCount.text = watchCount;
 	if(menberList){
 		if(menberList[socket.id].name){
@@ -48,7 +49,7 @@ const UpDate = (state, {screen}) => {
 			delete state.box;
 		} else if(menberList[socket.id].distance){
 			state.number.text = menberList[socket.id].distance;
-			state.box.body.position.y = menberList[socket.id].distance / 8;
+			state.box.body.position.x = width * (((4000 - menberList[socket.id].distance) + 500) / 5000);
 		}
 		Object.keys(menberList).forEach((e) =>{
 			if(e !== socket.id && !menberList[e].watcher){
@@ -56,17 +57,14 @@ const UpDate = (state, {screen}) => {
 					Matter.World.add(world, [body]);
 					state[e] = {
 						body: body,
-						size: [boxSize, boxSize],
-						color: "pink",
-						renderer: Box,
+						size: [animalSize, animalSize],
+						renderer: Animal,
 					};
-				} else {
-					state[e].body.position.y = menberList[e].distance / 8;
+				} else if(menberList[e].distance >= 0){
+					state[e].body.position.x = width * (((4000 - menberList[e].distance) + 500) / 5000);
 				}
 			}
 		});
-
-
 	}
 	return state;
 }
