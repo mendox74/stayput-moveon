@@ -1,6 +1,6 @@
 import React, { Component, PureComponent } from "react";
 import SvgUri from "react-native-svg-uri";
-import { StyleSheet, View, ART, Dimensions, Image, Text } from "react-native";
+import { StyleSheet, View, ART, Dimensions, Text } from "react-native";
 const dogImage = require('../assets/icons/dog.svg');
 
 class Box extends Component {
@@ -45,6 +45,7 @@ class Animal extends Component {
     const x = this.props.body.position.x - width / 2;
     const y = this.props.body.position.y - height / 2;
     const angle = this.props.body.angle;
+    const text = this.props.text;
    
     return (
       <View
@@ -59,7 +60,8 @@ class Animal extends Component {
         }
       >
         <SvgUri source={dogImage} />
-        </ View>
+        <Text>{text}</Text>
+      </ View>
     );
   }
 }

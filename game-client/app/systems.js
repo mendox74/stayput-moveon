@@ -20,7 +20,7 @@ let endFlg;
 const defaultHideTime = 15000;
 const { width, height } = Dimensions.get("window");
 const animalSize = Math.trunc(Math.max(width, height) * 0.075);
-const body = Matter.Bodies.rectangle(width / 10, height / 2, animalSize, animalSize,{ isStatic:true });
+// const body = Matter.Bodies.rectangle(width * (2 / 10) , height * (9 / 10), animalSize, animalSize,{ isStatic:true });
 
 socket.on('connect', () => {
 	console.log( 'connect : socket.id = %s', socket.id );
@@ -38,7 +38,7 @@ socket.on('update',(ht,wc,ml,win,hf,ri,ef,) => {
 
 const UpDate = (state, {screen}) => {
 	let world = state["physics"].world;
-	state.floor.size[1] = height * ( hideTime / defaultHideTime);
+	state.floor.size[0] = width * ( hideTime / defaultHideTime);
 	state.watchCount.text = watchCount;
 	if(menberList){
 		if(menberList[socket.id].name){
@@ -46,22 +46,29 @@ const UpDate = (state, {screen}) => {
 		}
 		if(menberList[socket.id].watcher){
 			state.number.text = hideTime;
-			delete state.box;
 		} else if(menberList[socket.id].distance){
 			state.number.text = menberList[socket.id].distance;
-			state.box.body.position.x = width * (((4000 - menberList[socket.id].distance) + 500) / 5000);
 		}
 		Object.keys(menberList).forEach((e) =>{
-			if(e !== socket.id && !menberList[e].watcher){
+			if(!menberList[e].watcher){
 				if(!state[e]){
+					let body = Matter.Bodies.rectangle(
+						width * (2 / 10) ,
+						height * (9 / 10),
+						animalSize,
+						animalSize,
+						{ isStatic:true }
+						);
 					Matter.World.add(world, [body]);
 					state[e] = {
 						body: body,
 						size: [animalSize, animalSize],
+						text: menberList[e].name,
 						renderer: Animal,
 					};
 				} else if(menberList[e].distance >= 0){
-					state[e].body.position.x = width * (((4000 - menberList[e].distance) + 500) / 5000);
+					state[e].body.position.y = height * ((menberList[e].distance + 500) / 5000);
+					state[e].body.position.x = width * ((menberList[e].distance + 5000) / 10000);
 				}
 			}
 		});
