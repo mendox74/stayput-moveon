@@ -136,6 +136,51 @@ class Number extends Component {
   }
 }
 
+class Result extends Component {
+  constructor(props) {
+    super(props);
+  }
+
+  render() {
+    const width = this.props.size[0];
+    const height = this.props.size[1];
+    const x = this.props.body.position.x - width / 2;
+    const y = this.props.body.position.y - height / 2;
+    let role = this.props.role;
+    let name = this.props.name;
+   
+    return (
+      <View
+        style={
+          {
+            position: "absolute",
+            left: x,
+            top: y,
+            width: width,
+            height: height,
+            borderColor: "#FFF",
+            borderWidth: 2,
+            alignItems:'center',
+            justifyContent: 'center',
+            backgroundColor: '#AC0'
+          }
+        }
+      >
+      <Text
+        style={{
+           fontSize: 40,
+          }}
+      >{role}</Text>
+            <Text
+        style={{
+           fontSize: 20,
+          }}
+      >{name}</Text>
+      </View>
+    );
+  }
+}
+
 export {
-  Box, Animal, CatcherButton, Number
+  Box, Animal, CatcherButton, Number, Result
 };

@@ -44,31 +44,66 @@ const UpDate = (state, {screen}) => {
 		if(menberList[socket.id].name){
 			state.roomId.text = menberList[socket.id].name;
 		}
-		if(menberList[socket.id].watcher){
-			state.number.text = hideTime;
-		} else if(menberList[socket.id].distance){
-			state.number.text = menberList[socket.id].distance;
+		if(winner){
+			if(menberList[winner].watcher){
+				state.result.role = 'GUARD!';
+			} else {
+				state.result.role = 'TOUCH!';
+			}
+			state.result.name = menberList[winner].name;
+		} else {
+			if(state.result.role){state.result.role = undefined}
+			if(state.result.name){state.result.name = undefined}
 		}
 		Object.keys(menberList).forEach((e) =>{
-			if(!menberList[e].watcher){
-				if(!state[e]){
-					let body = Matter.Bodies.rectangle(
-						width * (2 / 10) ,
-						height * (9 / 10),
-						animalSize,
-						animalSize,
-						{ isStatic:true }
-						);
-					Matter.World.add(world, [body]);
-					state[e] = {
-						body: body,
-						size: [animalSize, animalSize],
-						text: menberList[e].name,
-						renderer: Animal,
-					};
-				} else if(menberList[e].distance >= 0){
-					state[e].body.position.y = height * ((menberList[e].distance + 500) / 5000);
-					state[e].body.position.x = width * ((menberList[e].distance + 5000) / 10000);
+			if(menberList[e].join){
+				if(e === socket.id){
+					if(menberList[e].watcher){
+						state.number.text = hideTime;
+					} else{
+						if(!state[e]){
+							let body = Matter.Bodies.rectangle(
+								width * (2 / 10) ,
+								height * (9 / 10),
+								animalSize,
+								animalSize,
+								{ isStatic:true }
+								);
+							Matter.World.add(world, [body]);
+							state[e] = {
+								body: body,
+								size: [animalSize, animalSize],
+								text: menberList[e].name,
+								renderer: Animal,
+							};
+						} else if(menberList[e].distance >= 0){
+							state.number.text = menberList[socket.id].distance;
+							state[e].body.position.y = height * ((menberList[e].distance + 500) / 5000);
+							state[e].body.position.x = width * ((menberList[e].distance + 5000) / 10000);
+						}
+					} 
+				} else {
+					if(!menberList[e].watcher){
+						if(!state[e]){
+							let body = Matter.Bodies.rectangle(
+								width * (2 / 10) ,
+								height * (9 / 10),
+								animalSize,
+								animalSize,
+								{ isStatic:true }
+								);
+							Matter.World.add(world, [body]);
+							state[e] = {
+								body: body,
+								size: [animalSize, animalSize],
+								text: menberList[e].name,
+								renderer: Animal,
+							};
+						} else if(menberList[e].distance >= 0){
+							state[e].body.position.y = height * ((menberList[e].distance + 500) / 5000);
+							state[e].body.position.x = width * ((menberList[e].distance + 5000) / 10000);
+						}
+					}
 				}
 			}
 		});

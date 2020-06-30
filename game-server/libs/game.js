@@ -137,6 +137,7 @@ module.exports = class Game {
                     rooms[socket.roomId].winner = socket.id;
                     Object.keys(rooms[socket.roomId].menberList).forEach((id) =>{
                         rooms[socket.roomId].menberList[id].join = false;
+                        rooms[socket.roomId].menberList[id].watcher = false; 
                     });
                 }
             }
@@ -153,6 +154,7 @@ module.exports = class Game {
                     rooms[socket.roomId].winner = socket.id;
                     Object.keys(rooms[socket.roomId].menberList).forEach((id) =>{
                         rooms[socket.roomId].menberList[id].join = false;
+                        rooms[socket.roomId].menberList[id].watcher = false; 
                     });
                 }
             }

@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { StatusBar, Dimensions, StyleSheet } from "react-native";
 import { GameEngine } from "react-native-game-engine";
 import { Physics, CreateBox, MoveBox, UpDate} from "./systems";
-import { Box, CatcherButton, Number } from "./renderers";
+import { Box, CatcherButton, Number, Result } from "./renderers";
 import Matter from "matter-js";
 
 Matter.Common.isElement = () => false;
@@ -28,6 +28,7 @@ export default class RigidBodies extends Component {
     const watchCountBody = Matter.Bodies.rectangle(width / 1.3, height / 4.5, buttonSize, buttonSize, { isStatic:true });
     const roomIdBody = Matter.Bodies.rectangle(width / 5, height / 1.1, buttonSize, buttonSize, { isStatic:true });
     const floor = Matter.Bodies.rectangle(width / 2, boxSize, width, boxSize, { isStatic: true });
+    const result = Matter.Bodies.rectangle(width / 2, height / 2, width, buttonSize, { isStatic: true });
     const constraint = Matter.Constraint.create({
       label: "Drag Constraint",
       pointA: { x: 0, y: 0 },
@@ -51,7 +52,8 @@ export default class RigidBodies extends Component {
           number: { body: numberBody, size: [width / 2, buttonSize], text: 10, renderer: Number },
           watchCount: { body: watchCountBody, size: [width / 3, buttonSize / 2], text: 0, renderer: Number },
           roomId: { body: roomIdBody, size: [width / 3, buttonSize / 2], text: '', renderer: Number },
-          floor: { body: floor, size: [width, boxSize], color: "#961837", renderer: Box }
+          floor: { body: floor, size: [width, boxSize], color: "#961837", renderer: Box },
+          result: { body: result, size: [width, buttonSize], renderer: Result },
         }}
       >
 
