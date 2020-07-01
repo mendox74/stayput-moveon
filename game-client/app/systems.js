@@ -1,6 +1,6 @@
 import _ from "lodash";
 import { Dimensions } from "react-native";
-import { Box, Animal } from "./renderers";
+import { Box, Animal, Result } from "./renderers";
 import Matter from "matter-js";
 import io from "socket.io-client";
 
@@ -21,7 +21,7 @@ let toucherWin = undefined;
 const defaultHideTime = 15000;
 const { width, height } = Dimensions.get("window");
 const animalSize = Math.trunc(Math.max(width, height) * 0.075);
-// const body = Matter.Bodies.rectangle(width * (2 / 10) , height * (9 / 10), animalSize, animalSize,{ isStatic:true });
+const buttonSize = Math.trunc(Math.max(width, height) * 0.2);
 
 socket.on('connect', () => {
 	console.log( 'connect : socket.id = %s', socket.id );
@@ -47,18 +47,38 @@ const UpDate = (state, {screen}) => {
 			state.roomId.text = menberList[socket.id].name;
 		}
 		if(watcherWin || toucherWin){
-			if(!state.result.role){
+			if(!state.result){
+				let role;
+				let name;
+				let animation;
 				if(watcherWin){
-					state.result.role = 'GUARD!';
-					state.result.name = menberList[watcherWin].name;
+					role = 'GUARD!';
+					name = menberList[watcherWin].name;
+					animation = 'bounceInDown';
 				} else if(toucherWin){
-					state.result.role = 'TOUCH!';
-					state.result.name = menberList[toucherWin].name;
+					role = 'TOUCH!';
+					name = menberList[toucherWin].name;
+					animation = 'bounceIn';
 				}
+				let result = Matter.Bodies.rectangle(
+					width / 2,
+					height / 2,
+					width,
+					buttonSize,
+					{ isStatic:true }
+					);
+				Matter.World.add(world, [result]);
+				state.result = {
+					body: result,
+					size: [width, buttonSize],
+					role: role,
+					name: name,
+					animation: animation,
+					renderer: Result,
+				};
 			}
 		} else {
-			if(state.result.role){state.result.role = undefined}
-			if(state.result.name){state.result.name = undefined}
+			if(state.result){delete state.result}
 		}
 		Object.keys(menberList).forEach((e) =>{
 			if(menberList[e].join){

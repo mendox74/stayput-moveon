@@ -46,13 +46,13 @@ module.exports = class Game {
                     socket.leave(socket.roomId, () => {
                     delete rooms[socket.roomId].menberList[socket.id];
 
-                if(!io.sockets.adapter.rooms[socket.roomId]){
-                    clearInterval(rooms[socket.roomId].roopID);
-                    rooms.splice(rooms.indexOf(socket.roomId), 1);
-                    delete rooms[socket.roomId];
-                }
-                delete socket.roomId;
-                console.log(rooms)
+                    if(!io.sockets.adapter.rooms[socket.roomId]){
+                        clearInterval(rooms[socket.roomId].roopID);
+                        rooms.splice(rooms.indexOf(socket.roomId), 1);
+                        delete rooms[socket.roomId];
+                    }
+                    delete socket.roomId;
+                    console.log(rooms)
                 });
             });
 
@@ -112,7 +112,7 @@ module.exports = class Game {
                 rooms[socket.roomId].watchCount = defaultWatchCount;
                 rooms[socket.roomId].hideTime = defaultHideTime;
                 rooms[socket.roomId].watcherWin = undefined;
-                rooms[socket.roomId].touncherWin = undefined;
+                rooms[socket.roomId].toucherWin = undefined;
             });
 
             socket.on('join', () => {
@@ -126,50 +126,6 @@ module.exports = class Game {
                 rooms[socket.roomId].menberList[socket.id].join = true;
             });
 
-            function distanceCountDown () {
-                let distance = rooms[socket.roomId].menberList[socket.id].distance -= 10;
-                if(distance === 0 ){
-                    result();
-                    // rooms[socket.roomId].hideFlg = true;
-                    // rooms[socket.roomId].endFlg = true;
-                    // rooms[socket.roomId].startFlg = false;
-                    // clearInterval(socket.moveID);
-                    // clearInterval(rooms[socket.roomId].hideID);
-                    // clearInterval(rooms[socket.roomId].autoID);
-                    // if(rooms[socket.roomId].menberList[socket.id].watcher){
-                    //     rooms[socket.roomId].watcherWin = socket.id;
-                    // } else {
-                    //     rooms[socket.roomId].touncherWin = socket.id;
-                    // }
-                    // Object.keys(rooms[socket.roomId].menberList).forEach((id) =>{
-                    //     rooms[socket.roomId].menberList[id].join = false;
-                    //     rooms[socket.roomId].menberList[id].watcher = false; 
-                    // });
-                }
-            }
-
-            function hideTimeCountDown () {
-                rooms[socket.roomId].hideTime -= 10;
-                if(rooms[socket.roomId].hideTime === 0 ){
-                    result();
-                    // rooms[socket.roomId].hideFlg = true;
-                    // rooms[socket.roomId].endFlg = true;
-                    // rooms[socket.roomId].startFlg = false;
-                    // clearInterval(socket.moveID);
-                    // clearInterval(rooms[socket.roomId].hideID);
-                    // clearInterval(rooms[socket.roomId].autoID);
-                    // if(rooms[socket.roomId].menberList[socket.id].watcher){
-                    //     rooms[socket.roomId].watcherWin = socket.id;
-                    // } else {
-                    //     rooms[socket.roomId].touncherWin = socket.id;
-                    // }
-                    // Object.keys(rooms[socket.roomId].menberList).forEach((id) =>{
-                    //     rooms[socket.roomId].menberList[id].join = false;
-                    //     rooms[socket.roomId].menberList[id].watcher = false; 
-                    // });
-                }
-            }
-
             function result () {
                 let room = rooms[socket.roomId];
                 room.hideFlg = true;
@@ -181,7 +137,7 @@ module.exports = class Game {
                 if(room.menberList[socket.id].watcher){
                     room.watcherWin = socket.id;
                 } else {
-                    room.touncherWin = socket.id;
+                    room.toucherWin = socket.id;
                 }
                 Object.keys(room.menberList).forEach((id) =>{
                     room.menberList[id].join = false;
@@ -194,10 +150,7 @@ module.exports = class Game {
                 if(rooms[socket.roomId].hideFlg){
                     socket.moveID = setTimeout(moveCount, 10);
                     let distance = rooms[socket.roomId].menberList[socket.id].distance -= 10;
-                    if(distance === 0 ){
-                        result();
-                    }
-                    // distanceCountDown();
+                    if(distance === 0 ){result();}
                 } else {
                     rooms[socket.roomId].menberList[socket.id].distance = defaultDistance;
                 }
@@ -207,10 +160,7 @@ module.exports = class Game {
                 if(rooms[socket.roomId].endFlg)return;
                 rooms[socket.roomId].hideID = setTimeout(hideCount, 10);
                 let distance = rooms[socket.roomId].hideTime -= 10;
-                if(distance === 0 ){
-                    result();
-                }
-                // hideTimeCountDown();
+                if(distance === 0 ){result();}
             }
 
             function hide () {

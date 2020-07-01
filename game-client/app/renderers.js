@@ -1,6 +1,7 @@
 import React, { Component, PureComponent } from "react";
 import SvgUri from "react-native-svg-uri";
 import { StyleSheet, View, ART, Dimensions, Text } from "react-native";
+import * as Animatable from 'react-native-animatable';
 const dogImage = require('../assets/icons/dog.svg');
 
 class Box extends Component {
@@ -148,9 +149,10 @@ class Result extends Component {
     const y = this.props.body.position.y - height / 2;
     let role = this.props.role;
     let name = this.props.name;
+    let animation = this.props.animation;
    
     return (
-      <View
+      < Animatable.View animation={animation}
         style={
           {
             position: "absolute",
@@ -176,7 +178,7 @@ class Result extends Component {
            fontSize: 20,
           }}
       >{name}</Text>
-      </View>
+      </ Animatable.View>
     );
   }
 }

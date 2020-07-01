@@ -28,7 +28,6 @@ export default class RigidBodies extends Component {
     const watchCountBody = Matter.Bodies.rectangle(width / 1.3, height / 4.5, buttonSize, buttonSize, { isStatic:true });
     const roomIdBody = Matter.Bodies.rectangle(width / 5, height / 1.1, buttonSize, buttonSize, { isStatic:true });
     const floor = Matter.Bodies.rectangle(width / 2, boxSize, width, boxSize, { isStatic: true });
-    const result = Matter.Bodies.rectangle(width / 2, height / 2, width, buttonSize, { isStatic: true });
     const constraint = Matter.Constraint.create({
       label: "Drag Constraint",
       pointA: { x: 0, y: 0 },
@@ -53,7 +52,6 @@ export default class RigidBodies extends Component {
           watchCount: { body: watchCountBody, size: [width / 3, buttonSize / 2], text: 0, renderer: Number },
           roomId: { body: roomIdBody, size: [width / 3, buttonSize / 2], text: '', renderer: Number },
           floor: { body: floor, size: [width, boxSize], color: "#961837", renderer: Box },
-          result: { body: result, size: [width, buttonSize], renderer: Result },
         }}
       >
 
