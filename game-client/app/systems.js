@@ -12,10 +12,11 @@ let box = null;
 let hideTime = 15000;
 let watchCount = 5;
 let menberList;
-let winner;
 let hideFlg;
 let roomId = undefined;
 let endFlg;
+let watcherWin = undefined;
+let toucherWin = undefined;
 
 const defaultHideTime = 15000;
 const { width, height } = Dimensions.get("window");
@@ -26,14 +27,15 @@ socket.on('connect', () => {
 	console.log( 'connect : socket.id = %s', socket.id );
 });
 
-socket.on('update',(ht,wc,ml,win,hf,ri,ef,) => {
+socket.on('update',(ht,wc,ml,hf,ri,ef,ww,tw) => {
 	hideTime = ht;
 	watchCount = wc;
 	menberList = ml;
-	winner = win;
 	hideFlg = hf;
 	roomId = ri;
 	endFlg = ef;
+	watcherWin = ww;
+	toucherWin = tw;
 });
 
 const UpDate = (state, {screen}) => {
@@ -44,13 +46,16 @@ const UpDate = (state, {screen}) => {
 		if(menberList[socket.id].name){
 			state.roomId.text = menberList[socket.id].name;
 		}
-		if(winner){
-			if(menberList[winner].watcher){
-				state.result.role = 'GUARD!';
-			} else {
-				state.result.role = 'TOUCH!';
+		if(watcherWin || toucherWin){
+			if(!state.result.role){
+				if(watcherWin){
+					state.result.role = 'GUARD!';
+					state.result.name = menberList[watcherWin].name;
+				} else if(toucherWin){
+					state.result.role = 'TOUCH!';
+					state.result.name = menberList[toucherWin].name;
+				}
 			}
-			state.result.name = menberList[winner].name;
 		} else {
 			if(state.result.role){state.result.role = undefined}
 			if(state.result.name){state.result.name = undefined}

@@ -12,15 +12,18 @@ module.exports = class Room {
         this.hideID = undefined;
         this.menberList = {};
         this.winner = undefined;
+        this.watcherWin = undefined;
+        this.toucherWin = undefined;
         this.roopID = setInterval(() =>{
             io.to(this.roomId).emit('update',
             this.hideTime,
             this.watchCount,
             this.menberList,
-            this.winner,
             this.hideFlg,
             this.roomId,
             this.endFlg,
+            this.watcherWin,
+            this.toucherWin,
             );
         },1000/ 30);
     }    
