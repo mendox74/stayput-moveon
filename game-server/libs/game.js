@@ -58,37 +58,36 @@ module.exports = class Game {
 
             socket.on('move', () => {
                 if(!socket.roomId)return;
-                if(rooms[socket.roomId].endFlg)return;
-                if(rooms[socket.roomId].menberList[socket.id].watcher)return;
+                if(rooms[socket.roomId].endFlg || rooms[socket.roomId].menberList[socket.id].watcher)return;
+                // if(rooms[socket.roomId].menberList[socket.id].watcher)return;
                 moveCount();
             });
 
             socket.on('stop', () => {
                 if(!socket.roomId)return;
-                if(rooms[socket.roomId].endFlg)return;
-                if(rooms[socket.roomId].menberList[socket.id].watcher)return;
+                if(rooms[socket.roomId].endFlg || rooms[socket.roomId].menberList[socket.id].watcher)return;
+                // if(rooms[socket.roomId].menberList[socket.id].watcher)return;
                 clearInterval(socket.moveID);
             });
 
             socket.on('hide', () => {
                 if(!socket.roomId)return;
-                if(rooms[socket.roomId].endFlg)return;
-                if(!rooms[socket.roomId].menberList[socket.id].watcher)return;
+                // if(rooms[socket.roomId].endFlg)return;
+                // if(!rooms[socket.roomId].menberList[socket.id].watcher)return;
                 hide();
             });
 
             socket.on('watch', () => {
                 if(!socket.roomId)return;
-                if(rooms[socket.roomId].endFlg)return;
-                if(!rooms[socket.roomId].menberList[socket.id].watcher)return;
+                // if(rooms[socket.roomId].endFlg)return;
+                // if(!rooms[socket.roomId].menberList[socket.id].watcher)return;
                 watch();
             });
 
             socket.on('start', () => {
                 if(!socket.roomId)return;
                 if(!rooms[socket.roomId].startFlg)return;
-                if(Object.keys(rooms[socket.roomId].menberList).every((e) => {
-                     return rooms[socket.roomId].menberList[e].join === true;})){
+                if(Object.keys(rooms[socket.roomId].menberList).every((e) => {return rooms[socket.roomId].menberList[e].join === true;})){
                     rooms[socket.roomId].endFlg = false;
                 }
             });
@@ -118,7 +117,7 @@ module.exports = class Game {
             socket.on('join', () => {
                 if(!socket.roomId)return;
                 if(rooms[socket.roomId].menberList[socket.id].join)return;
-                if(Object.keys(rooms[socket.roomId].menberList).some((e) => { return rooms[socket.roomId].menberList[e].watcher === true; })){
+                if(Object.keys(rooms[socket.roomId].menberList).some((e) => {return rooms[socket.roomId].menberList[e].watcher === true; })){
                     rooms[socket.roomId].menberList[socket.id].distance = defaultDistance;
                 } else {
                     rooms[socket.roomId].menberList[socket.id].watcher = true;
@@ -129,6 +128,7 @@ module.exports = class Game {
             function result () {
                 let room = rooms[socket.roomId];
                 room.hideFlg = true;
+                room.hideFixed = false;
                 room.endFlg = true;
                 room.startFlg = false;
                 clearInterval(socket.moveID);
@@ -146,7 +146,7 @@ module.exports = class Game {
             }
 
             function moveCount () {
-                if(rooms[socket.roomId].endFlg)return;
+                // if(rooms[socket.roomId].endFlg || rooms[socket.roomId].menberList[socket.id].watcher)return;
                 if(rooms[socket.roomId].hideFlg){
                     socket.moveID = setTimeout(moveCount, 10);
                     let distance = rooms[socket.roomId].menberList[socket.id].distance -= 10;
@@ -164,13 +164,14 @@ module.exports = class Game {
             }
 
             function hide () {
-                if(rooms[socket.roomId].endFlg)return;
+                if(rooms[socket.roomId].endFlg || rooms[socket.roomId].hideFixed || !rooms[socket.roomId].menberList[socket.id].watcher)return;
+                if(rooms[socket.roomId].watchCount === 0){rooms[socket.roomId].hideFixed = true}
                 rooms[socket.roomId].hideFlg = true;
                 hideCount();
             }
 
             function watch () {
-                if(rooms[socket.roomId].endFlg || rooms[socket.roomId].watchCount === 0)return;
+                if(rooms[socket.roomId].endFlg || rooms[socket.roomId].watchCount === 0 || !rooms[socket.roomId].menberList[socket.id].watcher)return;
                 rooms[socket.roomId].hideFlg = false;
                 rooms[socket.roomId].watchCount -= 1;
                 clearInterval(rooms[socket.roomId].hideID);

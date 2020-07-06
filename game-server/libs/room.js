@@ -6,6 +6,7 @@ module.exports = class Room {
         this.watchCount = 0;
         this.random = undefined;
         this.hideFlg = true;
+        this.hideFixed = false;
         this.startFlg = false;
         this.endFlg = true;
         this.autoID = undefined;

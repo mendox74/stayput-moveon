@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { StatusBar, Dimensions, StyleSheet } from "react-native";
 import { GameEngine } from "react-native-game-engine";
 import { Physics, CreateBox, MoveBox, UpDate} from "./systems";
-import { Box, CatcherButton, Number, Result } from "./renderers";
+import { Box, CatcherButton, Number } from "./renderers";
 import Matter from "matter-js";
 
 Matter.Common.isElement = () => false;
