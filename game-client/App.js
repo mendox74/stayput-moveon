@@ -1,6 +1,7 @@
 import React, { PureComponent } from "react";
 import { AppRegistry, Dimensions } from "react-native";
 import RigidBodies from "./app/index";
+import Title from "./title/index"
 
 // const { width: WIDTH, height: HEIGHT } = Dimensions.get("window");
 // const RADIUS = 25;
@@ -26,7 +27,8 @@ export default class Game extends PureComponent {
  
   render() {
     return (
-      <RigidBodies />
+      <Title />
+      // <RigidBodies />
     );
   }
 }

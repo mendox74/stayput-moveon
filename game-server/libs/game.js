@@ -59,28 +59,22 @@ module.exports = class Game {
             socket.on('move', () => {
                 if(!socket.roomId)return;
                 if(rooms[socket.roomId].endFlg || rooms[socket.roomId].menberList[socket.id].watcher)return;
-                // if(rooms[socket.roomId].menberList[socket.id].watcher)return;
                 moveCount();
             });
 
             socket.on('stop', () => {
                 if(!socket.roomId)return;
                 if(rooms[socket.roomId].endFlg || rooms[socket.roomId].menberList[socket.id].watcher)return;
-                // if(rooms[socket.roomId].menberList[socket.id].watcher)return;
                 clearInterval(socket.moveID);
             });
 
             socket.on('hide', () => {
                 if(!socket.roomId)return;
-                // if(rooms[socket.roomId].endFlg)return;
-                // if(!rooms[socket.roomId].menberList[socket.id].watcher)return;
                 hide();
             });
 
             socket.on('watch', () => {
                 if(!socket.roomId)return;
-                // if(rooms[socket.roomId].endFlg)return;
-                // if(!rooms[socket.roomId].menberList[socket.id].watcher)return;
                 watch();
             });
 
@@ -146,7 +140,6 @@ module.exports = class Game {
             }
 
             function moveCount () {
-                // if(rooms[socket.roomId].endFlg || rooms[socket.roomId].menberList[socket.id].watcher)return;
                 if(rooms[socket.roomId].hideFlg){
                     socket.moveID = setTimeout(moveCount, 10);
                     let distance = rooms[socket.roomId].menberList[socket.id].distance -= 10;
