@@ -1,6 +1,6 @@
 import React, { Component, PureComponent } from "react";
 import SvgUri from "react-native-svg-uri";
-import { StyleSheet, View, ART, Dimensions, Text } from "react-native";
+import { StyleSheet, View, ART, Dimensions, Text, Button } from "react-native";
 import * as Animatable from 'react-native-animatable';
 const dogImage = require('../assets/icons/dog.svg');
 
@@ -31,6 +31,43 @@ class Box extends Component {
           }
         }
       />
+    );
+  }
+}
+
+class Logout extends Component {
+  constructor(props) {
+    super(props);
+  }
+
+  render() {
+    const width = this.props.size[0];
+    const height = this.props.size[1];
+    const x = this.props.body.position.x - width / 2;
+    const y = this.props.body.position.y - height / 2;
+    const angle = this.props.body.angle;
+    const close = this.props.close;
+   
+    return (
+      <View
+        style={
+          {
+            position: "absolute",
+            left: x,
+            top: y,
+            width: width,
+            height: height,
+            borderRadius: width / 2,
+            transform: [{ rotate: angle + "rad" }],
+            backgroundColor: this.props.color || "pink"
+          }
+        }
+      >
+      <Button 
+      title={""}
+      onPress={close}
+      />
+      </View>
     );
   }
 }
@@ -184,5 +221,5 @@ class Result extends Component {
 }
 
 export {
-  Box, Animal, CatcherButton, Number, Result
+  Box, Animal, CatcherButton, Number, Result, Logout
 };

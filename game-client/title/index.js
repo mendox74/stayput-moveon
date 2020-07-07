@@ -1,30 +1,30 @@
 import React, { Component } from "react";
-import { StyleSheet, View, Text, TextInput, Button } from "react-native";
-import Modal from "react-native-modal";
+import { StyleSheet, View, Text, TextInput, Button, Modal } from "react-native";
+import ModalAnimate from "react-native-modal";
 import RigidBodies from "../app/index";
 
 export default class Title extends Component {
     constructor() {
       super();
       this.state = {
-       inputValue: "You can change me!",
+       inputValue: "No Name",
        isMoadlVisible: false,
        sceneVisible: false,
        scene: null,
       };
     }
 
-    mountScene = scene => {
+    mountScene = () => {
       this.setState({
         sceneVisible: true,
-        // scene: scene
+        scene: <RigidBodies unMountScene={this.unMountScene}/>
       });
     };
   
     unMountScene = () => {
       this.setState({
         sceneVisible: false,
-        // scene: null
+        scene: null
       });
     };
 
@@ -52,8 +52,8 @@ export default class Title extends Component {
                   title="GO"
                   onPress={this.mountScene}
                 />
-                <Modal 
-                animationIn="bounceInLeft"
+                <ModalAnimate 
+                animationIn="bounceIn"
                 animationOut="bounceOut"
                 isVisible={this.state.isModalVisible}
                 >
@@ -69,11 +69,11 @@ export default class Title extends Component {
                       onPress={this.toggleModal}
                     />
                   </View>
-                </Modal>
+                </ModalAnimate>
                 <Modal
-                  animationIn="none"
+                  animationType={"none"}
                   transparent={false}
-                  isVisible={this.state.sceneVisible}
+                  visible={this.state.sceneVisible}
                   onRequestClose={_ => {}}
                 >
                   {this.state.scene}
