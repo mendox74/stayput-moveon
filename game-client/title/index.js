@@ -17,7 +17,7 @@ export default class Title extends Component {
     mountScene = () => {
       this.setState({
         sceneVisible: true,
-        scene: <RigidBodies unMountScene={this.unMountScene}/>
+        scene: <RigidBodies unMountScene={this.unMountScene} name={this.state.inputValue}/>
       });
     };
   

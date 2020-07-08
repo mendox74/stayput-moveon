@@ -1,4 +1,4 @@
-import React, { Component, PureComponent } from "react";
+import React, { Component } from "react";
 import SvgUri from "react-native-svg-uri";
 import { StyleSheet, View, ART, Dimensions, Text, Button } from "react-native";
 import * as Animatable from 'react-native-animatable';
@@ -14,7 +14,6 @@ class Box extends Component {
     const height = this.props.size[1];
     const x = this.props.body.position.x - width / 2;
     const y = this.props.body.position.y - height / 2;
-    const angle = this.props.body.angle;
    
     return (
       <View
@@ -26,7 +25,6 @@ class Box extends Component {
             width: width,
             height: height,
             borderRadius: width / 2,
-            transform: [{ rotate: angle + "rad" }],
             backgroundColor: this.props.color || "pink"
           }
         }
@@ -45,7 +43,6 @@ class Logout extends Component {
     const height = this.props.size[1];
     const x = this.props.body.position.x - width / 2;
     const y = this.props.body.position.y - height / 2;
-    const angle = this.props.body.angle;
     const close = this.props.close;
    
     return (
@@ -58,19 +55,10 @@ class Logout extends Component {
             width: width,
             height: height,
             borderRadius: width / 2,
-            transform: [{ rotate: angle + "rad" }],
             backgroundColor: this.props.color || "pink"
           }
         }
       >
-      <Button 
-      style={{
-        width: width,
-        height: height,
-      }}
-      title={""}
-      onPress={close}
-      />
       </View>
     );
   }
@@ -86,7 +74,6 @@ class Animal extends Component {
     const height = this.props.size[1];
     const x = this.props.body.position.x - width / 2;
     const y = this.props.body.position.y - height / 2;
-    const angle = this.props.body.angle;
     const text = this.props.text;
    
     return (
@@ -118,7 +105,6 @@ class MoveButton extends Component {
     const height = this.props.size[1];
     const x = this.props.body.position.x - width / 2;
     const y = this.props.body.position.y - height / 2;
-    // const angle = this.props.body.angle;
    
     return (
       <View
@@ -129,7 +115,6 @@ class MoveButton extends Component {
             width: width,
             height: height,
             borderRadius: width / 2,
-            // transform: [{ rotate: angle + "rad" }],
             backgroundColor: this.props.color || "pink"
           }}
       />

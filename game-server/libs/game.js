@@ -1,4 +1,5 @@
 const Room = require('./room');
+const Player = require('./player');
 
 module.exports = class Game {
     start(io){
@@ -39,7 +40,7 @@ module.exports = class Game {
                 socket.join(socket.roomId);
 
                 console.log(io.sockets.sockets[socket.id].roomId, io.sockets.sockets[socket.id].userName, rooms);
-                rooms[socket.roomId].menberList[socket.id] = {name: socket.userName};
+                rooms[socket.roomId].menberList[socket.id] = new Player(socket.userName);
             });
 
             socket.on('logout', () => {
