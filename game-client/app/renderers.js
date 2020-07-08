@@ -64,6 +64,10 @@ class Logout extends Component {
         }
       >
       <Button 
+      style={{
+        width: width,
+        height: height,
+      }}
       title={""}
       onPress={close}
       />
@@ -104,7 +108,7 @@ class Animal extends Component {
   }
 }
 
-class CatcherButton extends Component {
+class MoveButton extends Component {
   constructor(props) {
     super(props);
   }
@@ -114,22 +118,20 @@ class CatcherButton extends Component {
     const height = this.props.size[1];
     const x = this.props.body.position.x - width / 2;
     const y = this.props.body.position.y - height / 2;
-    const angle = this.props.body.angle;
+    // const angle = this.props.body.angle;
    
     return (
       <View
-        style={
-          {
+        style={{
             position: "absolute",
             left: x,
             top: y,
             width: width,
             height: height,
             borderRadius: width / 2,
-            transform: [{ rotate: angle + "rad" }],
+            // transform: [{ rotate: angle + "rad" }],
             backgroundColor: this.props.color || "pink"
-          }
-        }
+          }}
       />
     );
   }
@@ -221,5 +223,5 @@ class Result extends Component {
 }
 
 export {
-  Box, Animal, CatcherButton, Number, Result, Logout
+  Box, Animal, MoveButton, Number, Result, Logout
 };

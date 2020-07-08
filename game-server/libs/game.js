@@ -7,6 +7,7 @@ module.exports = class Game {
         const defaultWatchCount = 8;
         const rooms = []; 
         io.on('connection', (socket) => {
+            console.log(socket.id);
             // 接続切断処理
             socket.on('disconnect', () => {
                 if(!io.sockets.adapter.rooms[socket.roomId]){
@@ -76,6 +77,14 @@ module.exports = class Game {
             socket.on('watch', () => {
                 if(!socket.roomId)return;
                 watch();
+            });
+
+            socket.on('behavior', () => {
+                if(!socket.roomId)return;
+            });
+
+            socket.on('repose', () => {
+                if(!socket.roomId)return;
             });
 
             socket.on('start', () => {

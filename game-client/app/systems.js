@@ -6,8 +6,8 @@ import io from "socket.io-client";
 
 const socket = io('http://192.168.11.7:8080', {transports: ['websocket']} );
 
-let boxIds = 0;
-let box = null;
+// let boxIds = 0;
+// let box = null;
 
 let hideTime = 15000;
 let watchCount = 5;
@@ -136,30 +136,30 @@ const UpDate = (state, {screen}) => {
 	return state;
 }
 
-const SendBox = (state, {screen}) => {
-	let world = state["physics"].world;
-	let boxSize = Math.trunc(Math.max(screen.width, screen.height) * 0.075);
+// const SendBox = (state, {screen}) => {
+// 	let world = state["physics"].world;
+// 	let boxSize = Math.trunc(Math.max(screen.width, screen.height) * 0.075);
 
-	if(box){
-		let body = Matter.Bodies.rectangle(
-			...box,
-			boxSize,
-			boxSize,
-			{ frictionAir: 0.021 }
-		);
-		Matter.World.add(world, [body]);
+// 	if(box){
+// 		let body = Matter.Bodies.rectangle(
+// 			...box,
+// 			boxSize,
+// 			boxSize,
+// 			{ frictionAir: 0.021 }
+// 		);
+// 		Matter.World.add(world, [body]);
 
-		state[++boxIds] = {
-			body: body,
-			size: [boxSize, boxSize],
-			color: boxIds % 2 == 0 ? "pink" : "#B8E986",
-			renderer: Box
-		};
-	}
+// 		state[++boxIds] = {
+// 			body: body,
+// 			size: [boxSize, boxSize],
+// 			color: boxIds % 2 == 0 ? "pink" : "#B8E986",
+// 			renderer: Box
+// 		};
+// 	}
 
-	box = null;
-	return state;
-}
+// 	box = null;
+// 	return state;
+// }
 
 
 const distance = ([x1, y1], [x2, y2]) =>
@@ -213,17 +213,17 @@ const MoveBox = (state, { touches }) => {
 	return state;
 };
 
-const CleanBoxes = (state, { touches, screen }) => {
-	let world = state["physics"].world;
+// const CleanBoxes = (state, { touches, screen }) => {
+// 	let world = state["physics"].world;
 
-	Object.keys(state)
-		.filter(key => state[key].body && state[key].body.position.y > screen.height * 2)
-		.forEach(key => {
-			Matter.Composite.remove(world, state[key].body);
-			delete state[key];
-		});
+// 	Object.keys(state)
+// 		.filter(key => state[key].body && state[key].body.position.y > screen.height * 2)
+// 		.forEach(key => {
+// 			Matter.Composite.remove(world, state[key].body);
+// 			delete state[key];
+// 		});
 
-	return state;
-};
+// 	return state;
+// };
 
 export { Physics, CreateBox, MoveBox, CleanBoxes, SendBox, UpDate };
