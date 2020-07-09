@@ -29,7 +29,7 @@ module.exports = class Game {
                 // 部屋の有無を判定
                 if(rooms.length >= 1){
                     // 待機中の部屋を検索
-                    socket.roomId = rooms.find(room => io.sockets.adapter.rooms[room].length < 3);
+                    socket.roomId = rooms.find(room => io.sockets.adapter.rooms[room].length <= 100);
                 }
                 if(!socket.roomId){
                     // 新しい部屋を生成
@@ -82,10 +82,22 @@ module.exports = class Game {
 
             socket.on('behavior', () => {
                 if(!socket.roomId)return;
+                if(rooms[socket.roomId].endFlg)return;
+                if(rooms[socket.roomId].menberList[socket.id].watcher){
+                    hide();
+                } else {
+                    moveCount();
+                }
             });
 
             socket.on('repose', () => {
                 if(!socket.roomId)return;
+                if(rooms[socket.roomId].endFlg)return;
+                if(rooms[socket.roomId].menberList[socket.id].watcher){
+                    watch();
+                } else {
+                    clearInterval(socket.moveID);
+                }
             });
 
             socket.on('start', () => {
@@ -120,14 +132,40 @@ module.exports = class Game {
 
             socket.on('join', () => {
                 if(!socket.roomId)return;
-                if(rooms[socket.roomId].menberList[socket.id].join)return;
-                if(Object.keys(rooms[socket.roomId].menberList).some((e) => {return rooms[socket.roomId].menberList[e].watcher === true; })){
-                    rooms[socket.roomId].menberList[socket.id].distance = defaultDistance;
+                if(rooms[socket.roomId].menberList[socket.id].join){
+                    rooms[socket.roomId].menberList[socket.id].join = false;
+                    rooms[socket.roomId].menberList[socket.id].watcher = false;
                 } else {
-                    rooms[socket.roomId].menberList[socket.id].watcher = true;
+                    if(Object.keys(rooms[socket.roomId].menberList).some((e) => {return rooms[socket.roomId].menberList[e].watcher === true; })){
+                        rooms[socket.roomId].menberList[socket.id].distance = defaultDistance;
+                    } else {
+                        rooms[socket.roomId].menberList[socket.id].watcher = true;
+                    }
+                    rooms[socket.roomId].menberList[socket.id].join = true;
                 }
-                rooms[socket.roomId].menberList[socket.id].join = true;
+                // 2人以上joinでstanbyCountをスタート
+                if(Object.keys(rooms[socket.roomId].menberList).filter((e) => {return rooms[socket.roomId].menberList[e].join === true}).length >= 2){
+                    if(!rooms[socket.roomId].stanbyFlg){
+                        rooms[socket.roomId].stanbyCount = 6;
+                        rooms[socket.roomId].stanbyFlg = true;
+                        stanbyCount();
+                    }
+                } else {
+                    if(rooms[socket.roomId].stanbyFlg){
+                        clearInterval(rooms[socket.roomId].stanbyID);
+                        rooms[socket.roomId].stanbyFlg = false;
+                    }
+                }
             });
+            
+            function stanbyCount () {
+                rooms[socket.roomId].stanbyCount -= 1;
+                if(rooms[socket.roomId].stanbyCount > 0){
+                    rooms[socket.roomId].stanbyID = setTimeout(stanbyCount, 1000);
+                } else {
+                    rooms[socket.roomId].endFlg = false;
+                }
+            }
 
             function result () {
                 let room = rooms[socket.roomId];

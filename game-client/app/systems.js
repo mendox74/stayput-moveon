@@ -34,10 +34,15 @@ socket.on('update',(ht,wc,ml,hf,ri,ef,ww,tw) => {
 	toucherWin = tw;
 });
 
+const Login = (name) => {
+	socket.emit('login', name);
+}
+
 const UpDate = (state) => {
-	state.floor.size[0] = width * ( hideTime / defaultHideTime);
-	state.watchCount.text = watchCount;
 	if(menberList){
+		state.floor.size[0] = width * ( hideTime / defaultHideTime);
+		state.watchCount.text = watchCount;
+		// 結果表示
 		if(watcherWin || toucherWin){
 			if(!state.result){
 				let role;
@@ -64,30 +69,43 @@ const UpDate = (state) => {
 		} else {
 			if(state.result){delete state.result}
 		}
+		// menberListにないstateを削除
+		let currentId = Object.keys(menberList);
+		Object.keys(state).forEach((e) => {
+			if(state[e].id){
+				if(currentId.indexOf(e) === -1){
+					delete state[e];
+				}
+			}
+		})
 		Object.keys(menberList).forEach((e) =>{
 			if(menberList[e].join){
-					if(menberList[e].watcher){
-						if(!state[e]){
-							state[e] = {
-								body: {position: { x: width / 2, y: height * (1 / 10) }},
-								size: [animalSize, animalSize],
-								text: menberList[e].name,
-								renderer: Animal,
-							};
-						}
-					} else {
-						if(!state[e]){
-							state[e] = {
-								body: {position: { x: width * (2 / 10), y: height * (9 / 10) }},
-								size: [animalSize, animalSize],
-								text: menberList[e].name,
-								renderer: Animal,
-							};
-						} else if(menberList[e].distance >= 0){
-							state[e].body.position.y = height * ((menberList[e].distance + 500) / 5000);
-							state[e].body.position.x = width * ((menberList[e].distance + 5000) / 10000);
-						}
+				if(menberList[e].watcher){
+					if(!state[e]){
+						state[e] = {
+							id: e,
+							body: {position: { x: width / 2, y: height * (1 / 10) }},
+							size: [animalSize, animalSize],
+							text: menberList[e].name,
+							renderer: Animal,
+						};
 					}
+				} else {
+					if(!state[e]){
+						state[e] = {
+							id: e,
+							body: {position: { x: width * (2 / 10), y: height * (9 / 10) }},
+							size: [animalSize, animalSize],
+							text: menberList[e].name,
+							renderer: Animal,
+						};
+					} else if(menberList[e].distance >= 0){
+						state[e].body.position.y = height * ((menberList[e].distance + 500) / 5000);
+						state[e].body.position.x = width * ((menberList[e].distance + 5000) / 10000);
+					}
+				}
+			} else {
+				if(state[e]){delete state[e]}
 			}
 		});
 	}
@@ -103,14 +121,14 @@ const PressButton = (state, { touches }) => {
 		let join = state.join.body;
 		let logout = state.logout.body;
 		if(distance([join.position.x, join.position.y], Pos) < 25){
-			socket.emit('login', state.roomId.text);
+			// socket.emit('login', state.roomId.text);
 			socket.emit('join');
 			socket.emit('reset');
-			socket.emit('start');
+			// socket.emit('start');
 		}
 		if(distance([logout.position.x, logout.position.y], Pos) < 25){
-			state.logout.close();
 			socket.emit('logout');
+			state.logout.close();
 		}
 	});
 
@@ -123,8 +141,9 @@ const Behavior = (state, { touches }) => {
 		let startPos = [start.event.pageX, start.event.pageY];
 		let body = state.moveButton.body;
 		if(distance([body.position.x, body.position.y], startPos) < 50){
-			socket.emit('move');
-			socket.emit('hide');
+			// socket.emit('move');
+			// socket.emit('hide');
+			socket.emit('behavior');
 		}
 	}
 
@@ -133,12 +152,13 @@ const Behavior = (state, { touches }) => {
 		let endPos = [end.event.pageX, end.event.pageY];
 		let body = state.moveButton.body;
 		if(distance([body.position.x, body.position.y], endPos) < 50){
-			socket.emit('stop');
-			socket.emit('watch');
+			// socket.emit('stop');
+			// socket.emit('watch');
+			socket.emit('repose');
 		}
 	}
 
 	return state;
 };
 
-export { PressButton, Behavior, UpDate };
+export { PressButton, Behavior, UpDate, Login };

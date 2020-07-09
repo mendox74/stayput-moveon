@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { StatusBar, Dimensions, StyleSheet } from "react-native";
 import { GameEngine } from "react-native-game-engine";
-import { PressButton, Behavior, UpDate} from "./systems";
+import { PressButton, Behavior, UpDate, Login} from "./systems";
 import { Box, MoveButton, Number, Logout } from "./renderers";
 // import Matter from "matter-js";
 
@@ -9,7 +9,7 @@ export default class RigidBodies extends Component {
   constructor(props) {
     super(props);
   }
-  
+
   render() {
     const { width, height } = Dimensions.get("window");
     const boxSize = Math.trunc(Math.max(width, height) * 0.015);
@@ -22,6 +22,8 @@ export default class RigidBodies extends Component {
     const watchCountBody = {position: { x: width / 1.3, y: height / 10 }};
     const roomIdBody = {position: { x: width / 5, y: height / 1.1 }};
     const floor = {position: { x: width / 2, y: boxSize }};
+
+    Login(this.props.name);
 
     return (
       <GameEngine
