@@ -17,10 +17,10 @@ export default class RigidBodies extends Component {
     const buttonSize = Math.trunc(Math.max(width, height) * 0.12);
 
     const join = {position: {x: width / 1.3, y: height / 1.3 }};
-    const logout = {position: {x: width / 5, y: height / 1.3 }};
-    const moveBody = {position: { x: width / 2, y: height / 1.12 }};
-    const watchCountBody = {position: { x: width / 1.3, y: height / 10 }};
-    const roomIdBody = {position: { x: width / 5, y: height / 1.1 }};
+    const logout = {position: {x: width / 5, y: height / 1.08 }};
+    const moveBody = {position: { x: width / 2, y: height / 1.08 }};
+    const watchCountBody = {position: { x: width / 1.25, y: height / 10 }};
+    const roomIdBody = {position: { x: width / 1.22, y: height / 1.08 }};
     const floor = {position: { x: width / 2, y: boxSize }};
 
     Login(this.props.name);

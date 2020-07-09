@@ -207,6 +207,47 @@ class Result extends Component {
   }
 }
 
+class Stanby extends Component {
+  constructor(props) {
+    super(props);
+  }
+
+
+  render() {
+    const width = this.props.size[0];
+    const height = this.props.size[1];
+    const x = this.props.body.position.x - width / 2;
+    const y = this.props.body.position.y - height / 2;
+    let count = this.props.count;
+    let animation = this.props.animation;
+   
+    return (
+      < Animatable.View animation={animation}
+        style={
+          {
+            position: "absolute",
+            left: x,
+            top: y,
+            width: width,
+            height: height,
+            borderColor: "#FFF",
+            borderWidth: 2,
+            alignItems:'center',
+            justifyContent: 'center',
+            backgroundColor: 'pink',
+          }
+        }
+      >
+      <Text
+        style={{
+          fontSize: 40,
+        }}
+      >{count}</Text>
+      </ Animatable.View>
+    );
+  }
+}
+
 export {
-  Box, Animal, MoveButton, Number, Result, Logout
+  Box, Animal, MoveButton, Number, Result, Logout, Stanby
 };

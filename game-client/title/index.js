@@ -7,7 +7,7 @@ export default class Title extends Component {
     constructor() {
       super();
       this.state = {
-       inputValue: "No Name",
+       inputValue: "Name",
        isMoadlVisible: false,
        sceneVisible: false,
        scene: null,

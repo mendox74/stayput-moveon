@@ -13,6 +13,7 @@ module.exports = class Game {
             socket.on('disconnect', () => {
                 if(!io.sockets.adapter.rooms[socket.roomId]){
                 if(rooms.indexOf(socket.roomId) !== -1){
+                    clearInterval(rooms[socket.roomId].stanbyID);
                     clearInterval(rooms[socket.roomId].hideID);
                     clearInterval(rooms[socket.roomId].autoID);
                     clearInterval(rooms[socket.roomId].roopID);
@@ -58,28 +59,6 @@ module.exports = class Game {
                 });
             });
 
-            socket.on('move', () => {
-                if(!socket.roomId)return;
-                if(rooms[socket.roomId].endFlg || rooms[socket.roomId].menberList[socket.id].watcher)return;
-                moveCount();
-            });
-
-            socket.on('stop', () => {
-                if(!socket.roomId)return;
-                if(rooms[socket.roomId].endFlg || rooms[socket.roomId].menberList[socket.id].watcher)return;
-                clearInterval(socket.moveID);
-            });
-
-            socket.on('hide', () => {
-                if(!socket.roomId)return;
-                hide();
-            });
-
-            socket.on('watch', () => {
-                if(!socket.roomId)return;
-                watch();
-            });
-
             socket.on('behavior', () => {
                 if(!socket.roomId)return;
                 if(rooms[socket.roomId].endFlg)return;
@@ -100,13 +79,13 @@ module.exports = class Game {
                 }
             });
 
-            socket.on('start', () => {
-                if(!socket.roomId)return;
-                if(!rooms[socket.roomId].startFlg)return;
-                if(Object.keys(rooms[socket.roomId].menberList).every((e) => {return rooms[socket.roomId].menberList[e].join === true;})){
-                    rooms[socket.roomId].endFlg = false;
-                }
-            });
+            // socket.on('start', () => {
+            //     if(!socket.roomId)return;
+            //     if(!rooms[socket.roomId].startFlg)return;
+            //     if(Object.keys(rooms[socket.roomId].menberList).every((e) => {return rooms[socket.roomId].menberList[e].join === true;})){
+            //         rooms[socket.roomId].endFlg = false;
+            //     }
+            // });
 
             socket.on('auto', () => {
                 if(!socket.roomId)return;
@@ -132,6 +111,7 @@ module.exports = class Game {
 
             socket.on('join', () => {
                 if(!socket.roomId)return;
+                if(!rooms[socket.roomId].endFlg)return;
                 if(rooms[socket.roomId].menberList[socket.id].join){
                     rooms[socket.roomId].menberList[socket.id].join = false;
                     rooms[socket.roomId].menberList[socket.id].watcher = false;
@@ -159,10 +139,11 @@ module.exports = class Game {
             });
             
             function stanbyCount () {
-                rooms[socket.roomId].stanbyCount -= 1;
                 if(rooms[socket.roomId].stanbyCount > 0){
+                    rooms[socket.roomId].stanbyCount -= 1;
                     rooms[socket.roomId].stanbyID = setTimeout(stanbyCount, 1000);
                 } else {
+                    rooms[socket.roomId].stanbyFlg = false;
                     rooms[socket.roomId].endFlg = false;
                 }
             }

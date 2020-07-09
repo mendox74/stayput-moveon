@@ -28,6 +28,8 @@ module.exports = class Room {
             this.endFlg,
             this.watcherWin,
             this.toucherWin,
+            this.stanbyFlg,
+            this.stanbyCount,
             );
         },1000/ 30);
     }    
