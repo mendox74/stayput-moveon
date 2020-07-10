@@ -1,6 +1,6 @@
 import _ from "lodash";
 import { Dimensions } from "react-native";
-import { Animal, Result, Stanby } from "./renderers";
+import { Animal, Result, Stanby, Box } from "./renderers";
 import io from "socket.io-client";
 
 const socket = io('http://192.168.11.7:8080', {transports: ['websocket']} );
@@ -20,6 +20,7 @@ const defaultHideTime = 15000;
 const { width, height } = Dimensions.get("window");
 const animalSize = Math.trunc(Math.max(width, height) * 0.075);
 const buttonSize = Math.trunc(Math.max(width, height) * 0.2);
+const joinSize = Math.trunc(Math.max(width, height) * 0.4);
 
 socket.on('connect', () => {
 	console.log( 'connect : socket.id = %s', socket.id );
@@ -44,6 +45,20 @@ const Login = (name) => {
 
 const UpDate = (state) => {
 	if(menberList){
+		if(endFlg){
+			if(!state.join){
+				state.join = { 
+					body: {position: { x: width / 2, y: height *( 3 / 10)}}, 
+					size: [joinSize, joinSize], 
+					color: "pink", 
+					renderer: Box, 
+				}
+			}
+		} else {
+			if(state.join){
+				delete state.join;
+			}
+		}
 		state.floor.size[0] = width * ( hideTime / defaultHideTime);
 		state.watchCount.text = watchCount;
 		if(stanbyFlg){
@@ -117,16 +132,19 @@ const UpDate = (state) => {
 					}
 				} else {
 					if(!state[e]){
+						let randPos = Math.floor(Math.random() * 1000) + 1;
+						let widPos = randPos - 500;
 						state[e] = {
 							id: e,
-							body: {position: { x: width * (1 / 2), y: height * (9 / 10) }},
+							widPos: widPos,
+							body: {position: { x: width * (randPos / 1000), y: height * (8 / 10) }},
 							size: [animalSize, animalSize],
 							text: menberList[e].name,
 							renderer: Animal,
 						};
 					} else if(menberList[e].distance >= 0){
 						state[e].body.position.y = height * ((menberList[e].distance + 580) / 5800);
-						// state[e].body.position.x = width * ((menberList[e].distance + 5000) / 10000);
+						state[e].body.position.x = width * ((500 + (state[e].widPos * (menberList[e].distance / 4000))) / 1000);
 					}
 				}
 			} else {
@@ -147,7 +165,7 @@ const PressButton = (state, { touches }) => {
 		let logout = state.logout.body;
 		if(distance([join.position.x, join.position.y], Pos) < 25){
 			socket.emit('join');
-			socket.emit('reset');
+			// socket.emit('reset');
 		}
 		if(distance([logout.position.x, logout.position.y], Pos) < 25){
 			socket.emit('logout');
