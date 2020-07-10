@@ -18,9 +18,9 @@ let stanbyCount = 5;
 
 const defaultHideTime = 15000;
 const { width, height } = Dimensions.get("window");
-const animalSize = Math.trunc(Math.max(width, height) * 0.075);
+const animalSize = Math.trunc(Math.max(width, height) * 0.055);
 const buttonSize = Math.trunc(Math.max(width, height) * 0.2);
-const joinSize = Math.trunc(Math.max(width, height) * 0.4);
+const joinSize = Math.trunc(Math.max(width, height) * 0.2);
 
 socket.on('connect', () => {
 	console.log( 'connect : socket.id = %s', socket.id );
@@ -161,11 +161,12 @@ const distance = ([x1, y1], [x2, y2]) =>
 const PressButton = (state, { touches }) => {
 	touches.filter(t => t.type === "press").forEach(t => {
 		let Pos = [t.event.pageX, t.event.pageY];
-		let join = state.join.body;
 		let logout = state.logout.body;
-		if(distance([join.position.x, join.position.y], Pos) < 25){
-			socket.emit('join');
-			// socket.emit('reset');
+		if(state.join){
+			let join = state.join.body
+			if(distance([join.position.x, join.position.y], Pos) < 25){
+				socket.emit('join');
+			}
 		}
 		if(distance([logout.position.x, logout.position.y], Pos) < 25){
 			socket.emit('logout');

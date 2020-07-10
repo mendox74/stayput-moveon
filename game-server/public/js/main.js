@@ -208,7 +208,7 @@ $(function () {
         }
       }
 
-      console.log(hide, mydist, watch, hidef, playerList, playerName);
+      // console.log(hide, mydist, watch, hidef, playerList, playerName);
     },1000/30);
   }
 

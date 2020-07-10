@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { StyleSheet, View, Text, TextInput, Button, Modal } from "react-native";
+import * as Animatable from 'react-native-animatable';
 import ModalAnimate from "react-native-modal";
 import RigidBodies from "../app/index";
 
@@ -39,9 +40,25 @@ export default class Title extends Component {
     render() {
         return(
             <View style={styles.container}>
-                <Text style={styles.paragraph}>
-                  WATCH or TOUCH
-                </Text>
+                <Animatable.Text 
+                animation = "flash"
+                style={styles.paragraph}>
+                  WATCH
+                </Animatable.Text>
+                <Animatable.Text 
+                animation = "fadeIn"
+                delay = {500}
+                style={styles.paragraph}>
+                  or
+                </Animatable.Text>
+                <Animatable.Text 
+                animation = "bounceInRight"
+                delay = {1000}
+                style={styles.paragraph}>
+                  TOUCH
+                </Animatable.Text>
+
+
                 <Text 
                 style={styles.paragraph}
                 onPress={this.toggleModal}
@@ -91,7 +108,7 @@ const styles = StyleSheet.create({
       backgroundColor: '#ecf0f1',
     },
     paragraph: {
-      margin: 24,
+      margin: 2,
       fontSize: 28,
       fontWeight: 'bold',
       textAlign: 'center',

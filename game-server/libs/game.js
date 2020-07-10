@@ -92,21 +92,6 @@ module.exports = class Game {
                 auto();
             });
 
-            // socket.on('reset', () => {
-            //     if(!socket.roomId)return;
-            //     if(rooms[socket.roomId].startFlg)return;
-            //     rooms[socket.roomId].startFlg = true;
-            //     rooms[socket.roomId].endFlg = true;
-            //     rooms[socket.roomId].hideFlg = false;
-            //     clearInterval(socket.moveID);
-            //     clearInterval(rooms[socket.roomId].hideID);
-            //     clearInterval(rooms[socket.roomId].autoID);
-            //     rooms[socket.roomId].watchCount = defaultWatchCount;
-            //     rooms[socket.roomId].hideTime = defaultHideTime;
-            //     rooms[socket.roomId].watcherWin = undefined;
-            //     rooms[socket.roomId].toucherWin = undefined;
-            // });
-
             socket.on('join', () => {
                 if(!socket.roomId)return;
                 let list = rooms[socket.roomId].menberList;
