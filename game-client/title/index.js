@@ -1,8 +1,12 @@
 import React, { Component } from "react";
-import { StyleSheet, View, Text, TextInput, Button, Modal } from "react-native";
+import SvgUri from "react-native-svg-uri";
+import { StyleSheet, View, Text, TextInput, Button, Modal, Dimensions, TouchableWithoutFeedback } from "react-native";
 import * as Animatable from 'react-native-animatable';
 import ModalAnimate from "react-native-modal";
 import RigidBodies from "../app/index";
+
+const { width, height } = Dimensions.get("window");
+const startImage = require('../assets/menus/start.svg');
 
 export default class Title extends Component {
     constructor() {
@@ -65,10 +69,18 @@ export default class Title extends Component {
                 >
                   {this.state.inputValue}
                 </Text>
-                <Button
-                  title="GO"
-                  onPress={this.mountScene}
-                />
+                <TouchableWithoutFeedback onPress={this.mountScene}>
+                <Animatable.View
+                  animation = "pulse"
+                  iterationCount = {"infinite"}
+                  style={{
+                      width: width/3,
+                      height: height/5,
+                    }}
+                  >
+                  <SvgUri source={startImage} />
+                </Animatable.View>
+                </TouchableWithoutFeedback>
                 <ModalAnimate 
                 animationIn="bounceIn"
                 animationOut="bounceOut"

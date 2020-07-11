@@ -3,6 +3,7 @@ import SvgUri from "react-native-svg-uri";
 import { StyleSheet, View, ART, Dimensions, Text, Button } from "react-native";
 import * as Animatable from 'react-native-animatable';
 const dogImage = require('../assets/icons/dog.svg');
+const exitImage = require('../assets/menus/exit.svg')
 
 class Box extends Component {
   constructor(props) {
@@ -43,7 +44,6 @@ class Logout extends Component {
     const height = this.props.size[1];
     const x = this.props.body.position.x - width / 2;
     const y = this.props.body.position.y - height / 2;
-    const close = this.props.close;
    
     return (
       <View
@@ -55,10 +55,13 @@ class Logout extends Component {
             width: width,
             height: height,
             borderRadius: width / 2,
-            backgroundColor: this.props.color || "pink"
+            // borderColor: "#000000",
+            // borderWidth: 4,
           }
         }
       >
+        <SvgUri 
+        source = {exitImage} />
       </View>
     );
   }
