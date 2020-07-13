@@ -1,6 +1,6 @@
 import _ from "lodash";
 import { Dimensions } from "react-native";
-import { Animal, Result, Stanby, Box } from "./renderers";
+import { Animal, Result, Stanby, Box, Join } from "./renderers";
 import io from "socket.io-client";
 
 const socket = io('http://192.168.11.7:8080', {transports: ['websocket']} );
@@ -50,10 +50,10 @@ const UpDate = (state) => {
 		if(endFlg){
 			if(!state.join){
 				state.join = { 
-					body: {position: { x: width / 2, y: height *( 3 / 10)}}, 
+					body: {position: { x: width / 2, y: height * ( 6 / 10)}}, 
 					size: [joinSize, joinSize], 
 					color: "pink", 
-					renderer: Box, 
+					renderer: Join, 
 				}
 			}
 		} else {
@@ -131,8 +131,15 @@ const UpDate = (state) => {
 							body: {position: { x: width / 2, y: height * (1 / 13) }},
 							size: [animalSize, animalSize],
 							text: menberList[e].name,
+							angle: 0,
 							renderer: Animal,
 						};
+					} else {
+						if(hideFlg){
+							state[e].angle = 180;
+						} else {
+							state[e].angle = 0;
+						}
 					}
 				} else {
 					if(!state[e]){
@@ -144,6 +151,7 @@ const UpDate = (state) => {
 							body: {position: { x: width * (randPos / 1000), y: height * (8 / 10) }},
 							size: [animalSize, animalSize],
 							text: menberList[e].name,
+							angle: 0,
 							renderer: Animal,
 						};
 					} else if(menberList[e].distance >= 0){

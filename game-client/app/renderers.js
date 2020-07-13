@@ -1,11 +1,38 @@
 import React, { Component } from "react";
 import SvgUri from "react-native-svg-uri";
-import { StyleSheet, View, ART, Dimensions, Text, Button } from "react-native";
+import { StyleSheet, View, ART, Text } from "react-native";
 import * as Animatable from 'react-native-animatable';
 const dogImage = require('../assets/icons/dog.svg');
 const exitImage = require('../assets/menus/exit.svg')
 
 class Box extends Component {
+    constructor(props) {
+        super(props);
+    }
+
+    render() {
+        const width = this.props.size[0];
+        const height = this.props.size[1];
+        const x = this.props.body.position.x - width / 2;
+        const y = this.props.body.position.y - height / 2;
+   
+        return (
+            <View
+            style={{
+                position: "absolute",
+                left: x,
+                top: y,
+                width: width,
+                height: height,
+                borderRadius: width / 2,
+                backgroundColor: this.props.color || "pink"
+            }}
+            />
+        );
+    }
+}
+
+class Join extends Component {
     constructor(props) {
         super(props);
     }
@@ -42,22 +69,22 @@ class Logout extends Component {
         const height = this.props.size[1];
         const x = this.props.body.position.x - width / 2;
         const y = this.props.body.position.y - height / 2;
-   
+
         return (
-            <View
-                style={{
-                    position: "absolute",
-                    left: x,
-                    top: y,
-                    width: width,
-                    height: height,
-                    borderRadius: width / 2,
-                    // borderColor: "#000000",
-                    // borderWidth: 4,
-                }}
-            >
-                <SvgUri source = {exitImage} />
-            </View>
+                <View
+                    style={{
+                        position: "absolute",
+                        left: x,
+                        top: y,
+                        width: width,
+                        height: height,
+                        borderRadius: width / 2,
+                        // borderColor: "#000000",
+                        // borderWidth: 4,
+                    }}
+                >
+                    <SvgUri source = {exitImage} />
+                </View>
         );
     }
 }
@@ -73,6 +100,7 @@ class Animal extends Component {
         const x = this.props.body.position.x - width / 2;
         const y = this.props.body.position.y - height / 2;
         const text = this.props.text;
+        const angle = this.props.angle;
    
         return (
             <View
@@ -84,7 +112,14 @@ class Animal extends Component {
                     height: height,
                 }}
             >
-                <SvgUri source={dogImage} />
+                <Animatable.View
+                    transition={"rotate"}
+                    style={{
+                        transform: [{rotate: angle + "deg"}],
+                    }}
+                >
+                    <SvgUri source={dogImage}/>
+                </Animatable.View>
                 <Text>{text}</Text>
             </ View>
         );
@@ -244,5 +279,5 @@ class Stanby extends Component {
 }
 
 export {
-    Box, Animal, MoveButton, Number, Result, Logout, Stanby
+    Box, Animal, MoveButton, Number, Result, Logout, Stanby, Join
 };

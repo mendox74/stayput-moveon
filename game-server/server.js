@@ -6,7 +6,7 @@ const port = process.env.PORT || 8080;
 const Game = require('./libs/game');
 
 app.get('/', (req, res) => {
-  res.sendFile(__dirname + '/index.html');
+    res.sendFile(__dirname + '/index.html');
 });
 
 app.use('/static', express.static('public'));
@@ -15,5 +15,5 @@ const game = new Game();
 game.start(io);
 
 http.listen(port, () => {
-  console.log('listening on *:' + port);
+    console.log('listening on *:' + port);
 });

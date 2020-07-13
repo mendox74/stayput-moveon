@@ -36,7 +36,7 @@ module.exports = class Game {
                             clearInterval(room.autoID);
                             clearInterval(room.roopID);
                             rooms.splice(rooms.indexOf(socket.roomId), 1);
-                            delete room;
+                            delete rooms[socket.roomId];
                         }
                     }
                 }
@@ -85,7 +85,7 @@ module.exports = class Game {
                     if(!io.sockets.adapter.rooms[socket.roomId]){
                         clearInterval(room.roopID);
                         rooms.splice(rooms.indexOf(socket.roomId), 1);
-                        delete room;
+                        delete rooms[socket.roomId];
                     }
                     delete socket.roomId;
                     console.log(rooms)
