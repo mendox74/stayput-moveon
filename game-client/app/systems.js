@@ -15,6 +15,7 @@ let watcherWin = undefined;
 let toucherWin = undefined;
 let stanbyFlg = false;
 let stanbyCount = 5;
+let autoFlg;
 
 const defaultHideTime = 15000;
 const { width, height } = Dimensions.get("window");
@@ -26,7 +27,7 @@ socket.on('connect', () => {
 	console.log( 'connect : socket.id = %s', socket.id );
 });
 
-socket.on('update',(ht,wc,ml,hf,ri,ef,ww,tw,sf,sc) => {
+socket.on('update',(ht,wc,ml,hf,ri,ef,ww,tw,sf,sc,af) => {
 	hideTime = ht;
 	watchCount = wc;
 	menberList = ml;
@@ -37,6 +38,7 @@ socket.on('update',(ht,wc,ml,hf,ri,ef,ww,tw,sf,sc) => {
 	toucherWin = tw;
 	stanbyFlg = sf;
 	stanbyCount = sc;
+	autoFlg = af;
 });
 
 const Login = (name) => {
@@ -71,10 +73,12 @@ const UpDate = (state) => {
 					renderer: Stanby,
 				}
 			} else {
-				if(stanbyCount === 0){
-					state.stanby.count = 'START!';
-				} else {
-					state.stanby.count = stanbyCount;
+				if(state.stanby.count !== stanbyCount){
+					if(stanbyCount === 0){
+						state.stanby.count = 'START!';
+					} else {
+						state.stanby.count = stanbyCount;
+					}
 				}
 			}
 		} else {

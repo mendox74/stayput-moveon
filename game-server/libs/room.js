@@ -8,6 +8,7 @@ module.exports = class Room {
         this.random = undefined;
         this.hideFlg = false;
         this.hideFixed = false;
+        this.autoFlg = false;
         this.stanbyFlg = false;
         this.startFlg = false;
         this.endFlg = true;
@@ -30,6 +31,7 @@ module.exports = class Room {
             this.toucherWin,
             this.stanbyFlg,
             this.stanbyCount,
+            this.autoFlg,
             );
         },1000/ 30);
     }    

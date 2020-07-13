@@ -11,16 +11,35 @@ module.exports = class Game {
             console.log(socket.id);
             // 接続切断処理
             socket.on('disconnect', () => {
-                if(!io.sockets.adapter.rooms[socket.roomId]){
-                if(rooms.indexOf(socket.roomId) !== -1){
-                    clearInterval(rooms[socket.roomId].stanbyID);
-                    clearInterval(rooms[socket.roomId].hideID);
-                    clearInterval(rooms[socket.roomId].autoID);
-                    clearInterval(rooms[socket.roomId].roopID);
-                    rooms.splice(rooms.indexOf(socket.roomId), 1);
-                    delete rooms[socket.roomId];
+                if(socket.roomId){
+                    let list = rooms[socket.roomId].menberList;
+                    let room = rooms[socket.roomId];
+                    // ログアウト時にwatcherでgame中だった場合autoに切り替え
+                    if(list[socket.id].watcher && !room.endFlg){
+                        room.autoFlg = true;
+                        auto();
+                    }
+                    delete list[socket.id];
+                    if(room.endFlg){
+                        if(Object.keys(list).filter((e) => {return list[e].join === true}).length <= 1){
+                            if(room.stanbyFlg){
+                                room.stanbyFlg = false;
+                                clearInterval(room.stanbyID);
+                            }
+                        }
+                    }
+                    delete list[socket.id];
+                    if(!io.sockets.adapter.rooms[socket.roomId]){
+                        if(rooms.indexOf(socket.roomId) !== -1){
+                            clearInterval(room.stanbyID);
+                            clearInterval(room.hideID);
+                            clearInterval(room.autoID);
+                            clearInterval(room.roopID);
+                            rooms.splice(rooms.indexOf(socket.roomId), 1);
+                            delete room;
+                        }
+                    }
                 }
-                };
                 console.log("disconnect", socket.userName, rooms);
             });
 
@@ -40,19 +59,33 @@ module.exports = class Game {
                 }
                 socket.join(socket.roomId);
 
-                console.log(io.sockets.sockets[socket.id].roomId, io.sockets.sockets[socket.id].userName, rooms);
+                console.log(socket.roomId, socket.userName, rooms[socket.roomId].menberList);
                 rooms[socket.roomId].menberList[socket.id] = new Player(socket.userName);
             });
 
             socket.on('logout', () => {
                 if(!socket.roomId)return;
-                    socket.leave(socket.roomId, () => {
-                    delete rooms[socket.roomId].menberList[socket.id];
-
+                let list = rooms[socket.roomId].menberList;
+                let room = rooms[socket.roomId];
+                // ログアウト時にwatcherでgame中だった場合autoに切り替え
+                if(list[socket.id].watcher && !room.endFlg){
+                    room.autoFlg = true;
+                    auto();
+                }
+                delete list[socket.id];
+                if(room.endFlg){
+                    if(Object.keys(list).filter((e) => {return list[e].join === true}).length <= 1){
+                        if(room.stanbyFlg){
+                            room.stanbyFlg = false;
+                            clearInterval(room.stanbyID);
+                        }
+                    }
+                }
+                socket.leave(socket.roomId, () => {
                     if(!io.sockets.adapter.rooms[socket.roomId]){
-                        clearInterval(rooms[socket.roomId].roopID);
+                        clearInterval(room.roopID);
                         rooms.splice(rooms.indexOf(socket.roomId), 1);
-                        delete rooms[socket.roomId];
+                        delete room;
                     }
                     delete socket.roomId;
                     console.log(rooms)
@@ -87,9 +120,15 @@ module.exports = class Game {
 
             socket.on('auto', () => {
                 if(!socket.roomId)return;
-                rooms[socket.roomId].endFlg = false;
-                rooms[socket.roomId].hideFlg = false;
-                auto();
+                if(!rooms[socket.roomId].endFlg)return;
+                if(rooms[socket.roomId].autoFlg){
+                    clearInterval(rooms[socket.roomId].autoID);
+                } else {
+                    auto();
+                }
+                rooms[socket.roomId].autoFlg = !rooms[socket.roomId].autoFlg;
+                // rooms[socket.roomId].endFlg = false;
+                // rooms[socket.roomId].hideFlg = false;
             });
 
             socket.on('join', () => {
@@ -143,6 +182,7 @@ module.exports = class Game {
                 room.endFlg = true;
                 room.hideFlg = false;
                 room.hideFixed = false;
+                room.autoFlg = false;
                 clearInterval(socket.moveID);
                 clearInterval(room.hideID);
                 clearInterval(room.autoID);
@@ -158,6 +198,7 @@ module.exports = class Game {
                 room.endFlg = true;
                 room.hideFlg = false;
                 room.hideFixed = false;
+                room.autoFlg = false;
                 clearInterval(socket.moveID);
                 clearInterval(room.hideID);
                 clearInterval(room.autoID);
@@ -182,7 +223,7 @@ module.exports = class Game {
                         socket.moveID = setTimeout(moveCount, 10);
                     }
                 } else {
-                    rooms[socket.roomId].menberList[socket.id].distance = defaultDistance;
+                    rooms[socket.roomId].menberList[socket.id].distance = defaultDistance + 10;
                 }
             }
 
@@ -213,6 +254,7 @@ module.exports = class Game {
             }
 
             function auto () {
+                if(rooms[socket.roomId].endFlg)return;
                 rooms[socket.roomId].random = 500 + Math.floor(Math.random() * 3500);
                 rooms[socket.roomId].autoID = setTimeout(auto, rooms[socket.roomId].random);
                 if(rooms[socket.roomId].hideFlg){

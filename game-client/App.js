@@ -3,15 +3,15 @@ import { AppRegistry, Dimensions } from "react-native";
 import Title from "./title/index"
 
 export default class Game extends PureComponent {
-  constructor() {
-    super();
-  }
+    constructor() {
+        super();
+    }
  
-  render() {
-    return (
-      <Title />
-    );
-  }
+    render() {
+        return (
+            <Title />
+        );
+    }
 }
  
 AppRegistry.registerComponent("Game", () => Game);
