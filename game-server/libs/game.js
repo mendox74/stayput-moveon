@@ -14,10 +14,12 @@ module.exports = class Game {
                 if(socket.roomId){
                     let list = rooms[socket.roomId].menberList;
                     let room = rooms[socket.roomId];
-                    // ログアウト時にwatcherでgame中だった場合autoに切り替え
+                    // game中でwatcherだった場合autoWatcherに切り替え
                     if(list[socket.id].watcher && !room.endFlg){
-                        room.autoFlg = true;
-                        auto();
+                        list['autoWatcher'] = new Player('AUTO');
+                        list['autoWatcher'].join = true;
+                        list['autoWatcher'].watcher = true;
+                        room.autoWatcher();
                     }
                     delete list[socket.id];
                     if(room.endFlg){
@@ -67,12 +69,16 @@ module.exports = class Game {
                 if(!socket.roomId)return;
                 let list = rooms[socket.roomId].menberList;
                 let room = rooms[socket.roomId];
-                // ログアウト時にwatcherでgame中だった場合autoに切り替え
+                // game中でwatcherだった場合autoWatcherに切り替え
                 if(list[socket.id].watcher && !room.endFlg){
-                    room.autoFlg = true;
-                    auto();
+                    list['autoWatcher'] = new Player('AUTO');
+                    list['autoWatcher'].join = true;
+                    list['autoWatcher'].watcher = true;
+                    room.autoWatcher();
                 }
+                // menberListから削除
                 delete list[socket.id];
+                // joinが1以下だった場合stanby停止
                 if(room.endFlg){
                     if(Object.keys(list).filter((e) => {return list[e].join === true}).length <= 1){
                         if(room.stanbyFlg){
@@ -83,6 +89,9 @@ module.exports = class Game {
                 }
                 socket.leave(socket.roomId, () => {
                     if(!io.sockets.adapter.rooms[socket.roomId]){
+                        clearInterval(room.stanbyID);
+                        clearInterval(room.hideID);
+                        clearInterval(room.autoID);
                         clearInterval(room.roopID);
                         rooms.splice(rooms.indexOf(socket.roomId), 1);
                         delete rooms[socket.roomId];
@@ -94,7 +103,7 @@ module.exports = class Game {
 
             socket.on('behavior', () => {
                 if(!socket.roomId)return;
-                if(rooms[socket.roomId].endFlg)return;
+                if(rooms[socket.roomId].endFlg || !rooms[socket.roomId].menberList[socket.id].join)return;
                 if(rooms[socket.roomId].menberList[socket.id].watcher){
                     hide();
                 } else {
@@ -107,7 +116,7 @@ module.exports = class Game {
 
             socket.on('repose', () => {
                 if(!socket.roomId)return;
-                if(rooms[socket.roomId].endFlg)return;
+                if(rooms[socket.roomId].endFlg || !rooms[socket.roomId].menberList[socket.id].join)return;
                 if(rooms[socket.roomId].menberList[socket.id].watcher){
                     watch();
                 } else {
@@ -120,7 +129,7 @@ module.exports = class Game {
 
             socket.on('auto', () => {
                 if(!socket.roomId)return;
-                if(!rooms[socket.roomId].endFlg)return;
+                if(!rooms[socket.roomId].endFlg || !rooms[socket.roomId].menberList[socket.id].join)return;
                 if(rooms[socket.roomId].autoFlg){
                     clearInterval(rooms[socket.roomId].autoID);
                 } else {
@@ -147,6 +156,7 @@ module.exports = class Game {
                         socket.moveFlg = false;
                     } else {
                         list[socket.id].watcher = true;
+                        list[socket.id].distance = 0;
                     }
                 }
                 // 2人以上joinでstanbyCountをスタート
@@ -188,8 +198,10 @@ module.exports = class Game {
                 clearInterval(room.autoID);
                 room.watchCount = defaultWatchCount;
                 room.hideTime = defaultHideTime;
-                room.watcherWin = undefined;
-                room.toucherWin = undefined;
+                room.winner = [];
+                // room.watcherWin = undefined;
+                // room.toucherWin = undefined;
+                if(room.menberList['autoWatcher']){delete room.menberList['autoWatcher']}
             }
 
             function result () {
@@ -203,14 +215,15 @@ module.exports = class Game {
                 clearInterval(room.hideID);
                 clearInterval(room.autoID);
                 if(room.menberList[socket.id].watcher){
-                    room.watcherWin = socket.id;
+                    room.winner = ['watcher', room.menberList[socket.id].name];
                 } else {
-                    room.toucherWin = socket.id;
+                    room.winner = ['toucher', room.menberList[socket.id].name];
                 }
                 Object.keys(room.menberList).forEach((id) =>{
                     room.menberList[id].join = false;
                     room.menberList[id].watcher = false; 
                 });
+                // if(room.menberList['autoWatcher']){delete room.menberList['autoWatcher']}
             }
 
             function moveCount () {

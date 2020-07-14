@@ -11,8 +11,9 @@ let menberList;
 let hideFlg;
 let roomId = undefined;
 let endFlg;
-let watcherWin = undefined;
-let toucherWin = undefined;
+let winner = [];
+// let watcherWin = undefined;
+// let toucherWin = undefined;
 let stanbyFlg = false;
 let stanbyCount = 5;
 let autoFlg;
@@ -27,15 +28,16 @@ socket.on('connect', () => {
 	console.log( 'connect : socket.id = %s', socket.id );
 });
 
-socket.on('update',(ht,wc,ml,hf,ri,ef,ww,tw,sf,sc,af) => {
+socket.on('update',(ht,wc,ml,hf,ri,ef,wn,sf,sc,af) => {
 	hideTime = ht;
 	watchCount = wc;
 	menberList = ml;
 	hideFlg = hf;
 	roomId = ri;
 	endFlg = ef;
-	watcherWin = ww;
-	toucherWin = tw;
+	winner = wn
+	// watcherWin = ww;
+	// toucherWin = tw;
 	stanbyFlg = sf;
 	stanbyCount = sc;
 	autoFlg = af;
@@ -87,26 +89,14 @@ const UpDate = (state) => {
 			}
 		}
 		// 結果表示
-		if(watcherWin || toucherWin){
+		if(winner.length){
 			if(!state.result){
-				let role;
-				let name;
-				let animation;
-				if(watcherWin){
-					role = 'GUARD!';
-					name = menberList[watcherWin].name;
-					animation = 'bounceInDown';
-				} else if(toucherWin){
-					role = 'TOUCH!';
-					name = menberList[toucherWin].name;
-					animation = 'bounceIn';
-				}
 				state.result = {
 					body: {position: { x: width / 2, y: height / 2 }},
 					size: [width, buttonSize],
-					role: role,
-					name: name,
-					animation: animation,
+					role: winner[0],
+					name: winner[1],
+					animation: 'bounceIn',
 					renderer: Result,
 				};
 			}

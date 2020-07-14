@@ -3,7 +3,7 @@ $(function () {
 // 変数
   let roopID;
   let roopFlg  = false;
-  let autoModeFlg = false;
+  let autoModeFlg = true;
   let autoID;
   let autoMoveFlg = false;
   let autoBehavior = true;
@@ -11,13 +11,12 @@ $(function () {
 
   let hide;
   let hidef;
-  let mydist;
-  let watch;
   let roomId;
   let list;
   let endFlg;
-  let watchWin;
-  let touchWin;
+  let winner = [];
+  // let watchWin;
+  // let touchWin;
   let stanbyFlg;
   let stanbyCount;
 
@@ -80,16 +79,16 @@ $(function () {
 
 //======================================================================================================
 // 通信処理
-  socket.on('update', (hideTime, watchC , menbarList, hideFlg, id, end, watch, touch, stanbyF, stanbyC) =>{
+  socket.on('update', (hideTime, watchC , menbarList, hideFlg, id, end, win, stanbyF, stanbyC) =>{
     hide = hideTime;
     watchCount = watchC;
-    mydist = menbarList[socket.id].distance;
     list = menbarList;
     hidef = hideFlg;
     roomId = id;
     endFlg = end;
-    watchWin = watch;
-    touchWin = touch;
+    winner = win
+    // watchWin = watch;
+    // touchWin = touch;
     stanbyFlg = stanbyF;
     stanbyCount = stanbyC;
   })
@@ -149,33 +148,28 @@ $(function () {
         idList = Object.keys(list);
 
         idList.forEach((id) => {
-            if(!$('#' + list[id].name).length){
-              $('#player').append('<div id="' + list[id].name + '"><span>' + list[id].name + '：</span><span id="' + list[id].name + 'distance"></span></div>');
+            if(!$('#' + id).length){
+              $('#player').append('<div id="' + id + '"><span>' + list[id].name + '：</span><span id="' + id + 'distance"></span></div>');
             }
         });
         playerList.forEach((e) =>{
-          if(playerName.indexOf(e) === -1){
+          if(idList.indexOf(e) === -1){
             $('#' + e).remove()
           };
         });
       }
 
       // 勝利判定
-      if(watchWin || touchWin){
-          if(watchWin){
-            if($('#' + list[watchWin].name + 'distance').text() !== 'win'){
-              $('#' + list[watchWin].name + 'distance').text('win');
-            }
-          } else {
-            if($('#' + list[touchWin].name + 'distance').text() !== 'win'){
-              $('#' + list[touchWin].name + 'distance').text('win');
-            }
-          }
+      if(winner.length){
+        if($('#winner').text() === ''){
+          $('#winner').text(winner[0] + ':' + winner[1]);
+        }
         $('#child').text('stop');
       } else {
+        if($('#winner').text() !== ''){$('#winner').text('')}
         if(list){
           idList.forEach((id) => {
-              $('#' + list[id].name + 'distance').text(list[id].distance);
+              $('#' + id + 'distance').text(list[id].distance);
           });
         }
       }
@@ -189,19 +183,21 @@ $(function () {
             }
           }
         } else {
-          if(hidef){
-            if(!autoMoveFlg){
-              autoMoveFlg = true;
-              randTime = 1 + Math.floor(Math.random() * 1000);
-              autoID = setTimeout(autoMove,randTime);
-            }
-          } else {
-            if(autoMoveFlg){
-              autoMoveFlg = false;
-              clearInterval(autoID);
-              if(!autoBehavior){
-                socket.emit('repose');
-                autoBehavior = !autoBehavior;
+          if(!list[socket.id].watcher){
+            if(hidef){
+              if(!autoMoveFlg){
+                autoMoveFlg = true;
+                randTime = 1 + Math.floor(Math.random() * 1000);
+                autoID = setTimeout(autoMove,randTime);
+              }
+            } else {
+              if(autoMoveFlg){
+                autoMoveFlg = false;
+                clearInterval(autoID);
+                if(!autoBehavior){
+                  socket.emit('repose');
+                  autoBehavior = !autoBehavior;
+                }
               }
             }
           }
@@ -225,6 +221,7 @@ $(function () {
   function displayDelete () {
     $('#watchCount').text('');
     $('#hideTime').text('');
+    $('#winner').text('');
     $('#distance').text('');
     $('#roomNumber').text('');
     $('#roomMenber').text('');
