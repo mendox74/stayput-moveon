@@ -43,6 +43,10 @@ export default class Title extends Component {
         this.setState({ inputValue });
     };
 
+    _onPress = () => {
+        this.AnimationRef.bounce();
+    }
+
     render() {
         return(
             <View style={styles.container}>
@@ -83,6 +87,13 @@ export default class Title extends Component {
                         <SvgUri source={startImage} />
                     </Animatable.View>
                 </TouchableWithoutFeedback>
+
+                <TouchableWithoutFeedback onPressIn={this._onPress}>
+                    <Animatable.View ref={ref => (this.AnimationRef = ref)}>
+                        <Text>Bounce me!</Text>
+                    </Animatable.View>
+                </TouchableWithoutFeedback>
+
                 <ModalAnimate 
                     animationIn="bounceIn"
                     animationOut="bounceOut"

@@ -121,27 +121,31 @@ const UpDate = (state) => {
 							body: {position: { x: width / 2, y: height * (1 / 13) }},
 							size: [animalSize, animalSize],
 							text: menberList[e].name,
-							angle: 0,
+							angle: 180 + 'deg',
 							renderer: Animal,
 						};
 					} else {
 						if(hideFlg){
-							state[e].angle = 180;
+							state[e].angle = 0 + 'deg';
 						} else {
-							state[e].angle = 0;
+							state[e].angle = 180 + 'deg';
 						}
 					}
 				} else {
 					if(!state[e]){
 						let randPos = Math.floor(Math.random() * 1000) + 1;
 						let widPos = randPos - 500;
+						let angle = Math.atan2(
+									(width * (randPos / 1000)) - (width / 2),
+									(height * (8 / 10)) - height * (1 / 13),
+									) * -1;
 						state[e] = {
 							id: e,
 							widPos: widPos,
 							body: {position: { x: width * (randPos / 1000), y: height * (8 / 10) }},
 							size: [animalSize, animalSize],
 							text: menberList[e].name,
-							angle: 0,
+							angle: angle + 'rad',
 							renderer: Animal,
 						};
 					} else if(menberList[e].distance >= 0){

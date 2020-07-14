@@ -3,6 +3,7 @@ import SvgUri from "react-native-svg-uri";
 import { StyleSheet, View, ART, Text } from "react-native";
 import * as Animatable from 'react-native-animatable';
 const dogImage = require('../assets/icons/dog.svg');
+const airplaneImage = require('../assets/icons/cleaningRobot_1.svg')
 const exitImage = require('../assets/menus/exit.svg')
 
 class Box extends Component {
@@ -115,10 +116,11 @@ class Animal extends Component {
                 <Animatable.View
                     transition={"rotate"}
                     style={{
-                        transform: [{rotate: angle + "deg"}],
+                        transform: [{rotate: angle}],
                     }}
                 >
-                    <SvgUri source={dogImage}/>
+                    <SvgUri 
+                    source={airplaneImage}/>
                 </Animatable.View>
                 <Text>{text}</Text>
             </ View>
