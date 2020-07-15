@@ -14,8 +14,12 @@ module.exports = class Game {
                 if(socket.roomId){
                     let list = rooms[socket.roomId].menberList;
                     let room = rooms[socket.roomId];
+                    clearInterval(socket.moveID);
                     // game中でwatcherだった場合autoWatcherに切り替え
                     if(list[socket.id].watcher && !room.endFlg){
+                        room.autoFlg = false;
+                        clearInterval(room.autoID);
+                        clearInterval(room.watchLimitID);
                         list['autoWatcher'] = new Player('AUTO');
                         list['autoWatcher'].join = true;
                         list['autoWatcher'].watcher = true;
@@ -29,13 +33,19 @@ module.exports = class Game {
                                 clearInterval(room.stanbyID);
                             }
                         }
+                    } else {
+                        if(Object.keys(list).filter((e) => {
+                            if(e === 'autoWatcher')return;
+                            return list[e].join === true}).length <= 1){
+                            cancel();
+                        }
                     }
-                    delete list[socket.id];
                     if(!io.sockets.adapter.rooms[socket.roomId]){
                         if(rooms.indexOf(socket.roomId) !== -1){
                             clearInterval(room.stanbyID);
                             clearInterval(room.hideID);
                             clearInterval(room.autoID);
+                            clearInterval(room.watchLimitID);
                             clearInterval(room.roopID);
                             rooms.splice(rooms.indexOf(socket.roomId), 1);
                             delete rooms[socket.roomId];
@@ -69,8 +79,12 @@ module.exports = class Game {
                 if(!socket.roomId)return;
                 let list = rooms[socket.roomId].menberList;
                 let room = rooms[socket.roomId];
+                clearInterval(socket.moveID);
                 // game中でwatcherだった場合autoWatcherに切り替え
                 if(list[socket.id].watcher && !room.endFlg){
+                    room.autoFlg = false;
+                    clearInterval(room.autoID);
+                    clearInterval(room.watchLimitID);
                     list['autoWatcher'] = new Player('AUTO');
                     list['autoWatcher'].join = true;
                     list['autoWatcher'].watcher = true;
@@ -86,12 +100,19 @@ module.exports = class Game {
                             clearInterval(room.stanbyID);
                         }
                     }
+                } else {
+                    if(Object.keys(list).filter((e) => {
+                        if(e === 'autoWatcher')return;
+                        return list[e].join === true}).length <= 1){
+                        cancel();
+                    }
                 }
                 socket.leave(socket.roomId, () => {
                     if(!io.sockets.adapter.rooms[socket.roomId]){
                         clearInterval(room.stanbyID);
                         clearInterval(room.hideID);
                         clearInterval(room.autoID);
+                        clearInterval(room.watchLimitID);
                         clearInterval(room.roopID);
                         rooms.splice(rooms.indexOf(socket.roomId), 1);
                         delete rooms[socket.roomId];
@@ -105,6 +126,10 @@ module.exports = class Game {
                 if(!socket.roomId)return;
                 if(rooms[socket.roomId].endFlg || !rooms[socket.roomId].menberList[socket.id].join)return;
                 if(rooms[socket.roomId].menberList[socket.id].watcher){
+                    if(rooms[socket.roomId].autoFlg){
+                        clearInterval(rooms[socket.roomId].autoID);
+                        rooms[socket.roomId].autoFlg = false;
+                    }
                     hide();
                 } else {
                     if(!socket.moveFlg){
@@ -118,6 +143,10 @@ module.exports = class Game {
                 if(!socket.roomId)return;
                 if(rooms[socket.roomId].endFlg || !rooms[socket.roomId].menberList[socket.id].join)return;
                 if(rooms[socket.roomId].menberList[socket.id].watcher){
+                    if(rooms[socket.roomId].autoFlg){
+                        clearInterval(rooms[socket.roomId].autoID);
+                        rooms[socket.roomId].autoFlg = false;
+                    }
                     watch();
                 } else {
                     if(socket.moveFlg){
@@ -129,15 +158,14 @@ module.exports = class Game {
 
             socket.on('auto', () => {
                 if(!socket.roomId)return;
-                if(!rooms[socket.roomId].endFlg || !rooms[socket.roomId].menberList[socket.id].join)return;
-                if(rooms[socket.roomId].autoFlg){
-                    clearInterval(rooms[socket.roomId].autoID);
+                let room = rooms[socket.roomId];
+                if(room.endFlg || !room.menberList[socket.id].join || !room.menberList[socket.id].watcher)return;
+                if(room.autoFlg){
+                    clearInterval(room.autoID);
                 } else {
                     auto();
                 }
-                rooms[socket.roomId].autoFlg = !rooms[socket.roomId].autoFlg;
-                // rooms[socket.roomId].endFlg = false;
-                // rooms[socket.roomId].hideFlg = false;
+                room.autoFlg = !room.autoFlg;
             });
 
             socket.on('join', () => {
@@ -147,7 +175,16 @@ module.exports = class Game {
                 if(!room.endFlg)return;
                 if(list[socket.id].join){
                     list[socket.id].join = false;
-                    list[socket.id].watcher = false;
+                    if(list[socket.id].watcher){
+                        list[socket.id].watcher = false;
+                        Object.keys(list).some((e) => {
+                            if(list[e].join){
+                                list[e].watcher = true;
+                                list[e].distance = 0;
+                                return true;
+                            }
+                        });
+                    }
                 } else {
                     reset();
                     list[socket.id].join = true;
@@ -182,6 +219,7 @@ module.exports = class Game {
                 } else {
                     room.stanbyFlg = false;
                     room.endFlg = false;
+                    room.watchLimitID = setTimeout(watchLimit, 5000);
                 }
             }
 
@@ -196,11 +234,10 @@ module.exports = class Game {
                 clearInterval(socket.moveID);
                 clearInterval(room.hideID);
                 clearInterval(room.autoID);
+                clearInterval(room.watchLimitID);
                 room.watchCount = defaultWatchCount;
                 room.hideTime = defaultHideTime;
                 room.winner = [];
-                // room.watcherWin = undefined;
-                // room.toucherWin = undefined;
                 if(room.menberList['autoWatcher']){delete room.menberList['autoWatcher']}
             }
 
@@ -214,6 +251,7 @@ module.exports = class Game {
                 clearInterval(socket.moveID);
                 clearInterval(room.hideID);
                 clearInterval(room.autoID);
+                clearInterval(room.watchLimitID);
                 if(room.menberList[socket.id].watcher){
                     room.winner = ['watcher', room.menberList[socket.id].name];
                 } else {
@@ -223,7 +261,23 @@ module.exports = class Game {
                     room.menberList[id].join = false;
                     room.menberList[id].watcher = false; 
                 });
-                // if(room.menberList['autoWatcher']){delete room.menberList['autoWatcher']}
+            }
+
+            function cancel () {
+                let room = rooms[socket.roomId];
+                room.startFlg = false;
+                room.endFlg = true;
+                room.hideFlg = false;
+                room.hideFixed = false;
+                room.autoFlg = false;
+                clearInterval(room.hideID);
+                clearInterval(room.autoID);
+                clearInterval(room.watchLimitID);
+                Object.keys(room.menberList).forEach((id) =>{
+                    room.menberList[id].join = false;
+                    room.menberList[id].watcher = false; 
+                });
+                if(room.menberList['autoWatcher']){delete room.menberList['autoWatcher']}
             }
 
             function moveCount () {
@@ -255,6 +309,7 @@ module.exports = class Game {
                 if(room.endFlg || room.hideFlg || room.hideFixed || !room.menberList[socket.id].watcher)return;
                 if(room.watchCount === 0){room.hideFixed = true}
                 room.hideFlg = true;
+                clearInterval(room.watchLimitID);
                 hideCount();
             }
 
@@ -263,19 +318,28 @@ module.exports = class Game {
                 if(room.endFlg || !room.hideFlg || room.watchCount === 0 || !room.menberList[socket.id].watcher)return;
                 room.hideFlg = false;
                 room.watchCount -= 1;
+                room.watchLimitID = setTimeout(watchLimit, 5000);
                 clearInterval(room.hideID);
+            }
+            
+            function watchLimit () {
+                if(!socket.roomId)return;
+                rooms[socket.roomId].autoFlg = true;
+                auto();
             }
 
             function auto () {
-                if(rooms[socket.roomId].endFlg)return;
-                rooms[socket.roomId].random = 500 + Math.floor(Math.random() * 3500);
-                rooms[socket.roomId].autoID = setTimeout(auto, rooms[socket.roomId].random);
-                if(rooms[socket.roomId].hideFlg){
+                if(!socket.roomId)return;
+                let room = rooms[socket.roomId];
+                if(room.endFlg)return;
+                let random = 500 + Math.floor(Math.random() * 3500);
+                room.autoID = setTimeout(auto, random);
+                if(room.hideFlg){
                     watch();
                 } else {
                     hide();
-                    if(rooms[socket.roomId].watchCount === 0){
-                        clearInterval(rooms[socket.roomId].autoID);
+                    if(room.watchCount === 0){
+                        clearInterval(room.autoID);
                     }
                 }
             };

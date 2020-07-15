@@ -5,7 +5,6 @@ module.exports = class Room {
         this.hideTime = 0;
         this.watchCount = 0;
         this.stanbyCount = 0;
-        this.random = undefined;
         this.hideFlg = false;
         this.hideFixed = false;
         this.autoFlg = false;
@@ -15,10 +14,9 @@ module.exports = class Room {
         this.autoID = undefined;
         this.hideID = undefined;
         this.stanbyID = undefined;
+        this.watchLimitID = undefined;
         this.menberList = {};
         this.winner = [];
-        // this.watcherWin = undefined;
-        // this.toucherWin = undefined;
         this.roopID = setInterval(() =>{
             io.to(this.roomId).emit('update',
             this.hideTime,
@@ -28,8 +26,6 @@ module.exports = class Room {
             this.roomId,
             this.endFlg,
             this.winner,
-            // this.watcherWin,
-            // this.toucherWin,
             this.stanbyFlg,
             this.stanbyCount,
             this.autoFlg,
@@ -39,8 +35,8 @@ module.exports = class Room {
         this.autoWatcher = () => {
             if(!this.menberList['autoWatcher'])return;
             if(this.endFlg)return;
-            this.random = 500 + Math.floor(Math.random() * 3500);
-            this.autoID = setTimeout(this.autoWatcher, this.random);
+            let random = 500 + Math.floor(Math.random() * 3500);
+            this.autoID = setTimeout(this.autoWatcher, random);
             if(this.hideFlg){
                 if( this.watchCount === 0)return;
                 this.hideFlg = false;
@@ -82,7 +78,6 @@ module.exports = class Room {
                 this.menberList[id].join = false;
                 this.menberList[id].watcher = false; 
             });
-            // if(this.menberList['autoWatcher']){delete this.menberList['autoWatcher']}
         }
     }    
     

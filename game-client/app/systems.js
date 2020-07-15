@@ -12,8 +12,6 @@ let hideFlg;
 let roomId = undefined;
 let endFlg;
 let winner = [];
-// let watcherWin = undefined;
-// let toucherWin = undefined;
 let stanbyFlg = false;
 let stanbyCount = 5;
 let autoFlg;
@@ -36,8 +34,6 @@ socket.on('update',(ht,wc,ml,hf,ri,ef,wn,sf,sc,af) => {
 	roomId = ri;
 	endFlg = ef;
 	winner = wn
-	// watcherWin = ww;
-	// toucherWin = tw;
 	stanbyFlg = sf;
 	stanbyCount = sc;
 	autoFlg = af;

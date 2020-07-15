@@ -15,8 +15,6 @@ $(function () {
   let list;
   let endFlg;
   let winner = [];
-  // let watchWin;
-  // let touchWin;
   let stanbyFlg;
   let stanbyCount;
 
@@ -87,8 +85,6 @@ $(function () {
     roomId = id;
     endFlg = end;
     winner = win
-    // watchWin = watch;
-    // touchWin = touch;
     stanbyFlg = stanbyF;
     stanbyCount = stanbyC;
   })
