@@ -4,6 +4,7 @@ import { StyleSheet, View, Text, TextInput, Button, Modal, Dimensions, Touchable
 import * as Animatable from 'react-native-animatable';
 import ModalAnimate from "react-native-modal";
 import RigidBodies from "../app/index";
+const cleaningRobot_1 = require('../assets/icons/cleaningRobot_1.svg')
 
 const { width, height } = Dimensions.get("window");
 const startImage = require('../assets/menus/start.svg');
@@ -12,7 +13,7 @@ export default class Title extends Component {
     constructor() {
         super();
         this.state = {
-            inputValue: "Name",
+            inputValue: "noName",
             isMoadlVisible: false,
             sceneVisible: false,
             scene: null,
@@ -43,36 +44,47 @@ export default class Title extends Component {
         this.setState({ inputValue });
     };
 
-    _onPress = () => {
-        this.AnimationRef.bounce();
-    }
-
     render() {
         return(
             <View style={styles.container}>
                 <Animatable.Text 
                     animation = "flash"
-                    style={styles.paragraph}>
+                    style={styles.watch}>
                     WATCH
                 </Animatable.Text>
                 <Animatable.Text 
                     animation = "fadeIn"
                     delay = {500}
-                    style={styles.paragraph}>
+                    style={styles.or}>
                     or
                 </Animatable.Text>
                 <Animatable.Text 
                     animation = "bounceInRight"
                     delay = {1000}
-                    style={styles.paragraph}>
+                    style={styles.touch}>
                     TOUCH
                 </Animatable.Text>
-                <Text 
-                    style={styles.paragraph}
+                <TouchableWithoutFeedback
                     onPress={this.toggleModal}
                 >
-                    {this.state.inputValue}
-                </Text>
+                    <View
+                        style={styles.account}
+                    >
+                        <View
+                            style={styles.icon}
+                        >
+                            <SvgUri 
+                            width = {width / 10}
+                            height = {width / 10}
+                            source={cleaningRobot_1}/>
+                        </View>
+                        <Text 
+                            style={styles.name}
+                        >
+                            {this.state.inputValue}
+                        </Text>
+                    </View>
+                </TouchableWithoutFeedback>
                 <TouchableWithoutFeedback
                     onPress={this.mountScene}
                 >
@@ -80,6 +92,8 @@ export default class Title extends Component {
                         animation = "pulse"
                         iterationCount = {"infinite"}
                         style={{
+                            position: "absolute",
+                            top: height * (6 / 10),
                             width: width/3,
                             height: height/5,
                         }}
@@ -87,13 +101,6 @@ export default class Title extends Component {
                         <SvgUri source={startImage} />
                     </Animatable.View>
                 </TouchableWithoutFeedback>
-
-                <TouchableWithoutFeedback onPressIn={this._onPress}>
-                    <Animatable.View ref={ref => (this.AnimationRef = ref)}>
-                        <Text>Bounce me!</Text>
-                    </Animatable.View>
-                </TouchableWithoutFeedback>
-
                 <ModalAnimate 
                     animationIn="bounceIn"
                     animationOut="bounceOut"
@@ -132,7 +139,62 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         backgroundColor: '#ecf0f1',
     },
+    watch: {
+        position: "absolute",
+        left: width * (2 / 10),
+        top: height * (2.3 / 10),
+        margin: 2,
+        fontSize: 28,
+        fontWeight: 'bold',
+        textAlign: 'center',
+        color: '#34495e',
+    },
+    touch: {
+        position: "absolute",
+        left: width * (5.5 / 10),
+        top: height * (3.3 / 10),
+        margin: 2,
+        fontSize: 28,
+        fontWeight: 'bold',
+        textAlign: 'center',
+        color: '#34495e',
+    },
+    or: {
+        position: "absolute",
+        top: height * (2.8 / 10),
+        margin: 2,
+        fontSize: 28,
+        fontWeight: 'bold',
+        textAlign: 'center',
+        color: '#34495e',
+    },    
+    name: {
+        marginVertical: 6,
+        marginLeft: -4,
+        width: width/2.5,
+        height:height/16,
+        fontSize: 25,
+        textAlign: "center",
+        fontWeight: 'bold',
+        color: '#34495e',
+        borderRadius: width / 20,
+        borderColor: "#000000",
+        borderWidth: 5,
+    },
+    account: {
+        flexDirection: 'row',
+        position: "absolute",
+        top: height * (4.5 / 10),
+    },
+    icon: {
+        padding: 4,
+        borderRadius: width / 2,
+        borderColor: "#000000",
+        borderWidth:5,
+    },
     paragraph: {
+        position: "absolute",
+        top: height * (5 / 10),
         margin: 2,
         fontSize: 28,
         fontWeight: 'bold',
