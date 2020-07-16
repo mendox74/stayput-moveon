@@ -6,7 +6,6 @@
 
 body { 
     font: 13px Helvetica, Arial;
-    text-align: center;
     -webkit-user-select:none; 
 }
 
@@ -32,24 +31,6 @@ form button {
     padding: 10px; 
 }
 
-#messages { 
-    list-style-type: none; 
-    margin: 0; 
-    padding: 0; 
-}
-
-#messages li { 
-    padding: 5px 10px; 
-}
-
-#messages li:nth-child(odd) {
-    background: #eee; 
-}
-
-#messages { 
-    margin-bottom: 40px 
-}
-
 .btn-square {
     margin-top: 10px;
     display: inline-block;
@@ -69,4 +50,8 @@ form button {
 
 .btn-square.logout{
     display: none;
+}
+
+#controller {
+    display: flex;
 }

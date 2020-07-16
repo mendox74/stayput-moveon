@@ -7,23 +7,41 @@
     <title>Socket.IO</title>
   </head>
   <body>
-    
-    <div><span>COUNT：</span><span id="watchCount"></span></div>
-    <div><span>HIDETIME：</span><span id="hideTime"></span></div>
-    <div><span id="winner"></span></div>
-    <div id="player"></div>
-    <div><button id="child" class="btn-square">stop</button></div>
-    <div><button id="join" class="btn-square">join</button></div>
-    <div><button id="auto"  hidden >auto</button></div>
-    <div><span>autoMode：</span><button id="autoMode" >on</button></div>
 
-    <div id="stanbyCount"></div>
+    <div id="controller">
+      <div>
+        <div><span>COUNT：</span><span id="watchCount"></span></div>
+        <div><span>HIDETIME：</span><span id="hideTime"></span></div>
+        <div><span>autoflag：</span><span id="autoFlg"></span></div>
+    
+        <div id="controller">
+          <div><button id="child" class="btn-square">stop</button></div>
+          <div><button id="join" class="btn-square">join</button></div>
+          <div><button id="auto"  hidden >auto</button></div>
+        </div>
+        <div><span>auto：</span><button id="autoMode" >on</button></div>
+    
+        <div id="controller">
+          <div>
+            <button id="login" class="btn-square">入室</button>
+            <button id="logout" class="btn-square logout">退室</button>
+          </div>
+          <div>
+            <div id="userName">unknown</div>
+            <button id="nameChange">名前変更</button>
+          </div>
+        </div>
+
+      </div>
+      <div>
+        <div id="stanbyCount"></div>
+        <div><span id="winner"></span></div>
+        <div id="player"></div>
+      </div>
+    </div>
+
     <div id="roomNumber"></div>
     <div id="roomMenber"></div>
-    <button id="login" class="btn-square">入室</button>
-    <button id="logout" class="btn-square logout">退室</button>
-    <div id="userName">unknown</div>
-    <button id="nameChange">名前変更</button>
     
     <script src="/socket.io/socket.io.js"></script>
     <script src="https://code.jquery.com/jquery-1.11.1.js"></script>

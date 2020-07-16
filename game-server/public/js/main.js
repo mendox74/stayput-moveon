@@ -17,6 +17,7 @@ $(function () {
   let winner = [];
   let stanbyFlg;
   let stanbyCount;
+  let autoFlg = false;
 
 //======================================================================================================
 // イベント
@@ -77,7 +78,7 @@ $(function () {
 
 //======================================================================================================
 // 通信処理
-  socket.on('update', (hideTime, watchC , menbarList, hideFlg, id, end, win, stanbyF, stanbyC) =>{
+  socket.on('update', (hideTime, watchC , menbarList, hideFlg, id, end, win, stanbyF, stanbyC, autoF) =>{
     hide = hideTime;
     watchCount = watchC;
     list = menbarList;
@@ -87,6 +88,7 @@ $(function () {
     winner = win
     stanbyFlg = stanbyF;
     stanbyCount = stanbyC;
+    autoFlg = autoF;
   })
 
   socket.on('connect', () => {
@@ -104,9 +106,18 @@ $(function () {
 
   function updateRoop () {
     roopID = setInterval(() => {
-      $('#hideTime').text(hide);
-      $('#watchCount').text(watchCount);
-      $('#roomNumber').text(roomId);
+      if($('#hideTime').text() !== String(hide)){
+        $('#hideTime').text(hide);
+      }
+      if($('#watchCount').text() !== String(watchCount)){
+        $('#watchCount').text(watchCount);
+      }
+      if($('#roomNumber').text() !== String(roomId)){
+        $('#roomNumber').text(roomId);
+      }
+      if($('#autoFlg').text() !== String(autoFlg)){
+        $('#autoFlg').text(autoFlg);
+      }
 
       if(!hidef){
         if($('#child').text() === 'move'){$('#child').text('out')}
@@ -123,7 +134,9 @@ $(function () {
       }
 
       if(stanbyFlg){
-        $('#stanbyCount').text(stanbyCount);
+        if($('#stanbyCount').text() !== String(stanbyCount)){
+          $('#stanbyCount').text(stanbyCount);
+        }
       } else {
         if($('#stanbyCount').text() !== ''){
           $('#stanbyCount').text('');
@@ -140,12 +153,14 @@ $(function () {
       let playerName;
       if(list){
         playerName = Object.keys(list).map(id => {return list[id].name})
-        $('#roomMenber').text(playerName);
+        if($('#roomMenber').text() !== String(playerName)){
+          $('#roomMenber').text(playerName);
+        }
         idList = Object.keys(list);
 
         idList.forEach((id) => {
             if(!$('#' + id).length){
-              $('#player').append('<div id="' + id + '"><span>' + list[id].name + '：</span><span id="' + id + 'distance"></span></div>');
+              $('#player').append('<div id="' + id + '"><span>' + list[id].name + '：</span><span id="' + id + 'distance"></span><span id="' + id + 'join"></span><span id="' + id + 'watcher"></span></div>');
             }
         });
         playerList.forEach((e) =>{
@@ -160,12 +175,19 @@ $(function () {
         if($('#winner').text() === ''){
           $('#winner').text(winner[0] + ':' + winner[1]);
         }
-        $('#child').text('stop');
       } else {
         if($('#winner').text() !== ''){$('#winner').text('')}
         if(list){
           idList.forEach((id) => {
+            if($('#' + id + 'distance').text() !== String(list[id].distance)){
               $('#' + id + 'distance').text(list[id].distance);
+            }
+            if($('#' + id + 'join').text() !== String(list[id].join)){
+              $('#' + id + 'join').text(list[id].join);
+            }
+            if($('#' + id + 'watcher').text() !== String(list[id].watcher)){
+              $('#' + id + 'watcher').text(list[id].watcher);
+            }
           });
         }
       }
