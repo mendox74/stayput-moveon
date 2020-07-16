@@ -1,7 +1,8 @@
 import React, { Component } from "react";
 import SvgUri from "react-native-svg-uri";
-import { StyleSheet, View, ART, Text } from "react-native";
+import { StyleSheet, View, ART, Text, TouchableWithoutFeedback } from "react-native";
 import * as Animatable from 'react-native-animatable';
+import { socket } from "./systems";
 const dogImage = require('../assets/icons/dog.svg');
 const airplaneImage = require('../assets/icons/cleaningRobot_1.svg')
 const exitImage = require('../assets/menus/exit.svg')
@@ -38,6 +39,10 @@ class Join extends Component {
         super(props);
     }
 
+    _onPress = () => {
+        socket.emit('join');
+    }
+
     render() {
         const width = this.props.size[0];
         const height = this.props.size[1];
@@ -45,17 +50,21 @@ class Join extends Component {
         const y = this.props.body.position.y - height / 2;
    
         return (
-            <View
-            style={{
-                position: "absolute",
-                left: x,
-                top: y,
-                width: width,
-                height: height,
-                borderRadius: width / 2,
-                backgroundColor: this.props.color || "pink"
-            }}
-            />
+            <TouchableWithoutFeedback
+            onPress={this._onPress}
+            >
+                <View
+                style={{
+                    position: "absolute",
+                    left: x,
+                    top: y,
+                    width: width,
+                    height: height,
+                    borderRadius: width / 2,
+                    backgroundColor: this.props.color || "pink"
+                }}
+                />
+            </TouchableWithoutFeedback>
         );
     }
 }
@@ -65,6 +74,11 @@ class Logout extends Component {
         super(props);
     }
 
+    _onPress = () => {
+        socket.emit('logout');
+        this.props.close();
+    }
+
     render() {
         const width = this.props.size[0];
         const height = this.props.size[1];
@@ -72,6 +86,9 @@ class Logout extends Component {
         const y = this.props.body.position.y - height / 2;
 
         return (
+            <TouchableWithoutFeedback
+            onPress={this._onPress}
+            >
                 <View
                     style={{
                         position: "absolute",
@@ -86,6 +103,7 @@ class Logout extends Component {
                 >
                     <SvgUri source = {exitImage} />
                 </View>
+            </TouchableWithoutFeedback>
         );
     }
 }
@@ -133,6 +151,14 @@ class MoveButton extends Component {
         super(props);
     }
 
+    _onPressIn = () => {
+        socket.emit('behavior')
+    }
+
+    _onPressOut = () => {
+        socket.emit('repose')
+    }
+
     render() {
         const width = this.props.size[0];
         const height = this.props.size[1];
@@ -140,17 +166,22 @@ class MoveButton extends Component {
         const y = this.props.body.position.y - height / 2;
 
         return (
-            <View
-                style={{
-                    position: "absolute",
-                    left: x,
-                    top: y,
-                    width: width,
-                    height: height,
-                    borderRadius: width / 2,
-                    backgroundColor: this.props.color || "pink"
-                }}
-            />
+            <TouchableWithoutFeedback
+             onPressIn={this._onPressIn}
+             onPressOut={this._onPressOut}
+            >
+                <View
+                    style={{
+                        position: "absolute",
+                        left: x,
+                        top: y,
+                        width: width,
+                        height: height,
+                        borderRadius: width / 2,
+                        backgroundColor: this.props.color || "pink"
+                    }}
+                />
+            </TouchableWithoutFeedback>
         );
     }
 }

@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { StatusBar, Dimensions, StyleSheet } from "react-native";
 import { GameEngine } from "react-native-game-engine";
-import { PressButton, Behavior, UpDate, Login} from "./systems";
+import { JoinButton, StanbyCount, Hide, ResultShow, GameJoin, UpDate, Delete, Login} from "./systems";
 import { Box, MoveButton, Number, Logout } from "./renderers";
 
 export default class RigidBodies extends Component {
@@ -26,13 +26,13 @@ export default class RigidBodies extends Component {
         return (
             <GameEngine
                 style={styles.container}
-                systems={[PressButton, Behavior, UpDate]}
+                systems={[ JoinButton, StanbyCount, Hide, ResultShow, GameJoin, UpDate, Delete ]}
                 entities={{
                 logout: { body: logout, size: [joinSize, joinSize], color: "blue", close:this.props.unMountScene, renderer: Logout },
                 moveButton: { body: moveBody, size: [buttonSize, buttonSize], color: "#00ebc7", renderer: MoveButton },
                 watchCount: { body: watchCountBody, size: [width / 3, buttonSize / 2], text: 0, renderer: Number },
                 roomId: { body: roomIdBody, size: [width / 3, buttonSize / 2], text: this.props.name, renderer: Number },
-                floor: { body: floor, size: [width, boxSize], color: "blue", renderer: Box },
+                floor: { body: floor, size: [width, boxSize], color: "blue", hideTime: 0, renderer: Box },
                 }}
             >
 

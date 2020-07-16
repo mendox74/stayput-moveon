@@ -271,6 +271,7 @@ module.exports = class Game {
             }
 
             function hideCount () {
+                if(!rooms[socket.roomId])return;
                 if(rooms[socket.roomId].endFlg || !rooms[socket.roomId].hideFlg)return;
                 let hideTime = rooms[socket.roomId].hideTime -= 10;
                 if(hideTime <= 0 ){
