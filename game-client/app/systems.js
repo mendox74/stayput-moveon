@@ -1,9 +1,7 @@
 import _ from "lodash";
 import { Dimensions } from "react-native";
 import { Animal, Result, Stanby, Box, Join } from "./renderers";
-import io from "socket.io-client";
-
-const socket = io('http://192.168.11.7:8080', {transports: ['websocket']} );
+import { socket } from "../socket";
 
 let hideTime = 15000;
 let watchCount = 5;
@@ -43,7 +41,8 @@ const Login = (name) => {
 	socket.emit('login', name);
 }
 
-const JoinButton = (state) => {
+const UpDate = (state) => {
+	// joinButton処理
 	if(endFlg){
 		if(!state.join){
 			state.join = { 
@@ -58,10 +57,7 @@ const JoinButton = (state) => {
 			delete state.join;
 		}
 	}
-	return state;
-}
-
-const StanbyCount = (state) => {
+	// stanbyCount処理
 	if(stanbyFlg){
 		if(!state.stanby){
 			state.stanby = {
@@ -85,10 +81,7 @@ const StanbyCount = (state) => {
 			delete state.stanby;
 		}
 	}
-	return state;
-}
-
-const Hide = (state) => {
+	// hidetime処理
 	if(state.floor.hideTime !== hideTime){
 		state.floor.hideTime = hideTime;
 		state.floor.size[0] = width * ( hideTime / defaultHideTime);
@@ -96,10 +89,6 @@ const Hide = (state) => {
 	if(state.watchCount.text !== watchCount){
 		state.watchCount.text = watchCount;
 	}
-	return state;
-}
-
-const ResultShow = (state) => {
 	// 結果表示
 	if(winner.length){
 		if(!state.result){
@@ -115,12 +104,9 @@ const ResultShow = (state) => {
 	} else {
 		if(state.result){delete state.result}
 	}
-	return state;
-}
-
-const GameJoin = (state) => {
+	// updateループ処理
 	if(menberList){
-		Object.keys(menberList).forEach((e) => {
+		Object.keys(menberList).forEach((e) =>{
 			if(menberList[e].join){
 				if(state[e]){
 					if(menberList[e].watcher){
@@ -129,7 +115,24 @@ const GameJoin = (state) => {
 							state[e].angle = 3.14159 + 'rad',
 							state[e].body = {position: { x: width / 2, y: height * (1 / 13) }};
 						}
-					} 
+						if(hideFlg){
+							if(state[e].angle !== '0rad'){
+								state[e].angle = 0 + 'rad';
+							}
+						} else {
+							if(state[e].angle !== '3.14159rad'){
+								state[e].angle = 3.14159 + 'rad';
+							}
+						}
+					} else {
+						if(menberList[e].distance >= 0){
+							if(state[e].distance !== menberList[e].distance){
+								state[e].distance = menberList[e].distance;
+								state[e].body.position.y = height * ((menberList[e].distance + 580) / 5800);
+								state[e].body.position.x = width * ((500 + (state[e].widPos * (menberList[e].distance / 4000))) / 1000);
+							}
+						}
+					}
 				} else {
 					if(menberList[e].watcher){
 						state[e] = {
@@ -165,43 +168,6 @@ const GameJoin = (state) => {
 				if(state[e]){delete state[e]}
 			}
 		});
-	}
-	return state;
-}
-
-const UpDate = (state) => {
-	if(menberList){
-		Object.keys(menberList).forEach((e) =>{
-			if(menberList[e].join){
-				if(menberList[e].watcher){
-					if(state[e]){
-						if(hideFlg){
-							if(state[e].angle !== '0rad'){
-								state[e].angle = 0 + 'rad';
-							}
-						} else {
-							if(state[e].angle !== '3.14159rad'){
-								state[e].angle = 3.14159 + 'rad';
-							}
-						}
-					}
-				} else {
-					if(state[e] && menberList[e].distance >= 0){
-						if(state[e].distance !== menberList[e].distance){
-							state[e].distance = menberList[e].distance;
-							state[e].body.position.y = height * ((menberList[e].distance + 580) / 5800);
-							state[e].body.position.x = width * ((500 + (state[e].widPos * (menberList[e].distance / 4000))) / 1000);
-						}
-					}
-				}
-			} 
-		});
-	}
-	return state;
-}
-
-const Delete = (state) => {
-	if(menberList){
 		// menberListにないstateを削除
 		let currentId = Object.keys(menberList);
 		Object.keys(state).forEach((e) => {
@@ -210,9 +176,9 @@ const Delete = (state) => {
 					delete state[e];
 				}
 			}
-		})
+		});
 	}
 	return state;
 }
 
-export { JoinButton, StanbyCount, Hide, ResultShow, GameJoin, UpDate, Delete, Login, socket };
+export { UpDate, Login, socket };

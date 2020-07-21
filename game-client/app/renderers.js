@@ -1,11 +1,11 @@
 import React, { Component } from "react";
-import SvgUri from "react-native-svg-uri";
+// import SvgUri from "react-native-svg-uri";
 import { StyleSheet, View, ART, Text, TouchableWithoutFeedback } from "react-native";
 import * as Animatable from 'react-native-animatable';
-import { socket } from "./systems";
-const dogImage = require('../assets/icons/dog.svg');
-const airplaneImage = require('../assets/icons/cleaningRobot_1.svg')
-const exitImage = require('../assets/menus/exit.svg')
+import { socket } from "../socket";
+// const dogImage = require('../assets/icons/dog.svg');
+// const airplaneImage = require('../assets/icons/cleaningRobot_1.svg')
+// const exitImage = require('../assets/menus/exit.svg')
 
 class Box extends Component {
     constructor(props) {
@@ -97,11 +97,11 @@ class Logout extends Component {
                         width: width,
                         height: height,
                         borderRadius: width / 2,
-                        // borderColor: "#000000",
-                        // borderWidth: 4,
+                        borderColor: "#000000",
+                        borderWidth: 4,
                     }}
                 >
-                    <SvgUri source = {exitImage} />
+                    {/* <SvgUri source = {exitImage} /> */}
                 </View>
             </TouchableWithoutFeedback>
         );
@@ -129,17 +129,19 @@ class Animal extends Component {
                     top: y,
                     width: width,
                     height: height,
+                    borderColor: "#000000",
+                    borderWidth: 4,
                 }}
             >
-                <Animatable.View
+                {/* <Animatable.View
                     transition={"rotate"}
                     style={{
                         transform: [{rotate: angle}],
                     }}
-                >
-                    <SvgUri 
-                    source={airplaneImage}/>
-                </Animatable.View>
+                > */}
+                    {/* <SvgUri 
+                    source={airplaneImage}/> */}
+                {/* </Animatable.View> */}
                 <Text>{text}</Text>
             </ View>
         );

@@ -1,10 +1,10 @@
 import React, { Component } from "react";
-import SvgUri from "react-native-svg-uri";
+// import SvgUri from "react-native-svg-uri";
 import { StyleSheet, View, Text, TextInput, Button, Modal, Dimensions, TouchableWithoutFeedback } from "react-native";
 import * as Animatable from 'react-native-animatable';
 import ModalAnimate from "react-native-modal";
 import RigidBodies from "../app/index";
-const cleaningRobot_1 = require('../assets/icons/cleaningRobot_1.svg')
+// const cleaningRobot_1 = require('../assets/icons/cleaningRobot_1.svg')
 
 const { width, height } = Dimensions.get("window");
 const startImage = require('../assets/menus/start.svg');
@@ -73,10 +73,10 @@ export default class Title extends Component {
                         <View
                             style={styles.icon}
                         >
-                            <SvgUri 
+                            {/* <SvgUri 
                             width = {width / 10}
                             height = {width / 10}
-                            source={cleaningRobot_1}/>
+                            source={cleaningRobot_1}/> */}
                         </View>
                         <Text 
                             style={styles.name}
@@ -96,9 +96,11 @@ export default class Title extends Component {
                             top: height * (6 / 10),
                             width: width/3,
                             height: height/5,
+                            borderRadius: width / 2,
+                            backgroundColor: "pink"
                         }}
                     >
-                        <SvgUri source={startImage} />
+                        {/* <SvgUri source={startImage} /> */}
                     </Animatable.View>
                 </TouchableWithoutFeedback>
                 <ModalAnimate 
