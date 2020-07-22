@@ -106,41 +106,43 @@ const UpDate = (state) => {
 	}
 	// updateループ処理
 	if(menberList){
-		Object.keys(menberList).forEach((e) =>{
-			if(menberList[e].join){
-				if(state[e]){
-					if(menberList[e].watcher){
-						if(state[e].role === 'toucher'){
-							state[e].role = 'watcher';
-							state[e].angle = 3.14159 + 'rad',
-							state[e].body = {position: { x: width / 2, y: height * (1 / 13) }};
+		let currentId = Object.keys(menberList);
+		for(let i = 0; i < currentId.length; i++){
+			let id = currentId[i];
+			if(menberList[id].join){
+				if(state[id]){
+					if(menberList[id].watcher){
+						if(state[id].role === 'toucher'){
+							state[id].role = 'watcher';
+							state[id].angle = 3.14159 + 'rad',
+							state[id].body = {position: { x: width / 2, y: height * (1 / 13) }};
 						}
 						if(hideFlg){
-							if(state[e].angle !== '0rad'){
-								state[e].angle = 0 + 'rad';
+							if(state[id].angle !== '0rad'){
+								state[id].angle = 0 + 'rad';
 							}
 						} else {
-							if(state[e].angle !== '3.14159rad'){
-								state[e].angle = 3.14159 + 'rad';
+							if(state[id].angle !== '3.14159rad'){
+								state[id].angle = 3.14159 + 'rad';
 							}
 						}
 					} else {
-						if(menberList[e].distance >= 0){
-							if(state[e].distance !== menberList[e].distance){
-								state[e].distance = menberList[e].distance;
-								state[e].body.position.y = height * ((menberList[e].distance + 580) / 5800);
-								state[e].body.position.x = width * ((500 + (state[e].widPos * (menberList[e].distance / 4000))) / 1000);
+						if(menberList[id].distance >= 0){
+							if(state[id].distance !== menberList[id].distance){
+								state[id].distance = menberList[id].distance;
+								state[id].body.position.y = height * ((menberList[id].distance + 580) / 5800);
+								state[id].body.position.x = width * ((500 + (state[id].widPos * (menberList[id].distance / 4000))) / 1000);
 							}
 						}
 					}
 				} else {
-					if(menberList[e].watcher){
-						state[e] = {
+					if(menberList[id].watcher){
+						state[id] = {
 							id: e,
 							role: 'watcher',
 							body: {position: { x: width / 2, y: height * (1 / 13) }},
 							size: [animalSize, animalSize],
-							text: menberList[e].name,
+							text: menberList[id].name,
 							angle: 3.142 + 'rad',
 							renderer: Animal,
 						};
@@ -151,32 +153,103 @@ const UpDate = (state) => {
 									(width * (randPos / 1000)) - (width / 2),
 									(height * (8 / 10)) - height * (1 / 13),
 									) * -1;
-						state[e] = {
+						state[id] = {
 							id: e,
 							role: 'toucher',
 							widPos: widPos,
 							distance: 0,
 							body: {position: { x: width * (randPos / 1000), y: height * (8 / 10) }},
 							size: [animalSize, animalSize],
-							text: menberList[e].name,
+							text: menberList[id].name,
 							angle: angle + 'rad',
 							renderer: Animal,
 						};
 					}
 				}
 			} else {
-				if(state[e]){delete state[e]}
+				if(state[id]){delete state[id]}
 			}
-		});
+		}
+		// Object.keys(menberList).forEach((e) =>{
+		// 	if(menberList[e].join){
+		// 		if(state[e]){
+		// 			if(menberList[e].watcher){
+		// 				if(state[e].role === 'toucher'){
+		// 					state[e].role = 'watcher';
+		// 					state[e].angle = 3.14159 + 'rad',
+		// 					state[e].body = {position: { x: width / 2, y: height * (1 / 13) }};
+		// 				}
+		// 				if(hideFlg){
+		// 					if(state[e].angle !== '0rad'){
+		// 						state[e].angle = 0 + 'rad';
+		// 					}
+		// 				} else {
+		// 					if(state[e].angle !== '3.14159rad'){
+		// 						state[e].angle = 3.14159 + 'rad';
+		// 					}
+		// 				}
+		// 			} else {
+		// 				if(menberList[e].distance >= 0){
+		// 					if(state[e].distance !== menberList[e].distance){
+		// 						state[e].distance = menberList[e].distance;
+		// 						state[e].body.position.y = height * ((menberList[e].distance + 580) / 5800);
+		// 						state[e].body.position.x = width * ((500 + (state[e].widPos * (menberList[e].distance / 4000))) / 1000);
+		// 					}
+		// 				}
+		// 			}
+		// 		} else {
+		// 			if(menberList[e].watcher){
+		// 				state[e] = {
+		// 					id: e,
+		// 					role: 'watcher',
+		// 					body: {position: { x: width / 2, y: height * (1 / 13) }},
+		// 					size: [animalSize, animalSize],
+		// 					text: menberList[e].name,
+		// 					angle: 3.142 + 'rad',
+		// 					renderer: Animal,
+		// 				};
+		// 			} else {
+		// 				let randPos = Math.floor(Math.random() * 1000) + 1;
+		// 				let widPos = randPos - 500;
+		// 				let angle = Math.atan2(
+		// 							(width * (randPos / 1000)) - (width / 2),
+		// 							(height * (8 / 10)) - height * (1 / 13),
+		// 							) * -1;
+		// 				state[e] = {
+		// 					id: e,
+		// 					role: 'toucher',
+		// 					widPos: widPos,
+		// 					distance: 0,
+		// 					body: {position: { x: width * (randPos / 1000), y: height * (8 / 10) }},
+		// 					size: [animalSize, animalSize],
+		// 					text: menberList[e].name,
+		// 					angle: angle + 'rad',
+		// 					renderer: Animal,
+		// 				};
+		// 			}
+		// 		}
+		// 	} else {
+		// 		if(state[e]){delete state[e]}
+		// 	}
+		// });
 		// menberListにないstateを削除
-		let currentId = Object.keys(menberList);
-		Object.keys(state).forEach((e) => {
-			if(state[e].id){
-				if(currentId.indexOf(e) === -1){
-					delete state[e];
+		// let currentId = Object.keys(menberList);
+		let currentState = Object.keys(state);
+		for(let i = 0; i < currentState.length; i++){
+			let stateId = currentState[i];
+			if(state[stateId].id){
+				if(currentId.indexOf(stateId) === -1){
+					delete state[stateId];
 				}
 			}
-		});
+		}
+		// Object.keys(state).forEach((e) => {
+		// 	if(state[e].id){
+		// 		if(currentId.indexOf(e) === -1){
+		// 			delete state[e];
+		// 		}
+		// 	}
+		// });
 	}
 	return state;
 }
