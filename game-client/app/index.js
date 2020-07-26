@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { StatusBar, Dimensions, StyleSheet } from "react-native";
 import { GameEngine } from "react-native-game-engine";
 import { UpDate, Login } from "./systems";
-import { Box, MoveButton, Number, Logout } from "./renderers";
+import { Box, MoveButton, Number, Logout, Result } from "./renderers";
 
 export default class RigidBodies extends Component {
     constructor(props) {
@@ -20,6 +20,7 @@ export default class RigidBodies extends Component {
         const watchCountBody = {position: { x: width / 1.25, y: height / 10 }};
         const roomIdBody = {position: { x: width / 1.22, y: height / 1.08 }};
         const floor = {position: { x: width / 2, y: boxSize }};
+        const result = {position: { x: width / 2, y: height / 4 }};
 
         Login(this.props.name);
 
@@ -33,7 +34,8 @@ export default class RigidBodies extends Component {
                 watchCount: { body: watchCountBody, size: [width / 3, buttonSize / 2], text: 0, renderer: Number },
                 roomId: { body: roomIdBody, size: [width / 3, buttonSize / 2], text: this.props.name, renderer: Number },
                 floor: { body: floor, size: [width, boxSize], color: "blue", hideTime: 0, renderer: Box },
-                }}
+                result: { body: result, size: [width, height/ 1.1], isVisible: false, animation: 'none', renderer: Result,}
+            }}
             >
 
                 <StatusBar hidden={true} />

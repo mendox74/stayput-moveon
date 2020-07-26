@@ -1,23 +1,41 @@
 import React, { Component } from "react";
-// import SvgUri from "react-native-svg-uri";
-import { StyleSheet, View, Text, TextInput, Button, Modal, Dimensions, TouchableWithoutFeedback } from "react-native";
+import { StyleSheet, View, Text, TextInput, Button, Modal, Dimensions, TouchableWithoutFeedback, processColor } from "react-native";
 import * as Animatable from 'react-native-animatable';
 import ModalAnimate from "react-native-modal";
+import { storage } from "../storage"; 
+import IconSelecter from "../title/iconSelecter"
 import RigidBodies from "../app/index";
-// const cleaningRobot_1 = require('../assets/icons/cleaningRobot_1.svg')
+
+import CleaningRobot_1 from '../assets/icons/bigAirplane.svg';
+import StartImage from '../assets/menus/start.svg';
 
 const { width, height } = Dimensions.get("window");
-const startImage = require('../assets/menus/start.svg');
 
 export default class Title extends Component {
     constructor() {
         super();
         this.state = {
-            inputValue: "noName",
             isMoadlVisible: false,
             sceneVisible: false,
             scene: null,
+            iconName: 'bigAirplane',
         };
+    }
+
+    componentDidMount() {
+        storage.load({
+            key: 'user',
+        }).then(data => {
+            this.setState({ 
+                inputValue: data.name,
+                iconName: data.iconName,
+            });
+        }).catch(err => {
+            this.setState({ 
+                inputValue: 'notFound',
+                iconName: 'bigAirplane',
+            });
+        })
     }
 
     mountScene = () => {
@@ -70,14 +88,11 @@ export default class Title extends Component {
                     <View
                         style={styles.account}
                     >
-                        <View
+                        {/* <View
                             style={styles.icon}
-                        >
-                            {/* <SvgUri 
-                            width = {width / 10}
-                            height = {width / 10}
-                            source={cleaningRobot_1}/> */}
-                        </View>
+                        > */}
+                        <IconSelecter iconName={this.state.iconName}/>
+                        {/* </View> */}
                         <Text 
                             style={styles.name}
                         >
@@ -95,12 +110,12 @@ export default class Title extends Component {
                             position: "absolute",
                             top: height * (6 / 10),
                             width: width/3,
-                            height: height/5,
+                            height: width/3,
                             borderRadius: width / 2,
-                            backgroundColor: "pink"
+                            backgroundColor: "black"
                         }}
                     >
-                        {/* <SvgUri source={startImage} /> */}
+                        <StartImage />
                     </Animatable.View>
                 </TouchableWithoutFeedback>
                 <ModalAnimate 
@@ -108,12 +123,12 @@ export default class Title extends Component {
                     animationOut="bounceOut"
                     isVisible={this.state.isModalVisible}
                 >
-                    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: "#fff" }}>
+                    <View style={styles.setting}>
                         <Text>NAME</Text>
                         <TextInput
                             value={this.state.inputValue}
                             onChangeText={this._handleTextChange}
-                            style={{ width: 200, height: 44, padding: 8, textAlign: 'center',}}
+                            style={styles.textInput}
                         />
                         <Button
                             title="OK"
@@ -202,5 +217,17 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         textAlign: 'center',
         color: '#34495e',
+    },
+    setting: {
+        height: height * (8 / 10),
+        justifyContent: 'center',
+        alignItems: 'center', 
+        backgroundColor: "#fff" 
+    },
+    textInput: {
+        width: 200, 
+        height: 44, 
+        padding: 8, 
+        textAlign: 'center',
     },
   });

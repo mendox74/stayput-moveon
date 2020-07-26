@@ -13,10 +13,11 @@ let winner = [];
 let stanbyFlg = false;
 let stanbyCount = 5;
 let autoFlg;
+let resultFlg = true;
 
 const defaultHideTime = 15000;
 const { width, height } = Dimensions.get("window");
-const animalSize = Math.trunc(Math.max(width, height) * 0.055);
+const animalSize = Math.trunc(Math.max(width, height) * 0.045);
 const buttonSize = Math.trunc(Math.max(width, height) * 0.2);
 const joinSize = Math.trunc(Math.max(width, height) * 0.2);
 
@@ -91,18 +92,32 @@ const UpDate = (state) => {
 	}
 	// 結果表示
 	if(winner.length){
-		if(!state.result){
-			state.result = {
-				body: {position: { x: width / 2, y: height / 4 }},
-				size: [width, buttonSize],
-				role: winner[0],
-				name: winner[1],
-				animation: 'bounceIn',
-				renderer: Result,
-			};
+		// if(!state.result){
+		if(!resultFlg){
+			resultFlg = true;
+			state.result.isVisible = true;
+			//  = {
+				// body: {position: { x: width / 2, y: height / 4 }},
+				// size: [width, buttonSize],
+				// role: winner[0],
+				// name: winner[1],
+				// animation: 'bounceIn',
+				// isVisible: true,
+				// renderer: Result,
+			// };
 		}
-	} else {
-		if(state.result){delete state.result}
+		if(state.result.isVisible){
+			state.result.isVisible = false;
+		}
+		// }
+	}else {
+		if(resultFlg){
+			resultFlg = false;
+		}
+		if(state.result.isVisible){
+			state.result.isVisible = false;
+		}
+		// if(state.result){delete state.result}
 	}
 	// updateループ処理
 	if(menberList){
@@ -116,6 +131,7 @@ const UpDate = (state) => {
 							state[id].role = 'watcher';
 							state[id].angle = 3.14159 + 'rad',
 							state[id].body = {position: { x: width / 2, y: height * (1 / 13) }};
+							state[id].size = [animalSize * 2, animalSize * 2];
 						}
 						if(hideFlg){
 							if(state[id].angle !== '0rad'){
@@ -138,10 +154,10 @@ const UpDate = (state) => {
 				} else {
 					if(menberList[id].watcher){
 						state[id] = {
-							id: e,
+							id: id,
 							role: 'watcher',
 							body: {position: { x: width / 2, y: height * (1 / 13) }},
-							size: [animalSize, animalSize],
+							size: [animalSize * 2, animalSize * 2],
 							text: menberList[id].name,
 							angle: 3.142 + 'rad',
 							renderer: Animal,
@@ -154,7 +170,7 @@ const UpDate = (state) => {
 									(height * (8 / 10)) - height * (1 / 13),
 									) * -1;
 						state[id] = {
-							id: e,
+							id: id,
 							role: 'toucher',
 							widPos: widPos,
 							distance: 0,
@@ -170,70 +186,7 @@ const UpDate = (state) => {
 				if(state[id]){delete state[id]}
 			}
 		}
-		// Object.keys(menberList).forEach((e) =>{
-		// 	if(menberList[e].join){
-		// 		if(state[e]){
-		// 			if(menberList[e].watcher){
-		// 				if(state[e].role === 'toucher'){
-		// 					state[e].role = 'watcher';
-		// 					state[e].angle = 3.14159 + 'rad',
-		// 					state[e].body = {position: { x: width / 2, y: height * (1 / 13) }};
-		// 				}
-		// 				if(hideFlg){
-		// 					if(state[e].angle !== '0rad'){
-		// 						state[e].angle = 0 + 'rad';
-		// 					}
-		// 				} else {
-		// 					if(state[e].angle !== '3.14159rad'){
-		// 						state[e].angle = 3.14159 + 'rad';
-		// 					}
-		// 				}
-		// 			} else {
-		// 				if(menberList[e].distance >= 0){
-		// 					if(state[e].distance !== menberList[e].distance){
-		// 						state[e].distance = menberList[e].distance;
-		// 						state[e].body.position.y = height * ((menberList[e].distance + 580) / 5800);
-		// 						state[e].body.position.x = width * ((500 + (state[e].widPos * (menberList[e].distance / 4000))) / 1000);
-		// 					}
-		// 				}
-		// 			}
-		// 		} else {
-		// 			if(menberList[e].watcher){
-		// 				state[e] = {
-		// 					id: e,
-		// 					role: 'watcher',
-		// 					body: {position: { x: width / 2, y: height * (1 / 13) }},
-		// 					size: [animalSize, animalSize],
-		// 					text: menberList[e].name,
-		// 					angle: 3.142 + 'rad',
-		// 					renderer: Animal,
-		// 				};
-		// 			} else {
-		// 				let randPos = Math.floor(Math.random() * 1000) + 1;
-		// 				let widPos = randPos - 500;
-		// 				let angle = Math.atan2(
-		// 							(width * (randPos / 1000)) - (width / 2),
-		// 							(height * (8 / 10)) - height * (1 / 13),
-		// 							) * -1;
-		// 				state[e] = {
-		// 					id: e,
-		// 					role: 'toucher',
-		// 					widPos: widPos,
-		// 					distance: 0,
-		// 					body: {position: { x: width * (randPos / 1000), y: height * (8 / 10) }},
-		// 					size: [animalSize, animalSize],
-		// 					text: menberList[e].name,
-		// 					angle: angle + 'rad',
-		// 					renderer: Animal,
-		// 				};
-		// 			}
-		// 		}
-		// 	} else {
-		// 		if(state[e]){delete state[e]}
-		// 	}
-		// });
 		// menberListにないstateを削除
-		// let currentId = Object.keys(menberList);
 		let currentState = Object.keys(state);
 		for(let i = 0; i < currentState.length; i++){
 			let stateId = currentState[i];
@@ -243,13 +196,6 @@ const UpDate = (state) => {
 				}
 			}
 		}
-		// Object.keys(state).forEach((e) => {
-		// 	if(state[e].id){
-		// 		if(currentId.indexOf(e) === -1){
-		// 			delete state[e];
-		// 		}
-		// 	}
-		// });
 	}
 	return state;
 }
