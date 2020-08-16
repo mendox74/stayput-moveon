@@ -1,14 +1,16 @@
-import React, { Component } from "react";
-import { StyleSheet, View, ART, Text, TouchableWithoutFeedback } from "react-native";
+import React, { Component, PureComponent } from "react";
+import { StyleSheet, View, Text, TouchableWithoutFeedback } from "react-native";
 import * as Animatable from 'react-native-animatable';
 import ModalAnimate from "react-native-modal";
 import { socket } from "../socket";
+import IconSelecter from "../title/iconSelecter"
+
 import AirplaneImage from '../assets/icons/bigAirplane.svg';
 import Entry from '../assets/menus/entry.svg' 
 import ExitImage from '../assets/menus/exit.svg';
 // const dogImage = require('../assets/icons/dog.svg');
 
-class Box extends Component {
+class Box extends PureComponent {
     constructor(props) {
         super(props);
     }
@@ -35,7 +37,7 @@ class Box extends Component {
     }
 }
 
-class Join extends Component {
+class Join extends PureComponent {
     constructor(props) {
         super(props);
     }
@@ -74,7 +76,7 @@ class Join extends Component {
     }
 }
 
-class Logout extends Component {
+class Logout extends PureComponent {
     constructor(props) {
         super(props);
     }
@@ -113,7 +115,7 @@ class Logout extends Component {
     }
 }
 
-class Animal extends Component {
+class Animal extends PureComponent {
     constructor(props) {
         super(props);
     }
@@ -123,34 +125,55 @@ class Animal extends Component {
         const height = this.props.size[1];
         const x = this.props.body.position.x - width / 2;
         const y = this.props.body.position.y - height / 2;
+        const z = this.props.zIndex;
+        const borderColor = this.props.borderColor;
+        const borderWidth = this.props.borderWidth;
         const text = this.props.text;
-        const angle = this.props.angle;
+        const icon = this.props.icon;
    
         return (
             <View
                 style={{
+                    padding: 5,
                     position: "absolute",
                     left: x,
                     top: y,
+                    zIndex: z,
                     width: width,
                     height: height,
                     alignItems:'center',
                     justifyContent: 'center',
-                    // borderColor: "#000000",
-                    // borderWidth: 4,
                 }}
             >
-                <AirplaneImage 
+                <View
                     style={{
-                        transform: [{rotate: angle}],
+                        padding: 2,
+                        width: width,
+                        height: height,
+                        borderRadius: width / 2,
+                        borderColor: borderColor,
+                        borderWidth: borderWidth,
                     }}
-                />
-            </ View>
+                >
+                    <IconSelecter 
+                        iconName={icon}
+                        angle={this.props.angle}
+                    />
+                </View>
+                <Text 
+                    style={{
+                        width: width * 1.5,
+                        textAlign:'center',
+                        fontSize: 10,
+                    }} 
+                >
+                    {text}</Text>
+            </View>
         );
     }
 }
 
-class MoveButton extends Component {
+class MoveButton extends PureComponent {
     constructor(props) {
         super(props);
     }
@@ -190,7 +213,7 @@ class MoveButton extends Component {
     }
 }
 
-class Number extends Component {
+class Number extends PureComponent {
     constructor(props) {
         super(props);
     }
@@ -227,24 +250,14 @@ class Number extends Component {
     }
 }
 
-class Result extends Component {
+class Result extends PureComponent {
     constructor(props) {
         super(props);
-        this.state = { isVisible: false}
     }
 
-    static getDerivedStateFromProps( nextProps, prevState){
-        if(nextProps.isVisible){
-            if(!prevState.isVisible){
-                return { isVisible: true};
-            }
-        }
-        return null;
+    _onPress = () => {
+        this.props.close();
     }
-
-    hideModal = () => {
-        this.setState({ isVisible: false});
-    };
 
     render() {
         const width = this.props.size[0];
@@ -258,22 +271,17 @@ class Result extends Component {
     
         return (
             <TouchableWithoutFeedback
-                onPress={this.hideModal}
+                onPress={this._onPress}
             >
-                < ModalAnimate
-                    isVisible = {this.state.isVisible}
-                    animationIn="bounceIn"
-                    animationOut="bounceOut"
-                >
-                    <View
+                    <Animatable.View
+                        animation={'bounceIn'}
                         style={{
-                            // position: "absolute",
-                            // left: x,
-                            // top: y,
-                            width: width * (9/10),
+                            position: "absolute",
+                            left: x,
+                            top: y,
+                            zIndex: 2,
+                            width: width,
                             height: height,
-                            // borderColor: "#FFF",
-                            // borderWidth: 2,
                             alignItems:'center',
                             justifyContent: 'center',
                             backgroundColor: '#AC0'
@@ -291,14 +299,13 @@ class Result extends Component {
                             }}
                         >{name}
                         </Text>
-                    </View>
-                </ ModalAnimate>
+                    </Animatable.View>
             </TouchableWithoutFeedback>
         );
     }
 }
 
-class Stanby extends Component {
+class Stanby extends PureComponent {
     constructor(props) {
         super(props);
     }

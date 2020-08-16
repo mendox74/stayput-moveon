@@ -21,8 +21,12 @@
     "assetBundlePatterns": [
       "**/*"
     ],
+    "android": {
+      "config": {"googleMobileAdsAppId": "ca-app-pub-3940256099942544~3347511713" }
+    },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "config": { "googleMobileAdsAppId": "ca-app-pub-3940256099942544~1458002511" }
     },
     "packagerOpts": {
       "config": "metro.config.js",

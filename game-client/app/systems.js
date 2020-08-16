@@ -14,6 +14,7 @@ let stanbyFlg = false;
 let stanbyCount = 5;
 let autoFlg;
 let resultFlg = true;
+let resultClose = true;
 
 const defaultHideTime = 15000;
 const { width, height } = Dimensions.get("window");
@@ -38,8 +39,13 @@ socket.on('update',(ht,wc,ml,hf,ri,ef,wn,sf,sc,af) => {
 	autoFlg = af;
 });
 
-const Login = (name) => {
-	socket.emit('login', name);
+const Login = (name, icon) => {
+	socket.emit('login', name, icon);
+}
+
+const ResultClose = () => {
+	resultFlg = true;
+	resultClose = true;
 }
 
 const UpDate = (state) => {
@@ -92,32 +98,26 @@ const UpDate = (state) => {
 	}
 	// 結果表示
 	if(winner.length){
-		// if(!state.result){
 		if(!resultFlg){
-			resultFlg = true;
-			state.result.isVisible = true;
-			//  = {
-				// body: {position: { x: width / 2, y: height / 4 }},
-				// size: [width, buttonSize],
-				// role: winner[0],
-				// name: winner[1],
-				// animation: 'bounceIn',
-				// isVisible: true,
-				// renderer: Result,
-			// };
+			if(!state.result){
+				resultFlg = true;
+				resultClose = false;
+				state.result = {
+					body: {position: { x: width / 2, y: height / 2 }},
+					size: [width, height * (3/5)],
+					role: winner[0],
+					name: winner[1],
+					animation: 'bounceIn',
+					close: ResultClose,
+					renderer: Result,
+				};
+			}
 		}
-		if(state.result.isVisible){
-			state.result.isVisible = false;
-		}
-		// }
 	}else {
-		if(resultFlg){
-			resultFlg = false;
-		}
-		if(state.result.isVisible){
-			state.result.isVisible = false;
-		}
-		// if(state.result){delete state.result}
+		if(resultFlg){resultFlg = false;}
+	}
+	if(resultClose){
+		if(state.result){delete state.result}
 	}
 	// updateループ処理
 	if(menberList){
@@ -129,8 +129,8 @@ const UpDate = (state) => {
 					if(menberList[id].watcher){
 						if(state[id].role === 'toucher'){
 							state[id].role = 'watcher';
-							state[id].angle = 3.14159 + 'rad',
-							state[id].body = {position: { x: width / 2, y: height * (1 / 13) }};
+							state[id].angle = 3.14159 + 'rad';
+							state[id].body = {position: { x: width / 2, y: height * (1 / 10) }};
 							state[id].size = [animalSize * 2, animalSize * 2];
 						}
 						if(hideFlg){
@@ -146,7 +146,7 @@ const UpDate = (state) => {
 						if(menberList[id].distance >= 0){
 							if(state[id].distance !== menberList[id].distance){
 								state[id].distance = menberList[id].distance;
-								state[id].body.position.y = height * ((menberList[id].distance + 580) / 5800);
+								state[id].body.position.y = height * ((menberList[id].distance + 870) / 5950);
 								state[id].body.position.x = width * ((500 + (state[id].widPos * (menberList[id].distance / 4000))) / 1000);
 							}
 						}
@@ -156,10 +156,11 @@ const UpDate = (state) => {
 						state[id] = {
 							id: id,
 							role: 'watcher',
-							body: {position: { x: width / 2, y: height * (1 / 13) }},
+							body: {position: { x: width / 2, y: height * (1 / 10) }},
 							size: [animalSize * 2, animalSize * 2],
 							text: menberList[id].name,
-							angle: 3.142 + 'rad',
+							icon: menberList[id].icon,
+							angle: 3.14159 + 'rad',
 							renderer: Animal,
 						};
 					} else {
@@ -177,9 +178,19 @@ const UpDate = (state) => {
 							body: {position: { x: width * (randPos / 1000), y: height * (8 / 10) }},
 							size: [animalSize, animalSize],
 							text: menberList[id].name,
+							icon: menberList[id].icon,
 							angle: angle + 'rad',
 							renderer: Animal,
 						};
+					}
+					if(socket.id === id){
+						state[id].zIndex = 1;
+						state[id].borderColor = '#ff4500';
+						state[id].borderWidth = 2;
+					} else {
+						state[id].zIndex = 0;
+						state[id].borderColor = undefined;
+						state[id].borderWidth = 0;
 					}
 				}
 			} else {

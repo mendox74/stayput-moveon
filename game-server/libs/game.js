@@ -17,9 +17,10 @@ module.exports = class Game {
                 console.log("disconnect", socket.userName);
             });
 
-            socket.on('login', (userName) => {
+            socket.on('login', (userName, icon) => {
                 if(socket.roomId)return;
-                socket.userName = userName;
+                socket.userName = userName? userName: 'unknown';
+                socket.icon = icon? icon: 'cleaningRobot_1';
                 // 部屋の有無を判定
                 if(rooms.length >= 1){
                     // 待機中の部屋を検索
@@ -33,7 +34,7 @@ module.exports = class Game {
                 }
                 socket.join(socket.roomId);
 
-                rooms[socket.roomId].menberList[socket.id] = new Player(socket.userName);
+                rooms[socket.roomId].menberList[socket.id] = new Player(socket.userName, icon);
                 console.log(socket.roomId, socket.userName, rooms[socket.roomId].menberList);
             });
 

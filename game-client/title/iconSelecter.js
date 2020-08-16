@@ -1,42 +1,52 @@
-import React, { Component, Fragment } from "react";
+import React, { PureComponent } from "react";
 import { StyleSheet, View, Dimensions} from "react-native";
 import BigAirplane from "../assets/icons/bigAirplane.svg";
 import CleaningRobot_1 from "../assets/icons/cleaningRobot_1.svg";
 
 const { width, height } = Dimensions.get("window");
 
-export default class IconSelecter extends Component {
+export default class IconSelecter extends PureComponent {
     constructor(props){
         super(props)
         this.state = {
-            iconName: <CleaningRobot_1 />
+            icon: <CleaningRobot_1 />,
         }
     }
     
     componentDidMount (){
         switch (this.props.iconName){
             case 'bigAirplane':
-                this.setState({ iconName: <BigAirplane width = {width / 10} height = {width / 10} />});
+                this.setState({ icon: <BigAirplane style={{ transform: [{rotate: this.props.angle? this.props.angle: '0rad'}]}} />});
+                break;
+            case 'cleaningRobot_1':
+                this.setState({ icon: <CleaningRobot_1 style={{ transform: [{rotate: this.props.angle? this.props.angle: '0rad'}]}} />});
                 break;
             default:
-                this.setState({ iconName: <CleaningRobot_1 width = {width / 10} height = {width / 10} />});
+                this.setState({ icon: <CleaningRobot_1 style={{ transform: [{rotate: this.props.angle? this.props.angle: '0rad'}]}} />});
                 break;
+        }
+    }
+
+    componentDidUpdate (prevProps){
+        if(this.props.angle && this.props.angle !== prevProps.angle){
+            switch (this.props.iconName){
+                case 'bigAirplane':
+                    this.setState({ icon: <BigAirplane style={{ transform: [{rotate: this.props.angle}]}} />});
+                    break;
+                case 'cleaningRobot_1':
+                    this.setState({ icon: <CleaningRobot_1 style={{ transform: [{rotate: this.props.angle}]}} />});
+                    break;
+                default:
+                    this.setState({ icon: <CleaningRobot_1 style={{ transform: [{rotate: this.props.angle}]}} />});
+                    break;
+            }
         }
     }
     render(){
         return(
-            <View style={styles.icon}>
-                {this.state.iconName}
-            </View>
+            <>
+                {this.state.icon}
+            </>
         );
     }
 }
-
-const styles = StyleSheet.create({
-    icon: {
-        padding: 4,
-        borderRadius: width / 2,
-        borderColor: "#000000",
-        borderWidth:5,
-    },
-});
