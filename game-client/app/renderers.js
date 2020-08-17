@@ -65,8 +65,6 @@ class Join extends PureComponent {
                         top: y,
                         width: width,
                         height: height,
-                        // borderRadius: width / 2,
-                        // backgroundColor: this.props.color || "pink"
                 }}
                 >
                     <Entry />
@@ -103,9 +101,9 @@ class Logout extends PureComponent {
                         top: y,
                         width: width,
                         height: height,
-                        // borderRadius: width / 2,
-                        // borderColor: "#000000",
-                        // borderWidth: 4,
+                        borderColor: "#f2fdff",
+                        borderWidth: 3,
+                        borderRadius: width / 20,
                     }}
                 >
                     <ExitImage />
@@ -162,7 +160,8 @@ class Animal extends PureComponent {
                 </View>
                 <Text 
                     style={{
-                        width: width * 1.5,
+                        color:'#f2fdff',
+                        width: width * 2,
                         textAlign:'center',
                         fontSize: 10,
                     }} 
@@ -233,16 +232,17 @@ class Number extends PureComponent {
                     top: y,
                     width: width,
                     height: height,
-                    borderColor: "#CCC",
-                    borderWidth: 4,
-                    borderRadius: width,
+                    borderColor: "#f2fdff",
+                    borderWidth: 3,
+                    borderRadius: width / 20,
                     alignItems:'center',
                     justifyContent: 'center',
                 }}
             >
                 <Text
                     style={{
-                    fontSize: 20,
+                    color:'#f2fdff',
+                    fontSize: 15,
                     }}
                 >{text}</Text>
             </View>
@@ -284,7 +284,7 @@ class Result extends PureComponent {
                             height: height,
                             alignItems:'center',
                             justifyContent: 'center',
-                            backgroundColor: '#AC0'
+                            backgroundColor: '#FFFFBB'
                         }}
                     >
                         <Text
@@ -310,7 +310,6 @@ class Stanby extends PureComponent {
         super(props);
     }
 
-
     render() {
         const width = this.props.size[0];
         const height = this.props.size[1];
@@ -328,16 +327,17 @@ class Stanby extends PureComponent {
                     top: y,
                     width: width,
                     height: height,
-                    borderColor: "#FFF",
-                    borderWidth: 2,
+                    // borderColor: "#FFF",
+                    // borderWidth: 2,
                     alignItems:'center',
                     justifyContent: 'center',
-                    backgroundColor: 'pink',
+                    // backgroundColor: 'pink',
                 }}
             >
                 <Text
                     style={{
-                    fontSize: 40,
+                    color:'#f2fdff',
+                    fontSize: 110,
                     }}
                 >{count}
                 </Text>
@@ -346,6 +346,50 @@ class Stanby extends PureComponent {
     }
 }
 
+class Ranking extends PureComponent {
+    constructor(props) {
+        super(props);
+    }
+
+    render() {
+        const width = this.props.size[0];
+        const height = this.props.size[1];
+        const x = this.props.body.position.x - width / 2;
+        const y = this.props.body.position.y - height / 2;
+        let rank = this.props.rank || '0';
+        let entry = this.props.entry || '0';
+    
+        return (
+            <View
+                style={{
+                    position: "absolute",
+                    left: x,
+                    top: y,
+                    width: width,
+                    height: height,
+                    alignItems:'center',
+                    justifyContent: 'center',
+                }}
+            >
+                <Text
+                    style={{
+                    color:'#f2fdff',
+                    fontSize: 30,
+                    }}
+                >{rank}
+                </Text>
+                <Text
+                    style={{
+                    color:'#f2fdff',
+                    fontSize: 30,
+                    }}
+                >{entry}
+                </Text>
+            </View>
+        );
+    }
+}
+
 export {
-    Box, Animal, MoveButton, Number, Result, Logout, Stanby, Join
+    Box, Animal, MoveButton, Number, Result, Logout, Stanby, Join, Ranking
 };

@@ -76,7 +76,7 @@ module.exports = class Room {
             this.autoFlg = false;
             clearInterval(this.hideID);
             clearInterval(this.autoID);
-            this.winner = ['watcher', 'AUTOWatcher'];
+            this.winner = ['WATHCHER', 'AUTO MACHINE'];
             Object.keys(this.menberList).forEach((id) =>{
                 this.menberList[id].join = false;
                 this.menberList[id].watcher = false; 

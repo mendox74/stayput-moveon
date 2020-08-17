@@ -186,13 +186,17 @@ const UpDate = (state) => {
 						};
 					}
 					if(socket.id === id){
-						state[id].zIndex = 1;
-						state[id].borderColor = '#ff4500';
-						state[id].borderWidth = 2;
+						if(state[id].zIndex !== 1){
+							state[id].zIndex = 1;
+							state[id].borderColor = '#ff4500';
+							state[id].borderWidth = 2;
+						}
 					} else {
-						state[id].zIndex = 0;
-						state[id].borderColor = undefined;
-						state[id].borderWidth = 0;
+						if(state[id].zIndex !== 0){
+							state[id].zIndex = 0;
+							state[id].borderColor = undefined;
+							state[id].borderWidth = 0;
+						}
 					}
 				}
 			} else {
@@ -208,6 +212,27 @@ const UpDate = (state) => {
 					delete state[stateId];
 				}
 			}
+		}
+	}
+	// rank取得
+	let rankId = Object.keys(rank);
+	if(rankId.length){
+		if(state.ranking.entry !== rankId.length){
+			state.ranking.entry = rankId.length;
+		}
+		for(let i = 0; i < rankId.length; i++){
+			if(rankId[i] === socket.id){
+				if(state.ranking.rank !== rank[rankId[i]]){
+					state.ranking.rank = rank[rankId[i]];
+				}
+			}
+		}
+	} else {
+		if(state.ranking.entry !== 0){
+			state.ranking.entry = 0;
+		}
+		if(state.ranking.rank !== '-'){
+			state.ranking.rank = '-';
 		}
 	}
 	return state;

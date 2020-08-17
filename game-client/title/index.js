@@ -170,6 +170,7 @@ export default class Title extends Component {
                             android:"" ,
                             })
                         }
+                        bannerSize="smartBannerPortrait"
                         onDidFailToReceiveAdWithError={this.bannerError} 
                     />
                 </View>

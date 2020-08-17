@@ -218,7 +218,7 @@ module.exports = class Game {
                 if(room.menberList['autoWatcher']){delete room.menberList['autoWatcher']}
             }
 
-            function result () {
+            function result (winner = []) {
                 let room = rooms[socket.roomId];
                 room.startFlg = false;
                 room.endFlg = true;
@@ -229,11 +229,7 @@ module.exports = class Game {
                 clearInterval(room.hideID);
                 clearInterval(room.autoID);
                 clearInterval(room.watchLimitID);
-                if(room.menberList[socket.id].watcher){
-                    room.winner = ['watcher', room.menberList[socket.id].name];
-                } else {
-                    room.winner = ['toucher', room.menberList[socket.id].name];
-                }
+                room.winner = winner;
                 Object.keys(room.menberList).forEach((id) =>{
                     room.menberList[id].join = false;
                     room.menberList[id].watcher = false; 
@@ -262,7 +258,7 @@ module.exports = class Game {
                 if(rooms[socket.roomId].hideFlg){
                     let distance = rooms[socket.roomId].menberList[socket.id].distance -= 10;
                     if(distance <= 0 ){
-                        result();
+                        result(['TOUCHER', rooms[socket.roomId].menberList[socket.id].name]);
                     } else {
                         socket.moveID = setTimeout(moveCount, 10);
                     }
@@ -276,7 +272,13 @@ module.exports = class Game {
                 if(rooms[socket.roomId].endFlg || !rooms[socket.roomId].hideFlg)return;
                 let hideTime = rooms[socket.roomId].hideTime -= 10;
                 if(hideTime <= 0 ){
-                    result();
+                    let winnerName;
+                    Object.keys(rooms[socket.roomId].menberList).forEach((id) =>{
+                        if(rooms[socket.roomId].menberList[id].watcher === true){
+                             winnerName = rooms[socket.roomId].menberList[id].name;
+                        }
+                    });
+                    result(['WATCHER', winnerName]);
                 } else {
                     rooms[socket.roomId].hideID = setTimeout(hideCount, 10);
                 }
