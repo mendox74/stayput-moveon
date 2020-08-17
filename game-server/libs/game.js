@@ -176,7 +176,7 @@ module.exports = class Game {
                             room.autoFlg = false;
                             clearInterval(room.autoID);
                             clearInterval(room.watchLimitID);
-                            list['autoWatcher'] = new Player('AUTO');
+                            list['autoWatcher'] = new Player('AUTO', 'cleaningRobot_1');
                             list['autoWatcher'].join = true;
                             list['autoWatcher'].watcher = true;
                             room.autoWatcher();

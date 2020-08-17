@@ -12,12 +12,13 @@ $(function () {
   let hide;
   let hidef;
   let roomId;
-  let list;
+  let list = {};
   let endFlg;
   let winner = [];
   let stanbyFlg;
   let stanbyCount;
   let autoFlg = false;
+  let ranking = {};
 
 //======================================================================================================
 // イベント
@@ -78,7 +79,7 @@ $(function () {
 
 //======================================================================================================
 // 通信処理
-  socket.on('update', (hideTime, watchC , menbarList, hideFlg, id, end, win, stanbyF, stanbyC, autoF) =>{
+  socket.on('update', (hideTime, watchC , menbarList, hideFlg, id, end, win, stanbyF, stanbyC, autoF, rank) =>{
     hide = hideTime;
     watchCount = watchC;
     list = menbarList;
@@ -89,6 +90,7 @@ $(function () {
     stanbyFlg = stanbyF;
     stanbyCount = stanbyC;
     autoFlg = autoF;
+    ranking = rank? rank: {};
   })
 
   socket.on('connect', () => {
@@ -131,6 +133,21 @@ $(function () {
         if($('#auto').is(':visible')){
           $('#auto').hide();
         };
+      }
+
+      let rankText = '';
+      let entryText = ''
+      if(Object.keys(ranking).length){
+        Object.keys(ranking).forEach(id => {
+          rankText += list[id].name + ':' + ranking[id];
+        });
+        entryText = Object.keys(ranking).length;
+      }
+      if($('#ranking').text() !== rankText){
+        $('#ranking').text(rankText);
+      }
+      if($('#entry').text() !== entryText){
+        $('#entry').text(entryText);
       }
 
       if(stanbyFlg){

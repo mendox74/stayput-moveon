@@ -16,8 +16,10 @@ module.exports = class Room {
         this.stanbyID = undefined;
         this.watchLimitID = undefined;
         this.menberList = {};
+        this.rank = {};
         this.winner = [];
         this.roopID = setInterval(() =>{
+            this.ranking();
             io.to(this.roomId).emit('update',
             this.hideTime,
             this.watchCount,
@@ -29,6 +31,7 @@ module.exports = class Room {
             this.stanbyFlg,
             this.stanbyCount,
             this.autoFlg,
+            this.rank,
             );
         },1000/ 30);
 
@@ -78,6 +81,27 @@ module.exports = class Room {
                 this.menberList[id].join = false;
                 this.menberList[id].watcher = false; 
             });
+        }
+
+        this.ranking = () => {
+            let entry = [];
+            this.rank = {};
+            if(!Object.keys(this.menberList).length){return;}
+            Object.keys(this.menberList).forEach((id) =>{
+                if(this.menberList[id].join && !this.menberList[id].watcher){
+                    entry.push({id: id, distance: this.menberList[id].distance})
+                }
+            });
+            if(entry.length){
+                entry.sort((a, b) => {
+                    if(a.distance < b.distance) return -1;
+                    if(a.distance > b.distance) return 1;
+                    return 0;
+                });
+                for(let i = 0; i< entry.length; i++){
+                    this.rank[entry[i].id] = entry[i].distance < 4000? i+1: entry.length;
+                }
+            }
         }
     }    
     

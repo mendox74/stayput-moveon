@@ -6,6 +6,7 @@ import { socket } from "../socket";
 let hideTime = 15000;
 let watchCount = 5;
 let menberList;
+let rank = {};
 let hideFlg;
 let roomId = undefined;
 let endFlg;
@@ -26,7 +27,7 @@ socket.on('connect', () => {
 	console.log( 'connect : socket.id = %s', socket.id );
 });
 
-socket.on('update',(ht,wc,ml,hf,ri,ef,wn,sf,sc,af) => {
+socket.on('update',(ht,wc,ml,hf,ri,ef,wn,sf,sc,af,rk) => {
 	hideTime = ht;
 	watchCount = wc;
 	menberList = ml;
@@ -37,6 +38,7 @@ socket.on('update',(ht,wc,ml,hf,ri,ef,wn,sf,sc,af) => {
 	stanbyFlg = sf;
 	stanbyCount = sc;
 	autoFlg = af;
+	rank = rk;
 });
 
 const Login = (name, icon) => {
