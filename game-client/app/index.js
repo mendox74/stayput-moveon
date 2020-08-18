@@ -20,7 +20,7 @@ export default class RigidBodies extends PureComponent {
         const watchCountBody = {position: { x: width / 1.25, y: height / 12 }};
         const roomIdBody = {position: { x: width / 1.25, y: height / 1.08 }};
         const floor = {position: { x: width / 2, y: boxSize * 1.2 }};
-        const rankBody = {position: { x: width / 4.5, y: height / 6 }};
+        const rankBody = {position: { x: width / 5.3, y: height / 4.8 }};
 
         Login(this.props.name, this.props.icon);
 

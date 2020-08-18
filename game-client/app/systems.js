@@ -21,7 +21,7 @@ const defaultHideTime = 15000;
 const { width, height } = Dimensions.get("window");
 const animalSize = Math.trunc(Math.max(width, height) * 0.045);
 const buttonSize = Math.trunc(Math.max(width, height) * 0.2);
-const joinSize = Math.trunc(Math.max(width, height) * 0.2);
+const joinSize = Math.trunc(Math.max(width, height) * 0.3);
 
 socket.on('connect', () => {
 	console.log( 'connect : socket.id = %s', socket.id );
@@ -106,9 +106,10 @@ const UpDate = (state) => {
 				resultClose = false;
 				state.result = {
 					body: {position: { x: width / 2, y: height / 2 }},
-					size: [width, height * (3/5)],
+					size: [width, height * (4.3/5)],
 					role: winner[0],
 					name: winner[1],
+					rank: state.ranking.rank,
 					animation: 'bounceIn',
 					close: ResultClose,
 					renderer: Result,
@@ -225,6 +226,11 @@ const UpDate = (state) => {
 				if(state.ranking.rank !== rank[rankId[i]]){
 					state.ranking.rank = rank[rankId[i]];
 				}
+			}
+		}
+		if(!menberList[socket.id].join){
+			if(state.ranking.rank !== '-'){
+				state.ranking.rank = '-';
 			}
 		}
 	} else {

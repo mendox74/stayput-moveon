@@ -90,7 +90,7 @@ module.exports = class Room {
             if(!id.length){return;}
             for(let i = 0; i < id.length; i++){
                 if(this.menberList[id[i]].join && !this.menberList[id[i]].watcher){
-                    entry.push({id: id, distance: this.menberList[id[i]].distance})
+                    entry.push({id: id[i], distance: this.menberList[id[i]].distance})
                 }
             }
             if(entry.length){

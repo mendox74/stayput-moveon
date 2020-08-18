@@ -2,12 +2,14 @@ import React, { Component, PureComponent } from "react";
 import { StyleSheet, View, Text, TouchableWithoutFeedback } from "react-native";
 import * as Animatable from 'react-native-animatable';
 import ModalAnimate from "react-native-modal";
+import { AdMobBanner } from "expo-ads-admob";
 import { socket } from "../socket";
 import IconSelecter from "../title/iconSelecter"
 
 import AirplaneImage from '../assets/icons/bigAirplane.svg';
 import Entry from '../assets/menus/entry.svg' 
 import ExitImage from '../assets/menus/exit.svg';
+import Laurel from '../assets/menus/laurel.svg';
 // const dogImage = require('../assets/icons/dog.svg');
 
 class Box extends PureComponent {
@@ -65,9 +67,22 @@ class Join extends PureComponent {
                         top: y,
                         width: width,
                         height: height,
+                        borderRadius: width / 2,
+                        borderColor: "#f2fdff",
+                        borderWidth: 3,
+                        backgroundColor: "#dc143c",
+                        alignItems:'center',
+                        justifyContent: 'center',
                 }}
                 >
-                    <Entry />
+                    <Text
+                        style={{
+                            color:'#f2fdff',
+                            fontSize: width/5,
+                        }}
+                    >
+                        JOIN!
+                    </Text>
                 </Animatable.View>
             </TouchableWithoutFeedback>
         );
@@ -266,6 +281,7 @@ class Result extends PureComponent {
         const y = this.props.body.position.y - height / 2;
         let role = this.props.role;
         let name = this.props.name;
+        let rank = this.props.rank;
         let animationIn = this.props.animationIn;
         let animationOut = this.props.animationOut;
     
@@ -283,22 +299,80 @@ class Result extends PureComponent {
                             width: width,
                             height: height,
                             alignItems:'center',
-                            justifyContent: 'center',
                             backgroundColor: '#FFFFBB'
                         }}
                     >
                         <Text
                             style={{
-                            fontSize: 40,
+                            margin: 10,
+                            width: width,
+                            textAlign: 'center',
+                            fontSize: 20,
+                            }}
+                        >WINNER
+                        </Text>
+                        <Text
+                            style={{
+                            width: width,
+                            textAlign: 'center',
+                            fontSize: 30,
                             }}
                         >{role}
                         </Text>
                         <Text
                             style={{
-                            fontSize: 20,
+                            fontSize: 40,
                             }}
                         >{name}
                         </Text>
+                        <Text
+                            style={{
+                            marginTop: 10,
+                            marginBottom: -10,
+                            fontSize: 20,
+                            }}
+                        >RANK
+                        </Text>
+                        <View
+                            style={{
+                                alignItems:'center',
+                            }}
+                        >
+                            <Laurel 
+                                style={{
+                                    position: "absolute",
+                                    width: 120,
+                                    height: 120,
+                                }}/>
+                            <Text
+                                style={{
+                                    position: "absolute",
+                                    width: 120,
+                                    height: 120,
+                                    marginTop: 25,
+                                    fontSize: 50,
+                                    textAlign: 'center',
+                                }}
+                            >{rank}
+                            </Text>
+                        </View>
+                        <View
+                            style={{
+                                marginTop: 140
+                            }}
+                        >
+                            <AdMobBanner
+                                adUnitID={
+                                    __DEV__ ? "ca-app-pub-3940256099942544/6300978111"
+                                    : Platform.select({
+                                    ios: "" ,
+                                    android:"" ,
+                                    })
+                                }
+                                bannerSize="mediumRectangle"
+                                onDidFailToReceiveAdWithError={this.bannerError} 
+                            />
+                        </View>
                     </Animatable.View>
             </TouchableWithoutFeedback>
         );
@@ -356,31 +430,43 @@ class Ranking extends PureComponent {
         const height = this.props.size[1];
         const x = this.props.body.position.x - width / 2;
         const y = this.props.body.position.y - height / 2;
-        let rank = this.props.rank || '0';
+        let rank = this.props.rank || '-';
         let entry = this.props.entry || '0';
     
         return (
+            <View>
+                <Text
+                    style={{
+                    position: "absolute",
+                    left: x - width / 2.5,
+                    top: y - height / 1.2,
+                    width: width * 1.4,
+                    color:'#f2fdff',
+                    textAlign: 'center',
+                    fontSize: 50,
+                    }}
+                >{rank}
+                </Text>
             <View
                 style={{
                     position: "absolute",
                     left: x,
                     top: y,
                     width: width,
-                    height: height,
-                    alignItems:'center',
-                    justifyContent: 'center',
+                    height: height / 15,
+                    backgroundColor:'#f2fdff',
+                    transform:[{rotate: '-30deg'}]
                 }}
             >
+            </View>
                 <Text
                     style={{
+                    position: "absolute",
+                    left: x + width / 5,
+                    top: y + height / 8,
+                    width: width * 1.3,
                     color:'#f2fdff',
-                    fontSize: 30,
-                    }}
-                >{rank}
-                </Text>
-                <Text
-                    style={{
-                    color:'#f2fdff',
+                    textAlign: 'center',
                     fontSize: 30,
                     }}
                 >{entry}
