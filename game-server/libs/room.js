@@ -86,19 +86,20 @@ module.exports = class Room {
         this.ranking = () => {
             let entry = [];
             this.rank = {};
-            if(!Object.keys(this.menberList).length){return;}
-            Object.keys(this.menberList).forEach((id) =>{
-                if(this.menberList[id].join && !this.menberList[id].watcher){
-                    entry.push({id: id, distance: this.menberList[id].distance})
+            let id = Object.keys(this.menberList);
+            if(!id.length){return;}
+            for(let i = 0; i < id.length; i++){
+                if(this.menberList[id[i]].join && !this.menberList[id[i]].watcher){
+                    entry.push({id: id, distance: this.menberList[id[i]].distance})
                 }
-            });
+            }
             if(entry.length){
                 entry.sort((a, b) => {
                     if(a.distance < b.distance) return -1;
                     if(a.distance > b.distance) return 1;
                     return 0;
                 });
-                for(let i = 0; i< entry.length; i++){
+                for(let i = 0; i < entry.length; i++){
                     this.rank[entry[i].id] = entry[i].distance < 4000? i+1: entry.length;
                 }
             }
