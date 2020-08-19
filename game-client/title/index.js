@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { StyleSheet, View, Text, TextInput, Button, Modal, Dimensions, TouchableWithoutFeedback, processColor } from "react-native";
+import { StyleSheet, View, Text, TextInput, Modal, Dimensions, TouchableWithoutFeedback } from "react-native";
 import * as Animatable from 'react-native-animatable';
 import ModalAnimate from "react-native-modal";
 import { AdMobBanner } from "expo-ads-admob";
@@ -60,7 +60,8 @@ export default class Title extends Component {
         storage.save({
             key: 'user',
             data: {
-                name : this.state.inputValue
+                name : this.state.inputValue,
+                iconName: this.state.iconName,
             }
         })
         this.setState({ isModalVisible: !this.state.isModalVisible });
@@ -129,11 +130,20 @@ export default class Title extends Component {
                         <View style={styles.icon}>
                             <IconSelecter iconName={this.state.iconName}/>
                         </View>
-                        <Text 
-                            style={styles.name}
-                        >
-                            {this.state.inputValue}
-                        </Text>
+                        <View>
+                            <Text
+                                style={{
+                                    color: '#f2fdff',
+                                    textAlign: 'center',
+                                }}
+                            >
+                                NAME</Text>
+                            <Text 
+                                style={styles.name}
+                            >
+                                {this.state.inputValue}
+                            </Text>
+                        </View>
                     </View>
                 </TouchableWithoutFeedback>
                 <TouchableWithoutFeedback
@@ -180,23 +190,113 @@ export default class Title extends Component {
                     isVisible={this.state.isModalVisible}
                 >
                     <View style={styles.setting}>
-                        <Text>NAME</Text>
-                        <TextInput
-                            value={this.state.inputValue}
-                            onChangeText={this._handleTextChange}
-                            style={styles.textInput}
-                        />
-                        <View style={styles.icon}>
-                            <IconSelecter iconName={this.state.iconName}/>
+                        <View
+                            style={{
+                                paddingTop: 20,
+                                flexDirection: 'row',
+                            }}
+                        >
+                            <View style={styles.icon}>
+                                <IconSelecter iconName={this.state.iconName}/>
+                            </View>
+                            <View>
+                                <Text
+                                    style={{
+                                        textAlign: 'center',
+                                        color: '#f2fdff',
+                                    }}
+                                >
+                                    NAME
+                                </Text>
+                                <TextInput
+                                    value={this.state.inputValue}
+                                    onChangeText={this._handleTextChange}
+                                    style={styles.textInput}
+                                />
+                                <View
+                                    style={{
+                                        marginTop: 3,
+                                        marginLeft: 25,
+                                        flexDirection: 'row',
+                                    }}
+                                >
+                                    <Text
+                                        style={styles.button}
+                                        onPress={this.accountSave}
+                                    >OK
+                                    </Text>
+                                    <Text
+                                        style={styles.button}
+                                        title="CANCEL"
+                                        onPress={this.toggleModal}
+                                    >CANCEL
+                                    </Text>
+                                </View>
+                            </View>
                         </View>
-                        <Button
-                            title="OK"
-                            onPress={this.accountSave}
-                        />
-                        <Button
-                            title="CANCEL"
-                            onPress={this.toggleModal}
-                        />
+                        <Text
+                            style={{
+                                margin: 5,
+                                textAlign: 'center',
+                                color: '#f2fdff',
+                            }}
+                        >
+                            ICON SELECT
+                        </Text>
+                        <View
+                            style={{
+                                flexDirection: 'row',
+                            }}
+                        >
+                            <View style={styles.iconSelect}>
+                                <IconSelecter iconName={this.state.iconName}/>
+                            </View>
+                            <View style={styles.iconSelect}>
+                                <IconSelecter iconName={this.state.iconName}/>
+                            </View>
+                            <View style={styles.iconSelect}>
+                                <IconSelecter iconName={this.state.iconName}/>
+                            </View>
+                            <View style={styles.iconSelect}>
+                                <IconSelecter iconName={'cleaningRobot_1'}/>
+                            </View>
+                        </View>
+                        <View
+                            style={{
+                                flexDirection: 'row',
+                            }}
+                        >
+                            <View style={styles.iconSelect}>
+                                <IconSelecter iconName={this.state.iconName}/>
+                            </View>
+                            <View style={styles.iconSelect}>
+                                <IconSelecter iconName={this.state.iconName}/>
+                            </View>
+                            <View style={styles.iconSelect}>
+                                <IconSelecter iconName={this.state.iconName}/>
+                            </View>
+                            <View style={styles.iconSelect}>
+                                <IconSelecter iconName={this.state.iconName}/>
+                            </View>
+                        </View>
+                        <View
+                            style={{
+                                flexDirection: 'row',
+                            }}
+                        >
+                            <View style={styles.iconSelect}>
+                                <IconSelecter iconName={this.state.iconName}/>
+                            </View>
+                            <View style={styles.iconSelect}>
+                                <IconSelecter iconName={this.state.iconName}/>
+                            </View>
+                            <View style={styles.iconSelect}>
+                                <IconSelecter iconName={this.state.iconName}/>
+                            </View>
+                            <View style={styles.iconSelect}>
+                                <IconSelecter iconName={this.state.iconName}/>
+                            </View>
+                        </View>
                     </View>
                 </ModalAnimate>
                 <Modal
@@ -224,7 +324,7 @@ const styles = StyleSheet.create({
         left: width * (2 / 10),
         top: height * (2.3 / 10),
         margin: 2,
-        fontSize: 28,
+        fontSize: 30,
         fontWeight: 'bold',
         textAlign: 'center',
         color: '#f2fdff',
@@ -234,7 +334,7 @@ const styles = StyleSheet.create({
         left: width * (5.5 / 10),
         top: height * (3.3 / 10),
         margin: 2,
-        fontSize: 28,
+        fontSize: 30,
         fontWeight: 'bold',
         textAlign: 'center',
         color: '#f2fdff',
@@ -250,7 +350,6 @@ const styles = StyleSheet.create({
     },    
     name: {
         paddingTop: 9,
-        marginVertical: 6,
         marginLeft: -2,
         width: width/2,
         height:height/15,
@@ -279,22 +378,45 @@ const styles = StyleSheet.create({
     },
     setting: {
         height: height * (8 / 10),
-        justifyContent: 'center',
         alignItems: 'center', 
-        backgroundColor: "#fff" 
+        borderColor: "#f2fdff",
+        borderWidth: 3,
+        backgroundColor: "#101935" 
     },
     textInput: {
         width: 200, 
         height: 44, 
-        padding: 8, 
+        fontSize: 20,
         textAlign: 'center',
+        borderRadius: width / 20,
+        borderColor: "#f2fdff",
+        borderWidth: 3,
+        color: '#f2fdff',
     },
     icon: {
-        width: width / 7,
-        height: width / 7,
+        width: width / 5,
+        height: width / 5,
         padding: 4,
         borderRadius: width / 2,
         borderColor: "#f2fdff",
         borderWidth:3,
+    },
+    iconSelect: {
+        width: width / 7,
+        height: width / 7,
+        padding: 4,
+        margin: 10,
+    },
+    button: {
+        width: 80, 
+        height: 35, 
+        fontSize: 15,
+        margin: 5,
+        paddingTop: 5,
+        textAlign: 'center',
+        borderRadius: width / 30,
+        borderColor: "#f2fdff",
+        borderWidth: 3,
+        color: '#f2fdff',
     },
   });
