@@ -248,35 +248,43 @@ export default class Title extends Component {
                                 flexDirection: 'row',
                             }}
                         >
+                            <TouchableWithoutFeedback
+                                onPress={() => {this.setState({iconName: 'bigAirplane'})}}
+                            >
+                                <View style={styles.iconSelect}>
+                                    <IconSelecter iconName={'bigAirplane'}/>
+                                </View>
+                            </TouchableWithoutFeedback>
+                            <TouchableWithoutFeedback
+                                onPress={() => {this.setState({iconName: 'beetle_1'})}}
+                            >
+                                <View style={styles.iconSelect}>
+                                    <IconSelecter iconName={'beetle_1'}/>
+                                </View>
+                            </TouchableWithoutFeedback>
                             <View style={styles.iconSelect}>
-                                <IconSelecter iconName={this.state.iconName}/>
+                                <IconSelecter iconName={'beetle_2'}/>
                             </View>
                             <View style={styles.iconSelect}>
-                                <IconSelecter iconName={this.state.iconName}/>
+                                <IconSelecter iconName={'turtle_1'}/>
                             </View>
-                            <View style={styles.iconSelect}>
-                                <IconSelecter iconName={this.state.iconName}/>
-                            </View>
+                        </View>
+                        <View
+                            style={{
+                                flexDirection: 'row',
+                            }}
+                        >
                             <View style={styles.iconSelect}>
                                 <IconSelecter iconName={'cleaningRobot_1'}/>
                             </View>
-                        </View>
-                        <View
-                            style={{
-                                flexDirection: 'row',
-                            }}
-                        >
                             <View style={styles.iconSelect}>
-                                <IconSelecter iconName={this.state.iconName}/>
+                                <IconSelecter iconName={'cleaningRobot_2'}/>
                             </View>
                             <View style={styles.iconSelect}>
-                                <IconSelecter iconName={this.state.iconName}/>
+                                <IconSelecter iconName={'cleaningRobot_3'}/>
                             </View>
                             <View style={styles.iconSelect}>
-                                <IconSelecter iconName={this.state.iconName}/>
-                            </View>
-                            <View style={styles.iconSelect}>
-                                <IconSelecter iconName={this.state.iconName}/>
+                                <IconSelecter iconName={'crab_1'}/>
                             </View>
                         </View>
                         <View
@@ -285,16 +293,16 @@ export default class Title extends Component {
                             }}
                         >
                             <View style={styles.iconSelect}>
-                                <IconSelecter iconName={this.state.iconName}/>
+                                <IconSelecter iconName={'butterfly_1'}/>
                             </View>
                             <View style={styles.iconSelect}>
-                                <IconSelecter iconName={this.state.iconName}/>
+                                <IconSelecter iconName={'butterfly_2'}/>
                             </View>
                             <View style={styles.iconSelect}>
-                                <IconSelecter iconName={this.state.iconName}/>
+                                <IconSelecter iconName={'butterfly_3'}/>
                             </View>
                             <View style={styles.iconSelect}>
-                                <IconSelecter iconName={this.state.iconName}/>
+                                <IconSelecter iconName={'squid_1'}/>
                             </View>
                         </View>
                     </View>
