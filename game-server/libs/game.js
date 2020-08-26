@@ -19,12 +19,11 @@ module.exports = class Game {
 
             socket.on('login', (userName, icon) => {
                 if(socket.roomId)return;
-                socket.userName = userName? userName: 'unknown';
-                socket.icon = icon? icon: 'cleaningRobot_1';
+                socket.userName = userName || 'unknown';
                 // 部屋の有無を判定
                 if(rooms.length >= 1){
-                    // 待機中の部屋を検索
-                    socket.roomId = rooms.find(room => io.sockets.adapter.rooms[room].length <= 100);
+                    // フリーの待機中の部屋を検索
+                    socket.roomId = rooms.find(room => io.sockets.adapter.rooms[room].length < 101 && !room.protect);
                 }
                 if(!socket.roomId){
                     // 新しい部屋を生成
@@ -34,7 +33,45 @@ module.exports = class Game {
                 }
                 socket.join(socket.roomId);
 
-                rooms[socket.roomId].menberList[socket.id] = new Player(socket.userName, icon);
+                rooms[socket.roomId].menberList[socket.id] = new Player(socket.userName, icon || 'cleaningRobot_1');
+                console.log(socket.roomId, socket.userName, rooms[socket.roomId].menberList);
+            });
+
+            socket.on('createRoom', (userName, icon, roomId, protect = false) => {
+                if(socket.roomId)return;
+                socket.userName = userName || 'unknown';
+                // 指定roomIdの新しい部屋を生成
+                socket.roomId = roomId;
+                rooms.push(socket.roomId);
+                rooms[socket.roomId] = new Room(io, socket.roomId);
+                rooms[socket.roomId].protect = protect;
+                socket.join(socket.roomId);
+
+                rooms[socket.roomId].menberList[socket.id] = new Player(socket.userName, icon || 'cleaningRobot_1');
+                console.log(socket.roomId, socket.userName, rooms[socket.roomId].menberList);
+            });
+
+            socket.on('assignRoom', (userName, icon, roomId) => {
+                if(socket.roomId)return;
+                socket.userName = userName || 'unknown';
+                // 指定roomIdの部屋を検索、参加
+                if(rooms.length >= 1){
+                    if(rooms.some(room => room === roomId)){
+                        if(io.sockets.adapter.rooms[roomId].length < 101){
+                            socket.roomId = roomId;
+                        }else {
+                            console.log('full capacity the room');
+                            return;
+                        }
+                    } else {
+                        console.log('not found the room');
+                        return;
+                    }
+                }
+                if(!socket.roomId){ return;}
+                socket.join(socket.roomId);
+
+                rooms[socket.roomId].menberList[socket.id] = new Player(socket.userName, icon || 'cleaningRobot_1');
                 console.log(socket.roomId, socket.userName, rooms[socket.roomId].menberList);
             });
 
@@ -333,10 +370,16 @@ module.exports = class Game {
             + 'abcdefghijklmnopqrstuvwxyz'
             + 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
         
-            for (let i = 0; i < maxLen; i++) {
-                key += src[Math.floor(Math.random() * src.length)];
+            for(let count = 0; count < 10; count++){
+                for (let i = 0; i < maxLen; i++) {
+                    key += src[Math.floor(Math.random() * src.length)];
+                }
+                if(!rooms[key]){
+                    return key;
+                }
             }
-            return key;
+            console.log('key create error');
+            return 'key create error';
         }
     }
 }

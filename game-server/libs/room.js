@@ -2,6 +2,7 @@ module.exports = class Room {
     constructor(io, roomId){
         this.io = io;       
         this.roomId = roomId;
+        this.protect = false;
         this.hideTime = 0;
         this.watchCount = 0;
         this.stanbyCount = 0;
