@@ -7,6 +7,7 @@ $(function () {
   let autoID;
   let autoMoveFlg = false;
   let autoBehavior = true;
+  let protect = false;
   let socket = io();
 
   let hide;
@@ -62,6 +63,51 @@ $(function () {
     roomId = undefined;
     $('#login').show();
     $('#logout').hide();
+  });
+
+  $('#generateRoomId').on('click', () => {
+    $.get('generateRoomId', (roomId) => {
+      $('#idResult').text(roomId);
+    });
+  });
+
+  $('#createRoom').on('click', () => {
+    let userName = $('#userName').text();
+    let roomId = $('#idResult').text();
+    if(!roomId){
+      alert('RoomIDが作成されていません。');
+      return;
+    }
+    socket.emit('createRoom', userName, null, roomId, protect);
+    if(!roopFlg){
+      updateRoop();
+      displayDelete();
+    };
+    roopFlg = true;
+    $('#login').hide();
+    $('#logout').show();
+  });
+
+  $('#assignRoom').on('click', () => {
+    let userName = $('#userName').text();
+    let roomId = $('#assignRoomId').val();
+    if(!roomId){
+      alert('RoomIDが入力されていません');
+      return;
+    }
+    socket.emit('assignRoom', userName, null, roomId);
+    if(!roopFlg){
+      updateRoop();
+      displayDelete();
+    };
+    roopFlg = true;
+    $('#login').hide();
+    $('#logout').show();
+  });
+
+  $('#protect').on('click', () => {
+    protect = !protect
+    $('#protect').text(protect? 'on': 'off');
   });
 
   $('#child').on('touchend mouseup', () => {

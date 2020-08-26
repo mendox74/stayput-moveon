@@ -2,11 +2,14 @@ const Room = require('./room');
 const Player = require('./player');
 
 module.exports = class Game {
+    constructor() {
+        this.rooms = [];
+    }
     start(io){
         const defaultDistance = 4000;
         const defaultHideTime = 15000;
         const defaultWatchCount = 8;
-        const rooms = []; 
+        const rooms = this.rooms; 
         io.on('connection', (socket) => {
             console.log(socket.id);
             // 接続切断処理
@@ -14,32 +17,30 @@ module.exports = class Game {
                 if(socket.roomId){
                     logout();
                 }
-                console.log("disconnect", socket.userName);
+                console.log("disconnect", socket.id);
             });
 
             socket.on('login', (userName, icon) => {
                 if(socket.roomId)return;
-                socket.userName = userName || 'unknown';
                 // 部屋の有無を判定
                 if(rooms.length >= 1){
                     // フリーの待機中の部屋を検索
-                    socket.roomId = rooms.find(room => io.sockets.adapter.rooms[room].length < 101 && !room.protect);
+                    socket.roomId = rooms.find(room => io.sockets.adapter.rooms[room].length < 101 && !rooms[room].protect);
                 }
                 if(!socket.roomId){
                     // 新しい部屋を生成
-                    socket.roomId = makeKey();
+                    socket.roomId = this.makeKey();
                     rooms.push(socket.roomId);
                     rooms[socket.roomId] = new Room(io, socket.roomId);
                 }
                 socket.join(socket.roomId);
 
-                rooms[socket.roomId].menberList[socket.id] = new Player(socket.userName, icon || 'cleaningRobot_1');
-                console.log(socket.roomId, socket.userName, rooms[socket.roomId].menberList);
+                rooms[socket.roomId].menberList[socket.id] = new Player(userName || 'unknown', icon || 'cleaningRobot_1');
+                console.log(socket.roomId, userName || 'unknown', rooms[socket.roomId].menberList);
             });
 
             socket.on('createRoom', (userName, icon, roomId, protect = false) => {
                 if(socket.roomId)return;
-                socket.userName = userName || 'unknown';
                 // 指定roomIdの新しい部屋を生成
                 socket.roomId = roomId;
                 rooms.push(socket.roomId);
@@ -47,13 +48,12 @@ module.exports = class Game {
                 rooms[socket.roomId].protect = protect;
                 socket.join(socket.roomId);
 
-                rooms[socket.roomId].menberList[socket.id] = new Player(socket.userName, icon || 'cleaningRobot_1');
-                console.log(socket.roomId, socket.userName, rooms[socket.roomId].menberList);
+                rooms[socket.roomId].menberList[socket.id] = new Player(userName || 'unknown', icon || 'cleaningRobot_1');
+                console.log(socket.roomId, userName || 'unknown', rooms[socket.roomId].menberList, protect);
             });
 
             socket.on('assignRoom', (userName, icon, roomId) => {
                 if(socket.roomId)return;
-                socket.userName = userName || 'unknown';
                 // 指定roomIdの部屋を検索、参加
                 if(rooms.length >= 1){
                     if(rooms.some(room => room === roomId)){
@@ -68,11 +68,12 @@ module.exports = class Game {
                         return;
                     }
                 }
+                console.log('not create the room');
                 if(!socket.roomId){ return;}
                 socket.join(socket.roomId);
 
-                rooms[socket.roomId].menberList[socket.id] = new Player(socket.userName, icon || 'cleaningRobot_1');
-                console.log(socket.roomId, socket.userName, rooms[socket.roomId].menberList);
+                rooms[socket.roomId].menberList[socket.id] = new Player(userName || 'unknown', icon || 'cleaningRobot_1');
+                console.log(socket.roomId, userName || 'unknown', rooms[socket.roomId].menberList);
             });
 
             socket.on('logout', () => {
@@ -363,23 +364,23 @@ module.exports = class Game {
 
         });
 
-        function makeKey () {
-            let key = '';
-            let maxLen = 10;
-            let src = '0123456789'
-            + 'abcdefghijklmnopqrstuvwxyz'
-            + 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-        
-            for(let count = 0; count < 10; count++){
-                for (let i = 0; i < maxLen; i++) {
-                    key += src[Math.floor(Math.random() * src.length)];
-                }
-                if(!rooms[key]){
-                    return key;
-                }
+    }
+    makeKey () {
+        let key = '';
+        let maxLen = 10;
+        let src = '0123456789'
+        + 'abcdefghijklmnopqrstuvwxyz'
+        + 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
+        for(let count = 0; count < 10; count++){
+            for (let i = 0; i < maxLen; i++) {
+                key += src[Math.floor(Math.random() * src.length)];
             }
-            console.log('key create error');
-            return 'key create error';
+            if(!this.rooms[key]){
+                return key;
+            }
         }
+        console.log('key create error');
+        return 'key create error';
     }
 }

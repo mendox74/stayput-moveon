@@ -13,7 +13,8 @@ app.get('/', (req, res) => {
 });
 
 app.get('/generateRoomId', (req, res) => {
-    let roomId = game.start.makekey();
+    let hostname = req.headers.host;
+    let roomId = game.makeKey();
     res.send(roomId);
 });
 
