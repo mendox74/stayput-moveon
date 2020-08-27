@@ -1,18 +1,18 @@
-import React, { Component } from "react";
+import React, { PureComponent } from "react";
 import { StyleSheet, View, Text, TextInput, Modal, Dimensions, TouchableWithoutFeedback } from "react-native";
 import * as Animatable from 'react-native-animatable';
 import ModalAnimate from "react-native-modal";
 import { AdMobBanner } from "expo-ads-admob";
+import { socket } from "../socket";
 import { storage } from "../storage"; 
 import IconSelecter from "../title/iconSelecter"
 import RigidBodies from "../app/index";
 
-import CleaningRobot_1 from '../assets/icons/bigAirplane.svg';
 import StartImage from '../assets/menus/start.svg';
 
 const { width, height } = Dimensions.get("window");
 
-export default class Title extends Component {
+export default class Title extends PureComponent {
     constructor() {
         super();
         this.state = {
@@ -20,6 +20,9 @@ export default class Title extends Component {
             sceneVisible: false,
             scene: null,
             iconName: 'bigAirplane',
+            roomId: null,
+            hostname: null,
+            protect: false,
         };
     }
 
@@ -40,6 +43,7 @@ export default class Title extends Component {
     }
 
     mountScene = () => {
+        socket.emit('connect');
         this.setState({
             sceneVisible: true,
             scene: <RigidBodies
@@ -100,6 +104,19 @@ export default class Title extends Component {
     _handleTextChange = inputValue => {
         this.setState({ inputValue });
     };
+
+    getRoomId = () => {
+        fetch('http://192.168.11.7:8080/generateRoomId')
+        .then((data) => {
+            this.setState({
+                roomId: data.roomId,
+                hostname: data.hostname,
+            })
+        })
+        .catch((error) => {
+            console.log(error);
+        });
+    }
 
     render() {
         return(
@@ -166,6 +183,46 @@ export default class Title extends Component {
                         <StartImage />
                     </Animatable.View>
                 </TouchableWithoutFeedback>
+
+                <View>
+                    <Text
+                        style={{
+                            textAlign: 'center',
+                            color: '#f2fdff',
+                        }}
+                    >
+                        ROOM ID
+                    </Text>
+                    <Text 
+                        style={styles.name}
+                    >
+                        {this.state.hostname}
+                    </Text>
+                    <Text 
+                        style={styles.name}
+                    >
+                        {this.state.roomId}
+                    </Text>
+                    <View
+                        style={{
+                            marginTop: 3,
+                            marginLeft: 25,
+                            flexDirection: 'row',
+                        }}
+                    >
+                        <Text
+                            style={styles.button}
+                            onPress={this.getRoomId}
+                        >Generate
+                        </Text>
+                        <Text
+                            style={styles.button}
+                            onPress={}
+                        >Share
+                        </Text>
+                    </View>
+                </View>
+
                 <View
                     style={{
                         position: 'absolute',

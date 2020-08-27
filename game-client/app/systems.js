@@ -244,4 +244,4 @@ const UpDate = (state) => {
 	return state;
 }
 
-export { UpDate, Login, socket };
+export { UpDate, Login };

@@ -66,8 +66,8 @@ $(function () {
   });
 
   $('#generateRoomId').on('click', () => {
-    $.get('generateRoomId', (roomId) => {
-      $('#idResult').text(roomId);
+    $.get('generateRoomId', (data) => {
+      $('#idResult').text(data.roomId);
     });
   });
 

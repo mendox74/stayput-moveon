@@ -1,6 +1,7 @@
 import React, { PureComponent } from "react";
 import { StatusBar, Dimensions, StyleSheet } from "react-native";
 import { GameEngine } from "react-native-game-engine";
+import { socket } from "../socket";
 import { UpDate, Login } from "./systems";
 import { Box, MoveButton, Number, Logout, Ranking } from "./renderers";
 
@@ -22,7 +23,8 @@ export default class RigidBodies extends PureComponent {
         const floor = {position: { x: width / 2, y: boxSize * 1.2 }};
         const rankBody = {position: { x: width / 5.3, y: height / 4.8 }};
 
-        Login(this.props.name, this.props.icon);
+        socket.emit('login', this.props.name, this.props.icon);
+        // Login(this.props.name, this.props.icon);
 
         return (
             <GameEngine
