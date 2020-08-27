@@ -23,9 +23,6 @@ export default class RigidBodies extends PureComponent {
         const floor = {position: { x: width / 2, y: boxSize * 1.2 }};
         const rankBody = {position: { x: width / 5.3, y: height / 4.8 }};
 
-        socket.emit('login', this.props.name, this.props.icon);
-        // Login(this.props.name, this.props.icon);
-
         return (
             <GameEngine
                 style={styles.container}

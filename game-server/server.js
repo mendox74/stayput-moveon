@@ -15,7 +15,7 @@ app.get('/', (req, res) => {
 app.get('/generateRoomId', (req, res) => {
     let hostname = req.headers.host;
     let roomId = game.makeKey();
-    res.send([roomId, hostname]);
+    res.send({roomId: roomId, hostname: hostname});
 });
 
 app.use('/static', express.static('public'));

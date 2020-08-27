@@ -78,7 +78,7 @@ $(function () {
       alert('RoomIDが作成されていません。');
       return;
     }
-    socket.emit('createRoom', userName, null, roomId, protect);
+    socket.emit('createRoom', userName, null, null, roomId, protect);
     if(!roopFlg){
       updateRoop();
       displayDelete();
@@ -95,7 +95,7 @@ $(function () {
       alert('RoomIDが入力されていません');
       return;
     }
-    socket.emit('assignRoom', userName, null, roomId);
+    socket.emit('assignRoom', userName, null, null, roomId);
     if(!roopFlg){
       updateRoop();
       displayDelete();

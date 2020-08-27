@@ -1,4 +1,4 @@
-import React, { Component, PureComponent } from "react";
+import React, { PureComponent } from "react";
 import { StyleSheet, View, Text, TouchableWithoutFeedback } from "react-native";
 import * as Animatable from 'react-native-animatable';
 import ModalAnimate from "react-native-modal";
@@ -6,7 +6,6 @@ import { AdMobBanner } from "expo-ads-admob";
 import { socket } from "../socket";
 import IconSelecter from "../title/iconSelecter"
 
-import AirplaneImage from '../assets/icons/bigAirplane.svg';
 import Entry from '../assets/menus/entry.svg' 
 import ExitImage from '../assets/menus/exit.svg';
 import Laurel from '../assets/menus/laurel.svg';
@@ -170,6 +169,7 @@ class Animal extends PureComponent {
                 >
                     <IconSelecter 
                         iconName={icon}
+                        color={this.props.color}
                         angle={this.props.angle}
                     />
                 </View>

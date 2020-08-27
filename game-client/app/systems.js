@@ -41,10 +41,6 @@ socket.on('update',(ht,wc,ml,hf,ri,ef,wn,sf,sc,af,rk) => {
 	rank = rk;
 });
 
-const Login = (name, icon) => {
-	socket.emit('login', name, icon);
-}
-
 const ResultClose = () => {
 	resultFlg = true;
 	resultClose = true;
@@ -163,6 +159,7 @@ const UpDate = (state) => {
 							size: [animalSize * 2, animalSize * 2],
 							text: menberList[id].name,
 							icon: menberList[id].icon,
+							color: menberList[id].color,
 							angle: 3.14159 + 'rad',
 							renderer: Animal,
 						};
@@ -182,6 +179,7 @@ const UpDate = (state) => {
 							size: [animalSize, animalSize],
 							text: menberList[id].name,
 							icon: menberList[id].icon,
+							color: menberList[id].color,
 							angle: angle + 'rad',
 							renderer: Animal,
 						};
@@ -244,4 +242,4 @@ const UpDate = (state) => {
 	return state;
 }
 
-export { UpDate, Login };
+export { UpDate };

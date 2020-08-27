@@ -20,6 +20,7 @@ export default class Title extends PureComponent {
             sceneVisible: false,
             scene: null,
             iconName: 'bigAirplane',
+            color: '#f2fdff',
             roomId: null,
             hostname: null,
             protect: false,
@@ -27,23 +28,12 @@ export default class Title extends PureComponent {
     }
 
     componentDidMount() {
-        storage.load({
-            key: 'user',
-        }).then(data => {
-            this.setState({ 
-                inputValue: data.name ? data.name : 'unknown',
-                iconName: data.iconName ? data.iconName : 'bigAirplane',
-            });
-        }).catch(err => {
-            this.setState({ 
-                inputValue: 'unknown',
-                iconName: 'bigAirplane',
-            });
-        })
+        this.storageLoad();
     }
 
     mountScene = () => {
-        socket.emit('connect');
+        socket.open();
+        socket.emit('login', this.state.inputValue, this.state.iconName, this.state.color);
         this.setState({
             sceneVisible: true,
             scene: <RigidBodies
@@ -66,39 +56,16 @@ export default class Title extends PureComponent {
             data: {
                 name : this.state.inputValue,
                 iconName: this.state.iconName,
+                color: this.state.color,
             }
         })
         this.setState({ isModalVisible: !this.state.isModalVisible });
-        storage.load({
-            key: 'user',
-        }).then(data => {
-            this.setState({ 
-                inputValue: data.name ? data.name : 'unknown',
-                iconName: data.iconName ? data.iconName : 'bigAirplane',
-            });
-        }).catch(err => {
-            this.setState({ 
-                inputValue: 'unknown',
-                iconName: 'bigAirplane',
-            });
-        })
+        this.storageLoad();
     }
 
     toggleModal = () => {
         this.setState({ isModalVisible: !this.state.isModalVisible });
-        storage.load({
-            key: 'user',
-        }).then(data => {
-            this.setState({ 
-                inputValue: data.name ? data.name : 'unknown',
-                iconName: data.iconName ? data.iconName : 'bigAirplane',
-            });
-        }).catch(err => {
-            this.setState({ 
-                inputValue: 'unknown',
-                iconName: 'bigAirplane',
-            });
-        })
+        this.storageLoad();
     };
   
     _handleTextChange = inputValue => {
@@ -107,6 +74,7 @@ export default class Title extends PureComponent {
 
     getRoomId = () => {
         fetch('http://192.168.11.7:8080/generateRoomId')
+        .then((response) => response.json())
         .then((data) => {
             this.setState({
                 roomId: data.roomId,
@@ -116,6 +84,24 @@ export default class Title extends PureComponent {
         .catch((error) => {
             console.log(error);
         });
+    }
+
+    storageLoad = () => {
+        storage.load({
+            key: 'user',
+        }).then(data => {
+            this.setState({ 
+                inputValue: data.name || 'unknown',
+                iconName: data.iconName || 'bigAirplane',
+                color: data.color || '#f2fdff',
+            });
+        }).catch(err => {
+            this.setState({ 
+                inputValue: 'unknown',
+                iconName: 'bigAirplane',
+                color: '#f2fdff',
+            });
+        })
     }
 
     render() {
@@ -145,7 +131,7 @@ export default class Title extends PureComponent {
                         style={styles.account}
                     >
                         <View style={styles.icon}>
-                            <IconSelecter iconName={this.state.iconName}/>
+                            <IconSelecter iconName={this.state.iconName} color={this.state.color}/>
                         </View>
                         <View>
                             <Text
@@ -171,7 +157,7 @@ export default class Title extends PureComponent {
                         iterationCount = {"infinite"}
                         style={{
                             position: "absolute",
-                            top: height * (6 / 10),
+                            top: height * (5 / 10),
                             width: width/3,
                             height: width/3,
                             borderRadius: width / 2,
@@ -184,7 +170,9 @@ export default class Title extends PureComponent {
                     </Animatable.View>
                 </TouchableWithoutFeedback>
 
-                <View>
+                <View
+                    style={styles.createRoom}
+                >
                     <Text
                         style={{
                             textAlign: 'center',
@@ -217,7 +205,7 @@ export default class Title extends PureComponent {
                         </Text>
                         <Text
                             style={styles.button}
-                            onPress={}
+                            onPress={this.getRoomId}
                         >Share
                         </Text>
                     </View>
@@ -254,7 +242,7 @@ export default class Title extends PureComponent {
                             }}
                         >
                             <View style={styles.icon}>
-                                <IconSelecter iconName={this.state.iconName}/>
+                                <IconSelecter iconName={this.state.iconName} color={this.state.color}/>
                             </View>
                             <View>
                                 <Text
@@ -298,6 +286,36 @@ export default class Title extends PureComponent {
                                 color: '#f2fdff',
                             }}
                         >
+                            COLOR SELECT
+                        </Text>
+                        <View
+                            style={{
+                                flexDirection: 'row',
+                            }}
+                        >
+                            <TouchableWithoutFeedback onPress={() => {this.setState({color: '#f2fdff'})}}>
+                                <View style={{...styles.colorSelect, backgroundColor: '#f2fdff'}}></View>
+                            </TouchableWithoutFeedback>
+                            <TouchableWithoutFeedback onPress={() => {this.setState({color: '#1e90ff'})}}>
+                                <View style={{...styles.colorSelect, backgroundColor: '#1e90ff'}}></View>
+                            </TouchableWithoutFeedback>
+                            <TouchableWithoutFeedback onPress={() => {this.setState({color: '#ffff00'})}}>
+                                <View style={{...styles.colorSelect, backgroundColor: '#ffff00'}}></View>
+                            </TouchableWithoutFeedback>
+                            <TouchableWithoutFeedback onPress={() => {this.setState({color: '#dc143c'})}}>
+                                <View style={{...styles.colorSelect, backgroundColor: '#dc143c'}}></View>
+                            </TouchableWithoutFeedback>
+                            <TouchableWithoutFeedback onPress={() => {this.setState({color: '#7cfc00'})}}>
+                                <View style={{...styles.colorSelect, backgroundColor: '#7cfc00'}}></View>
+                            </TouchableWithoutFeedback>
+                        </View>
+                        <Text
+                            style={{
+                                margin: 5,
+                                textAlign: 'center',
+                                color: '#f2fdff',
+                            }}
+                        >
                             ICON SELECT
                         </Text>
                         <View
@@ -305,62 +323,78 @@ export default class Title extends PureComponent {
                                 flexDirection: 'row',
                             }}
                         >
-                            <TouchableWithoutFeedback
-                                onPress={() => {this.setState({iconName: 'bigAirplane'})}}
-                            >
+                            <TouchableWithoutFeedback onPress={() => {this.setState({iconName: 'bigAirplane'})}}>
                                 <View style={styles.iconSelect}>
                                     <IconSelecter iconName={'bigAirplane'}/>
                                 </View>
                             </TouchableWithoutFeedback>
-                            <TouchableWithoutFeedback
-                                onPress={() => {this.setState({iconName: 'beetle_1'})}}
-                            >
+                            <TouchableWithoutFeedback onPress={() => {this.setState({iconName: 'beetle_1'})}}>
                                 <View style={styles.iconSelect}>
                                     <IconSelecter iconName={'beetle_1'}/>
                                 </View>
                             </TouchableWithoutFeedback>
+                            <TouchableWithoutFeedback onPress={() => {this.setState({iconName: 'beetle_2'})}}>
                             <View style={styles.iconSelect}>
                                 <IconSelecter iconName={'beetle_2'}/>
                             </View>
+                            </TouchableWithoutFeedback>
+                            <TouchableWithoutFeedback onPress={() => {this.setState({iconName: 'turtle_1'})}}>
                             <View style={styles.iconSelect}>
                                 <IconSelecter iconName={'turtle_1'}/>
                             </View>
+                            </TouchableWithoutFeedback>
                         </View>
                         <View
                             style={{
                                 flexDirection: 'row',
                             }}
                         >
+                            <TouchableWithoutFeedback onPress={() => {this.setState({iconName: 'cleaningRobot_1'})}}>
                             <View style={styles.iconSelect}>
                                 <IconSelecter iconName={'cleaningRobot_1'}/>
                             </View>
+                            </TouchableWithoutFeedback>
+                            <TouchableWithoutFeedback onPress={() => {this.setState({iconName: 'cleaningRobot_2'})}}>
                             <View style={styles.iconSelect}>
                                 <IconSelecter iconName={'cleaningRobot_2'}/>
                             </View>
+                            </TouchableWithoutFeedback>
+                            <TouchableWithoutFeedback onPress={() => {this.setState({iconName: 'cleaningRobot_3'})}}>
                             <View style={styles.iconSelect}>
                                 <IconSelecter iconName={'cleaningRobot_3'}/>
                             </View>
+                            </TouchableWithoutFeedback>
+                            <TouchableWithoutFeedback onPress={() => {this.setState({iconName: 'crab_1'})}}>
                             <View style={styles.iconSelect}>
                                 <IconSelecter iconName={'crab_1'}/>
                             </View>
+                            </TouchableWithoutFeedback>
                         </View>
                         <View
                             style={{
                                 flexDirection: 'row',
                             }}
                         >
+                            <TouchableWithoutFeedback onPress={() => {this.setState({iconName: 'butterfly_1'})}}>
                             <View style={styles.iconSelect}>
                                 <IconSelecter iconName={'butterfly_1'}/>
                             </View>
+                            </TouchableWithoutFeedback>
+                            <TouchableWithoutFeedback onPress={() => {this.setState({iconName: 'butterfly_2'})}}>
                             <View style={styles.iconSelect}>
                                 <IconSelecter iconName={'butterfly_2'}/>
                             </View>
+                            </TouchableWithoutFeedback>
+                            <TouchableWithoutFeedback onPress={() => {this.setState({iconName: 'butterfly_3'})}}>
                             <View style={styles.iconSelect}>
                                 <IconSelecter iconName={'butterfly_3'}/>
                             </View>
+                            </TouchableWithoutFeedback>
+                            <TouchableWithoutFeedback onPress={() => {this.setState({iconName: 'squid_1'})}}>
                             <View style={styles.iconSelect}>
                                 <IconSelecter iconName={'squid_1'}/>
                             </View>
+                            </TouchableWithoutFeedback>
                         </View>
                     </View>
                 </ModalAnimate>
@@ -430,7 +464,7 @@ const styles = StyleSheet.create({
     account: {
         flexDirection: 'row',
         position: "absolute",
-        top: height * (4.3 / 10),
+        top: height * (4 / 10),
     },
     paragraph: {
         position: "absolute",
@@ -461,7 +495,7 @@ const styles = StyleSheet.create({
     icon: {
         width: width / 5,
         height: width / 5,
-        padding: 4,
+        padding: 6,
         borderRadius: width / 2,
         borderColor: "#f2fdff",
         borderWidth:3,
@@ -469,6 +503,13 @@ const styles = StyleSheet.create({
     iconSelect: {
         width: width / 7,
         height: width / 7,
+        padding: 4,
+        margin: 10,
+    },
+    colorSelect: {
+        width: width / 10,
+        height: width / 10,
+        borderRadius: width / 2,
         padding: 4,
         margin: 10,
     },
@@ -483,5 +524,9 @@ const styles = StyleSheet.create({
         borderColor: "#f2fdff",
         borderWidth: 3,
         color: '#f2fdff',
+    },
+    createRoom: {
+        position: "absolute",
+        top: height * (7 / 10),
     },
   });

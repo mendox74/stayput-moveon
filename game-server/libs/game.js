@@ -20,7 +20,7 @@ module.exports = class Game {
                 console.log("disconnect", socket.id);
             });
 
-            socket.on('login', (userName, icon) => {
+            socket.on('login', (userName, icon, color) => {
                 if(socket.roomId)return;
                 // 部屋の有無を判定
                 if(rooms.length >= 1){
@@ -35,11 +35,11 @@ module.exports = class Game {
                 }
                 socket.join(socket.roomId);
 
-                rooms[socket.roomId].menberList[socket.id] = new Player(userName || 'unknown', icon || 'cleaningRobot_1');
+                rooms[socket.roomId].menberList[socket.id] = new Player(userName || 'unknown', icon || 'cleaningRobot_1', color || '#f2fdff');
                 console.log(socket.roomId, userName || 'unknown', rooms[socket.roomId].menberList);
             });
 
-            socket.on('createRoom', (userName, icon, roomId, protect = false) => {
+            socket.on('createRoom', (userName, icon, color, roomId, protect = false) => {
                 if(socket.roomId)return;
                 // 指定roomIdの新しい部屋を生成
                 socket.roomId = roomId;
@@ -48,11 +48,11 @@ module.exports = class Game {
                 rooms[socket.roomId].protect = protect;
                 socket.join(socket.roomId);
 
-                rooms[socket.roomId].menberList[socket.id] = new Player(userName || 'unknown', icon || 'cleaningRobot_1');
+                rooms[socket.roomId].menberList[socket.id] = new Player(userName || 'unknown', icon || 'cleaningRobot_1', color || '#f2fdff');
                 console.log(socket.roomId, userName || 'unknown', rooms[socket.roomId].menberList, protect);
             });
 
-            socket.on('assignRoom', (userName, icon, roomId) => {
+            socket.on('assignRoom', (userName, icon, color, roomId) => {
                 if(socket.roomId)return;
                 // 指定roomIdの部屋を検索、参加
                 if(rooms.length >= 1){
@@ -72,7 +72,7 @@ module.exports = class Game {
                 if(!socket.roomId){ return;}
                 socket.join(socket.roomId);
 
-                rooms[socket.roomId].menberList[socket.id] = new Player(userName || 'unknown', icon || 'cleaningRobot_1');
+                rooms[socket.roomId].menberList[socket.id] = new Player(userName || 'unknown', icon || 'cleaningRobot_1', color || '#f2fdff');
                 console.log(socket.roomId, userName || 'unknown', rooms[socket.roomId].menberList);
             });
 
@@ -214,7 +214,7 @@ module.exports = class Game {
                             room.autoFlg = false;
                             clearInterval(room.autoID);
                             clearInterval(room.watchLimitID);
-                            list['autoWatcher'] = new Player('AUTO', 'cleaningRobot_1');
+                            list['autoWatcher'] = new Player('AUTO', 'cleaningRobot_1', '#ff0000');
                             list['autoWatcher'].join = true;
                             list['autoWatcher'].watcher = true;
                             room.autoWatcher();

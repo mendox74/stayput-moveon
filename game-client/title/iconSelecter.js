@@ -81,6 +81,9 @@ export default class IconSelecter extends PureComponent {
         if(this.props.iconName && this.props.iconName !== prevProps.iconName){
             this.setIcon();
         }
+        if(this.props.color && this.props.color !== prevProps.color){
+            this.setIcon();
+        }
     }
     render(){
         return(
