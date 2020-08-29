@@ -2,6 +2,7 @@ import React, { PureComponent } from "react";
 import { StyleSheet, View, Text, TextInput, Modal, Dimensions, TouchableWithoutFeedback } from "react-native";
 import * as Animatable from 'react-native-animatable';
 import ModalAnimate from "react-native-modal";
+import ScrollableTabView from "react-native-scrollable-tab-view";
 import { AdMobBanner } from "expo-ads-admob";
 import { socket } from "../socket";
 import { storage } from "../storage"; 
@@ -107,6 +108,9 @@ export default class Title extends PureComponent {
     render() {
         return(
             <View style={styles.container}>
+                <View
+                    style={styles.title}
+                >
                 <Animatable.Text 
                     animation = "flash"
                     style={styles.watch}>
@@ -124,6 +128,7 @@ export default class Title extends PureComponent {
                     style={styles.touch}>
                     TOUCH
                 </Animatable.Text>
+                </View>
                 <TouchableWithoutFeedback
                     onPress={this.toggleModal}
                 >
@@ -149,30 +154,80 @@ export default class Title extends PureComponent {
                         </View>
                     </View>
                 </TouchableWithoutFeedback>
-                <TouchableWithoutFeedback
-                    onPress={this.mountScene}
-                >
-                    <Animatable.View
-                        animation = "pulse"
-                        iterationCount = {"infinite"}
-                        style={{
-                            position: "absolute",
-                            top: height * (5 / 10),
-                            width: width/3,
-                            height: width/3,
-                            borderRadius: width / 2,
-                            borderWidth: 4,
-                            borderColor: '#f2fdff',
-                            backgroundColor: '#f2fdff',
-                        }}
-                    >
-                        <StartImage />
-                    </Animatable.View>
-                </TouchableWithoutFeedback>
-
                 <View
                     style={styles.createRoom}
                 >
+                <ScrollableTabView
+                tabBarTextStyle={{
+                    color: '#f2fdff',
+                }}
+                >
+                <View tabLabel="OPEN"
+                    style={{
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        height: width/2,
+                    }}
+                >
+                    <TouchableWithoutFeedback
+                        onPress={this.mountScene}
+                    >
+                        <Animatable.View
+                            animation = "pulse"
+                            iterationCount = {"infinite"}
+                            style={{
+                                width: width/1.3,
+                                height: width/4.5,
+                                borderRadius: width / 20,
+                                borderWidth: 6,
+                                borderColor: '#f2fdff',
+                                backgroundColor: '#dc143c',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                            }}
+                        >
+                                <Text
+                                    style={{
+                                        color: '#f2fdff',
+                                        fontSize: 30,
+                                    }}
+                                >CONNECT</Text>
+                        </Animatable.View>
+                    </TouchableWithoutFeedback>
+                </View>
+
+                <View tabLabel="SELECT"
+                    style={{
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        height: width/2,
+                    }}
+                >
+                    <TouchableWithoutFeedback
+                        onPress={this.mountScene}
+                    >
+                        <Animatable.View
+                            animation = "pulse"
+                            iterationCount = {"infinite"}
+                            style={{
+                                width: width/1.3,
+                                height: width/6,
+                                borderRadius: width / 20,
+                                borderWidth: 6,
+                                borderColor: '#f2fdff',
+                                backgroundColor: '#dc143c',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                            }}
+                        >
+                                <Text
+                                    style={{
+                                        color: '#f2fdff',
+                                        fontSize: 20,
+                                    }}
+                                >CONNECT</Text>
+                        </Animatable.View>
+                    </TouchableWithoutFeedback>
                     <Text
                         style={{
                             textAlign: 'center',
@@ -182,12 +237,12 @@ export default class Title extends PureComponent {
                         ROOM ID
                     </Text>
                     <Text 
-                        style={styles.name}
+                        style={styles.roomId}
                     >
                         {this.state.hostname}
                     </Text>
                     <Text 
-                        style={styles.name}
+                        style={styles.roomId}
                     >
                         {this.state.roomId}
                     </Text>
@@ -209,6 +264,8 @@ export default class Title extends PureComponent {
                         >Share
                         </Text>
                     </View>
+                </View>
+                </ScrollableTabView>
                 </View>
 
                 <View
@@ -418,30 +475,27 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         backgroundColor: '#101935',
     },
-    watch: {
+    title:{
         position: "absolute",
-        left: width * (2 / 10),
-        top: height * (2.3 / 10),
+        top: height * (1 / 10),
+        width: width /1.3,
+    },
+    watch: {
         margin: 2,
-        fontSize: 30,
+        fontSize: 35,
         fontWeight: 'bold',
-        textAlign: 'center',
+        textAlign: 'left',
         color: '#f2fdff',
     },
     touch: {
-        position: "absolute",
-        left: width * (5.5 / 10),
-        top: height * (3.3 / 10),
         margin: 2,
-        fontSize: 30,
+        fontSize: 35,
         fontWeight: 'bold',
-        textAlign: 'center',
+        textAlign: 'right',
         color: '#f2fdff',
     },
     or: {
-        position: "absolute",
-        top: height * (2.8 / 10),
-        margin: 2,
+        margin: 3,
         fontSize: 28,
         fontWeight: 'bold',
         textAlign: 'center',
@@ -450,7 +504,7 @@ const styles = StyleSheet.create({
     name: {
         paddingTop: 9,
         marginLeft: -2,
-        width: width/2,
+        width: width/1.8,
         height:height/15,
         fontSize: 20,
         textAlign: "center",
@@ -464,7 +518,7 @@ const styles = StyleSheet.create({
     account: {
         flexDirection: 'row',
         position: "absolute",
-        top: height * (4 / 10),
+        top: height * (3.5 / 10),
     },
     paragraph: {
         position: "absolute",
@@ -515,18 +569,32 @@ const styles = StyleSheet.create({
     },
     button: {
         width: 80, 
-        height: 35, 
+        height:height/25,
         fontSize: 15,
         margin: 5,
-        paddingTop: 5,
+        paddingTop: 2,
         textAlign: 'center',
-        borderRadius: width / 30,
+        borderRadius: 10,
         borderColor: "#f2fdff",
-        borderWidth: 3,
+        borderWidth: 2,
         color: '#f2fdff',
     },
     createRoom: {
         position: "absolute",
-        top: height * (7 / 10),
+        top: height * (5 / 10),
+    },
+    roomId: {
+        paddingTop: 2,
+        marginLeft: -2,
+        width: width/1.8,
+        height:height/25,
+        fontSize: 15,
+        textAlign: "center",
+        justifyContent: 'center',
+        alignItems: 'center', 
+        color: '#f2fdff',
+        borderRadius: 10,
+        borderColor: "#f2fdff",
+        borderWidth: 2,
     },
   });
