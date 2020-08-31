@@ -1,6 +1,7 @@
 import React, { PureComponent } from "react";
-import { StyleSheet, View, Text, TextInput, Modal, Dimensions, TouchableWithoutFeedback, AppState, Switch } from "react-native";
+import { StyleSheet, View, Text, TextInput, Modal, Dimensions, TouchableWithoutFeedback, AppState } from "react-native";
 import * as Animatable from 'react-native-animatable';
+import SwitchSelector from "react-native-switch-selector";
 import ModalAnimate from "react-native-modal";
 import ScrollableTabView from "react-native-scrollable-tab-view";
 import { AdMobBanner } from "expo-ads-admob";
@@ -12,6 +13,7 @@ import RigidBodies from "../app/index";
 import StartImage from '../assets/menus/start.svg';
 
 const { width, height } = Dimensions.get("window");
+const option = [{label: 'OPEN', value: false},{label: 'CLOSED', value: true}];
 let backgroundTimeOut;
 
 export default class Title extends PureComponent {
@@ -52,7 +54,7 @@ export default class Title extends PureComponent {
             backgroundTimeOut = setTimeout(() => {
                 socket.close();
                 this.unMountScene();
-            },30000)
+            },20000)
         }
         this.setState({ appState: nextAppState });
     }
@@ -134,8 +136,8 @@ export default class Title extends PureComponent {
         .then((response) => response.json())
         .then((data) => {
             this.setState({
-                roomId: data.roomId,
-                hostname: data.hostname,
+                generateRoomId: data.roomId,
+                generateHostname: data.hostname,
             })
         })
         .catch((error) => {
@@ -226,7 +228,7 @@ export default class Title extends PureComponent {
                             style={{
                                 alignItems: 'center',
                                 justifyContent: 'center',
-                                height: width/2,
+                                height: height/2.5,
                             }}
                         >
                             <TouchableWithoutFeedback
@@ -274,25 +276,29 @@ export default class Title extends PureComponent {
                             <Text 
                                 style={styles.roomId}
                             >
-                                {this.state.generateHostname}
-                            </Text>
-                            <Text 
-                                style={styles.roomId}
-                            >
-                                {this.state.generateRoomId}
+                                {this.state.generateHostname}{this.state.generateRoomId}
                             </Text>
                             <View
                                 style={{
                                     marginTop: 3,
-                                    marginLeft: 25,
                                     flexDirection: 'row',
                                 }}
                             >
-                                <Switch
-                                    onValueChange={this.switchProtect}
-                                    value={this.state.protect}
-                                    activeText={'CLOSED'}
-                                    inActiveText={'OPEN'}
+                                <SwitchSelector
+                                    options={option}
+                                    initial={0}
+                                    onPress={value => this.setState({ protect: value})}
+                                    textColor={'#f2fdff'}
+                                    selectedColor={'#101935'}
+                                    buttonColor={'#f2fdff'}
+                                    backgroundColor={'#101935'}
+                                    borderWidth= {5}
+                                    fontSize={13}
+                                    height={30}
+                                    style={{
+                                        marginTop: 3,
+                                        width: 120,
+                                    }}
                                 />
                                 <Text
                                     style={styles.button}
@@ -312,6 +318,7 @@ export default class Title extends PureComponent {
                                     animation = "pulse"
                                     iterationCount = {"infinite"}
                                     style={{
+                                        marginTop: 30,
                                         width: width/1.3,
                                         height: width/6,
                                         borderRadius: width / 20,
@@ -349,17 +356,11 @@ export default class Title extends PureComponent {
                             <Text 
                                 style={styles.roomId}
                             >
-                                {this.state.assignHostname}
-                            </Text>
-                            <Text 
-                                style={styles.roomId}
-                            >
-                                {this.state.assignRoomId}
+                                {this.state.assignHostname}{this.state.assignRoomId}
                             </Text>
                             <View
                                 style={{
                                     marginTop: 3,
-                                    marginLeft: 25,
                                     flexDirection: 'row',
                                 }}
                             >
@@ -376,6 +377,7 @@ export default class Title extends PureComponent {
                                     animation = "pulse"
                                     iterationCount = {"infinite"}
                                     style={{
+                                        marginTop: 30,
                                         width: width/1.3,
                                         height: width/6,
                                         borderRadius: width / 20,
@@ -699,7 +701,7 @@ const styles = StyleSheet.create({
     },
     button: {
         width: 80, 
-        height:height/25,
+        height: height/25,
         fontSize: 15,
         margin: 5,
         paddingTop: 2,
@@ -714,10 +716,9 @@ const styles = StyleSheet.create({
         top: height * (5 / 10),
     },
     roomId: {
-        paddingTop: 2,
-        marginLeft: -2,
-        width: width/1.8,
-        height:height/25,
+        width: width/1.4,
+        height:height/23,
+        paddingTop: 3,
         fontSize: 15,
         textAlign: "center",
         justifyContent: 'center',

@@ -9,7 +9,6 @@ import IconSelecter from "../title/iconSelecter"
 import Entry from '../assets/menus/entry.svg' 
 import ExitImage from '../assets/menus/exit.svg';
 import Laurel from '../assets/menus/laurel.svg';
-// const dogImage = require('../assets/icons/dog.svg');
 
 class Box extends PureComponent {
     constructor(props) {
@@ -260,7 +259,7 @@ class Number extends PureComponent {
                 <Text
                     style={{
                     color:'#f2fdff',
-                    fontSize: 15,
+                    fontSize: 30,
                     }}
                 >{text}</Text>
             </View>
@@ -323,8 +322,6 @@ class Result extends PureComponent {
         let role = this.props.role;
         let name = this.props.name;
         let rank = this.props.rank;
-        let animationIn = this.props.animationIn;
-        let animationOut = this.props.animationOut;
     
         return (
             <TouchableWithoutFeedback

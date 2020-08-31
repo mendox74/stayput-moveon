@@ -57,11 +57,11 @@ const UpDate = (state) => {
 				text: "JOIN!",
 				renderer: Join, 
 			}
-		} else {
+		} else if(menberList){
 			if(menberList[socket.id].join){
 				if(state.join.text === "JOIN!"){
 					state.join.text = "LEAVE?";
-					state.join.color = "#dc143c";
+					state.join.color = "#000080";
 				}
 			} else {
 				if(state.join.text !== "JOIN!"){
@@ -79,7 +79,7 @@ const UpDate = (state) => {
 	if(stanbyFlg){
 		if(!state.stanby){
 			state.stanby = {
-				body: {position: { x: width / 2, y: height / 4 }},
+				body: {position: { x: width / 2, y: height / 3 }},
 				size: [width, buttonSize],
 				count: stanbyCount,
 				animation: 'bounceIn',
