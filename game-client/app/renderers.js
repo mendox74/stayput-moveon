@@ -95,6 +95,7 @@ class Logout extends PureComponent {
 
     _onPress = () => {
         socket.emit('logout');
+        socket.close();
         this.props.close();
     }
 

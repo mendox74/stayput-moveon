@@ -1,8 +1,7 @@
 import React, { PureComponent } from "react";
 import { StatusBar, Dimensions, StyleSheet } from "react-native";
 import { GameEngine } from "react-native-game-engine";
-import { socket } from "../socket";
-import { UpDate, Login } from "./systems";
+import { UpDate } from "./systems";
 import { Box, MoveButton, Number, Logout, Ranking } from "./renderers";
 
 export default class RigidBodies extends PureComponent {

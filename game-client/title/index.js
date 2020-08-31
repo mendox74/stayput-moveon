@@ -1,5 +1,5 @@
 import React, { PureComponent } from "react";
-import { StyleSheet, View, Text, TextInput, Modal, Dimensions, TouchableWithoutFeedback } from "react-native";
+import { StyleSheet, View, Text, TextInput, Modal, Dimensions, TouchableWithoutFeedback, AppState, Switch } from "react-native";
 import * as Animatable from 'react-native-animatable';
 import ModalAnimate from "react-native-modal";
 import ScrollableTabView from "react-native-scrollable-tab-view";
@@ -12,44 +12,100 @@ import RigidBodies from "../app/index";
 import StartImage from '../assets/menus/start.svg';
 
 const { width, height } = Dimensions.get("window");
+let backgroundTimeOut;
 
 export default class Title extends PureComponent {
     constructor() {
         super();
         this.state = {
+            appState: AppState.currentState,
             isMoadlVisible: false,
             sceneVisible: false,
             scene: null,
             iconName: 'bigAirplane',
             color: '#f2fdff',
-            roomId: null,
-            hostname: null,
+            generateHostname: null,
+            generateRoomId: null,
+            assignHostname: null,
+            assignRoomId: null,
             protect: false,
         };
     }
 
     componentDidMount() {
         this.storageLoad();
+        AppState.addEventListener("change", this._handleAppStateChange);
     }
 
-    mountScene = () => {
+    componentWillUnmount() {
+        AppState.removeEventListener("change", this._handleAppStateChange);
+    }
+
+    _handleAppStateChange = nextAppState => {
+        if (
+          this.state.appState.match(/inactive|background/) &&
+          nextAppState === "active"
+        ) {
+          console.log("App has come to the foreground!");
+          clearInterval(backgroundTimeOut);
+        } else {
+            backgroundTimeOut = setTimeout(() => {
+                socket.close();
+                this.unMountScene();
+            },30000)
+        }
+        this.setState({ appState: nextAppState });
+    }
+
+    openConnect = () => {
         socket.open();
         socket.emit('login', this.state.inputValue, this.state.iconName, this.state.color);
         this.setState({
             sceneVisible: true,
             scene: <RigidBodies
                     unMountScene={this.unMountScene}
-                    name={this.state.inputValue}
-                    icon={this.state.iconName}/>
+                    name={this.state.inputValue}/>
         });
-    };
+    }
+
+    generateConnect = () => {
+        if(!this.state.generateRoomId)return;
+        socket.open();
+        socket.emit('createRoom', this.state.inputValue, this.state.iconName, this.state.color, this.state.generateRoomId, this.state.protect);
+        this.setState({
+            sceneVisible: true,
+            scene: <RigidBodies
+                    unMountScene={this.unMountScene}
+                    name={this.state.inputValue}/>
+        });
+    }
+
+    assignConnect = () => {
+        if(!this.state.assignRoomId)return;
+        socket.open();
+        socket.emit('assingRoom', this.state.inputValue, this.state.iconName,  this.state.assignRoomId, this.state.color);
+        this.setState({
+            sceneVisible: true,
+            scene: <RigidBodies
+                    unMountScene={this.unMountScene}
+                    name={this.state.inputValue}/>
+        });
+    }
+
+    generateShare = () => {
+        if(!this.state.generateRoomId)return;
+    }
+
+    assignShare = () => {
+        if(!this.state.assignRoomId)return;
+    }
   
     unMountScene = () => {
         this.setState({
             sceneVisible: false,
             scene: null
         });
-    };
+    }
 
     accountSave = () => {
         storage.save({
@@ -85,6 +141,10 @@ export default class Title extends PureComponent {
         .catch((error) => {
             console.log(error);
         });
+    }
+
+    switchProtect = (value) => {
+        this.setState({ protect: value});
     }
 
     storageLoad = () => {
@@ -157,115 +217,185 @@ export default class Title extends PureComponent {
                 <View
                     style={styles.createRoom}
                 >
-                <ScrollableTabView
-                tabBarTextStyle={{
-                    color: '#f2fdff',
-                }}
-                >
-                <View tabLabel="OPEN"
-                    style={{
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        height: width/2,
-                    }}
-                >
-                    <TouchableWithoutFeedback
-                        onPress={this.mountScene}
-                    >
-                        <Animatable.View
-                            animation = "pulse"
-                            iterationCount = {"infinite"}
-                            style={{
-                                width: width/1.3,
-                                height: width/4.5,
-                                borderRadius: width / 20,
-                                borderWidth: 6,
-                                borderColor: '#f2fdff',
-                                backgroundColor: '#dc143c',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                            }}
-                        >
-                                <Text
-                                    style={{
-                                        color: '#f2fdff',
-                                        fontSize: 30,
-                                    }}
-                                >CONNECT</Text>
-                        </Animatable.View>
-                    </TouchableWithoutFeedback>
-                </View>
-
-                <View tabLabel="SELECT"
-                    style={{
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        height: width/2,
-                    }}
-                >
-                    <TouchableWithoutFeedback
-                        onPress={this.mountScene}
-                    >
-                        <Animatable.View
-                            animation = "pulse"
-                            iterationCount = {"infinite"}
-                            style={{
-                                width: width/1.3,
-                                height: width/6,
-                                borderRadius: width / 20,
-                                borderWidth: 6,
-                                borderColor: '#f2fdff',
-                                backgroundColor: '#dc143c',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                            }}
-                        >
-                                <Text
-                                    style={{
-                                        color: '#f2fdff',
-                                        fontSize: 20,
-                                    }}
-                                >CONNECT</Text>
-                        </Animatable.View>
-                    </TouchableWithoutFeedback>
-                    <Text
-                        style={{
-                            textAlign: 'center',
+                    <ScrollableTabView
+                        tabBarTextStyle={{
                             color: '#f2fdff',
                         }}
                     >
-                        ROOM ID
-                    </Text>
-                    <Text 
-                        style={styles.roomId}
-                    >
-                        {this.state.hostname}
-                    </Text>
-                    <Text 
-                        style={styles.roomId}
-                    >
-                        {this.state.roomId}
-                    </Text>
-                    <View
-                        style={{
-                            marginTop: 3,
-                            marginLeft: 25,
-                            flexDirection: 'row',
-                        }}
-                    >
-                        <Text
-                            style={styles.button}
-                            onPress={this.getRoomId}
-                        >Generate
-                        </Text>
-                        <Text
-                            style={styles.button}
-                            onPress={this.getRoomId}
-                        >Share
-                        </Text>
-                    </View>
-                </View>
-                </ScrollableTabView>
+                        <View tabLabel="OPEN"
+                            style={{
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                height: width/2,
+                            }}
+                        >
+                            <TouchableWithoutFeedback
+                                onPress={this.openConnect}
+                            >
+                                <Animatable.View
+                                    animation = "pulse"
+                                    iterationCount = {"infinite"}
+                                    style={{
+                                        width: width/1.3,
+                                        height: width/4.5,
+                                        borderRadius: width / 20,
+                                        borderWidth: 6,
+                                        borderColor: '#f2fdff',
+                                        backgroundColor: '#dc143c',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                    }}
+                                >
+                                        <Text
+                                            style={{
+                                                color: '#f2fdff',
+                                                fontSize: 30,
+                                            }}
+                                        >CONNECT</Text>
+                                </Animatable.View>
+                            </TouchableWithoutFeedback>
+                        </View>
+
+                        <View tabLabel="GENERATE"
+                            style={{
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                height: width/2,
+                            }}
+                        >
+                            <Text
+                                style={{
+                                    textAlign: 'center',
+                                    color: '#f2fdff',
+                                }}
+                            >
+                                ROOM ID
+                            </Text>
+                            <Text 
+                                style={styles.roomId}
+                            >
+                                {this.state.generateHostname}
+                            </Text>
+                            <Text 
+                                style={styles.roomId}
+                            >
+                                {this.state.generateRoomId}
+                            </Text>
+                            <View
+                                style={{
+                                    marginTop: 3,
+                                    marginLeft: 25,
+                                    flexDirection: 'row',
+                                }}
+                            >
+                                <Switch
+                                    onValueChange={this.switchProtect}
+                                    value={this.state.protect}
+                                    activeText={'CLOSED'}
+                                    inActiveText={'OPEN'}
+                                />
+                                <Text
+                                    style={styles.button}
+                                    onPress={this.getRoomId}
+                                >Generate
+                                </Text>
+                                <Text
+                                    style={styles.button}
+                                    onPress={this.generateShare}
+                                >Share
+                                </Text>
+                            </View>
+                            <TouchableWithoutFeedback
+                                onPress={this.generateConnect}
+                            >
+                                <Animatable.View
+                                    animation = "pulse"
+                                    iterationCount = {"infinite"}
+                                    style={{
+                                        width: width/1.3,
+                                        height: width/6,
+                                        borderRadius: width / 20,
+                                        borderWidth: 6,
+                                        borderColor: '#f2fdff',
+                                        backgroundColor: '#dc143c',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                    }}
+                                >
+                                        <Text
+                                            style={{
+                                                color: '#f2fdff',
+                                                fontSize: 20,
+                                            }}
+                                        >CONNECT</Text>
+                                </Animatable.View>
+                            </TouchableWithoutFeedback>
+                        </View>
+                        <View tabLabel="ASSIGN"
+                            style={{
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                height: width/2,
+                            }}
+                        >
+                            <Text
+                                style={{
+                                    textAlign: 'center',
+                                    color: '#f2fdff',
+                                }}
+                            >
+                                ROOM ID
+                            </Text>
+                            <Text 
+                                style={styles.roomId}
+                            >
+                                {this.state.assignHostname}
+                            </Text>
+                            <Text 
+                                style={styles.roomId}
+                            >
+                                {this.state.assignRoomId}
+                            </Text>
+                            <View
+                                style={{
+                                    marginTop: 3,
+                                    marginLeft: 25,
+                                    flexDirection: 'row',
+                                }}
+                            >
+                                <Text
+                                    style={styles.button}
+                                    onPress={this.assignShare}
+                                >Share
+                                </Text>
+                            </View>
+                            <TouchableWithoutFeedback
+                                onPress={this.assignConnect}
+                            >
+                                <Animatable.View
+                                    animation = "pulse"
+                                    iterationCount = {"infinite"}
+                                    style={{
+                                        width: width/1.3,
+                                        height: width/6,
+                                        borderRadius: width / 20,
+                                        borderWidth: 6,
+                                        borderColor: '#f2fdff',
+                                        backgroundColor: '#dc143c',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                    }}
+                                >
+                                        <Text
+                                            style={{
+                                                color: '#f2fdff',
+                                                fontSize: 20,
+                                            }}
+                                        >CONNECT</Text>
+                                </Animatable.View>
+                            </TouchableWithoutFeedback>
+                        </View>
+                    </ScrollableTabView>
                 </View>
 
                 <View

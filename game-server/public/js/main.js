@@ -8,7 +8,7 @@ $(function () {
   let autoMoveFlg = false;
   let autoBehavior = true;
   let protect = false;
-  let socket = io();
+  let socket = io({autoConnect: false, reconnection: false});
 
   let hide;
   let hidef;
@@ -24,7 +24,7 @@ $(function () {
 //======================================================================================================
 // イベント
   $(window).on('beforeunload', () => {
-    socket.disconnect();
+    socket.close();
   });
 
   $('#auto').click(() => {
@@ -45,7 +45,12 @@ $(function () {
   });
 
   $('#login').on('click', () => {
-    socket.emit('login', $('#userName').text());
+    let userName = $('#userName').text();
+    let icon = $('option:selected').val();
+    let color = $('#colorSelect').val();
+    socket.io.uri = 'http://localhost:8080';
+    socket.open();
+    socket.emit('login', userName, icon, color);
     if(!roopFlg){
       updateRoop();
       displayDelete();
@@ -57,6 +62,7 @@ $(function () {
 
   $('#logout').on('click', () => {
     socket.emit('logout');
+    socket.close()
     roopFlg = false;
     clearInterval(roopID);
     displayDelete();
@@ -67,18 +73,23 @@ $(function () {
 
   $('#generateRoomId').on('click', () => {
     $.get('generateRoomId', (data) => {
+      $('#server').text(data.hostname);
       $('#idResult').text(data.roomId);
     });
   });
 
   $('#createRoom').on('click', () => {
     let userName = $('#userName').text();
+    let icon = $('option:selected').val();
+    let color = $('#colorSelect').val();
     let roomId = $('#idResult').text();
     if(!roomId){
       alert('RoomIDが作成されていません。');
       return;
     }
-    socket.emit('createRoom', userName, null, null, roomId, protect);
+    socket.io.url = 'http://localhost:8080';
+    socket.open();
+    socket.emit('createRoom', userName, icon, color, roomId, protect);
     if(!roopFlg){
       updateRoop();
       displayDelete();
@@ -90,12 +101,16 @@ $(function () {
 
   $('#assignRoom').on('click', () => {
     let userName = $('#userName').text();
+    let icon = $('option:selected').val();
+    let color = $('#colorSelect').val();
     let roomId = $('#assignRoomId').val();
     if(!roomId){
       alert('RoomIDが入力されていません');
       return;
     }
-    socket.emit('assignRoom', userName, null, null, roomId);
+    socket.io.url = 'http://localhost:8080';
+    socket.open();
+    socket.emit('assignRoom', userName, icon, color, roomId);
     if(!roopFlg){
       updateRoop();
       displayDelete();
@@ -122,6 +137,12 @@ $(function () {
     }
     socket.emit('repose');
   });
+
+  $('#colorSelect').on('change', () => {
+    $('#iconColor').text($('#colorSelect').val());
+  });
+
+  $('#iconColor').text($('#colorSelect').val());
 
 //======================================================================================================
 // 通信処理
