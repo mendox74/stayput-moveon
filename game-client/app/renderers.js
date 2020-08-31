@@ -52,6 +52,8 @@ class Join extends PureComponent {
         const height = this.props.size[1];
         const x = this.props.body.position.x - width / 2;
         const y = this.props.body.position.y - height / 2;
+        const color = this.props.color || "#dc143c";
+        const text = this.props.text || 'JOIN!';
    
         return (
             <TouchableWithoutFeedback
@@ -69,7 +71,7 @@ class Join extends PureComponent {
                         borderRadius: width / 2,
                         borderColor: "#f2fdff",
                         borderWidth: 3,
-                        backgroundColor: "#dc143c",
+                        backgroundColor: color,
                         alignItems:'center',
                         justifyContent: 'center',
                 }}
@@ -80,7 +82,7 @@ class Join extends PureComponent {
                             fontSize: width/5,
                         }}
                     >
-                        JOIN!
+                        {text}
                     </Text>
                 </Animatable.View>
             </TouchableWithoutFeedback>
@@ -229,6 +231,44 @@ class MoveButton extends PureComponent {
 }
 
 class Number extends PureComponent {
+    constructor(props) {
+        super(props);
+    }
+
+    render() {
+        const width = this.props.size[0];
+        const height = this.props.size[1];
+        const x = this.props.body.position.x - width / 2;
+        const y = this.props.body.position.y - height / 2;
+        let text = this.props.text;
+    
+        return (
+            <View
+                style={{
+                    position: "absolute",
+                    left: x,
+                    top: y,
+                    width: width,
+                    height: height,
+                    borderColor: "#f2fdff",
+                    borderWidth: 3,
+                    borderRadius: width / 20,
+                    alignItems:'center',
+                    justifyContent: 'center',
+                }}
+            >
+                <Text
+                    style={{
+                    color:'#f2fdff',
+                    fontSize: 15,
+                    }}
+                >{text}</Text>
+            </View>
+        );
+    }
+}
+
+class Info extends PureComponent {
     constructor(props) {
         super(props);
     }
@@ -478,5 +518,5 @@ class Ranking extends PureComponent {
 }
 
 export {
-    Box, Animal, MoveButton, Number, Result, Logout, Stanby, Join, Ranking
+    Box, Animal, MoveButton, Number, Result, Logout, Stanby, Join, Ranking, Info
 };

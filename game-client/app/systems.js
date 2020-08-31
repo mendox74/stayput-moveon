@@ -53,8 +53,21 @@ const UpDate = (state) => {
 			state.join = { 
 				body: {position: { x: width / 2, y: height * ( 6 / 10)}}, 
 				size: [joinSize, joinSize], 
-				color: "pink", 
+				color: "#dc143c", 
+				text: "JOIN!",
 				renderer: Join, 
+			}
+		} else {
+			if(menberList[socket.id].join){
+				if(state.join.text === "JOIN!"){
+					state.join.text = "LEAVE?";
+					state.join.color = "#dc143c";
+				}
+			} else {
+				if(state.join.text !== "JOIN!"){
+					state.join.text = "JOIN!";
+					state.join.color = "#dc143c";
+				}
 			}
 		}
 	} else {

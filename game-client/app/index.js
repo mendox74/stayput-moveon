@@ -2,7 +2,7 @@ import React, { PureComponent } from "react";
 import { StatusBar, Dimensions, StyleSheet } from "react-native";
 import { GameEngine } from "react-native-game-engine";
 import { UpDate } from "./systems";
-import { Box, MoveButton, Number, Logout, Ranking } from "./renderers";
+import { Box, MoveButton, Number, Logout, Ranking, Info } from "./renderers";
 
 export default class RigidBodies extends PureComponent {
     constructor(props) {
@@ -12,7 +12,6 @@ export default class RigidBodies extends PureComponent {
     render() {
         const { width, height } = Dimensions.get("window");
         const boxSize = Math.trunc(Math.max(width, height) * 0.015);
-        const joinSize = Math.trunc(Math.max(width, height) * 0.1);
         const buttonSize = Math.trunc(Math.max(width, height) * 0.12);
 
         const logout = {position: {x: width / 5, y: height / 1.08 }};
@@ -30,7 +29,7 @@ export default class RigidBodies extends PureComponent {
                 logout: { body: logout, size: [width / 4, buttonSize / 2.5], close:this.props.unMountScene, renderer: Logout },
                 moveButton: { body: moveBody, size: [buttonSize, buttonSize], color: "#f2fdff", renderer: MoveButton },
                 watchCount: { body: watchCountBody, size: [width / 3, buttonSize / 2.5], text: 0, renderer: Number },
-                roomId: { body: roomIdBody, size: [width / 3, buttonSize / 2.5], text: this.props.name, renderer: Number },
+                roomId: { body: roomIdBody, size: [width / 3, buttonSize / 2.5], text: this.props.name, renderer: Info },
                 floor: { body: floor, size: [width, boxSize], color: "#f2fdff", hideTime: 0, renderer: Box },
                 ranking: {body: rankBody, size: [buttonSize, buttonSize], color: "#f2fdff", renderer: Ranking }
             }}
