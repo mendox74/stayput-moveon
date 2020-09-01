@@ -1,5 +1,5 @@
 import React, { PureComponent } from "react";
-import { StyleSheet, View, Text, TouchableWithoutFeedback } from "react-native";
+import { StyleSheet, View, Text, TouchableWithoutFeedback, FlatList } from "react-native";
 import * as Animatable from 'react-native-animatable';
 import ModalAnimate from "react-native-modal";
 import { AdMobBanner } from "expo-ads-admob";
@@ -270,6 +270,17 @@ class Number extends PureComponent {
 class Info extends PureComponent {
     constructor(props) {
         super(props);
+        this.state = {
+            isMoadlVisible: false,
+        }
+    }
+
+    toggleModal = () => {
+        this.setState({ isModalVisible: !this.state.isModalVisible });
+    };
+
+    assignShare = () => {
+
     }
 
     render() {
@@ -277,30 +288,119 @@ class Info extends PureComponent {
         const height = this.props.size[1];
         const x = this.props.body.position.x - width / 2;
         const y = this.props.body.position.y - height / 2;
+        const data = [this.props.menberList] || [{name: ''}];
+        const roomId = this.props.roomId || '';
         let text = this.props.text;
     
         return (
-            <View
-                style={{
-                    position: "absolute",
-                    left: x,
-                    top: y,
-                    width: width,
-                    height: height,
-                    borderColor: "#f2fdff",
-                    borderWidth: 3,
-                    borderRadius: width / 20,
-                    alignItems:'center',
-                    justifyContent: 'center',
-                }}
+            <>
+            <TouchableWithoutFeedback
+                onPress={this.toggleModal}
             >
-                <Text
+                <View
                     style={{
-                    color:'#f2fdff',
-                    fontSize: 15,
+                        position: "absolute",
+                        left: x,
+                        top: y,
+                        width: width,
+                        height: height,
+                        borderColor: "#f2fdff",
+                        borderWidth: 3,
+                        borderRadius: width / 20,
+                        alignItems:'center',
+                        justifyContent: 'center',
                     }}
-                >{text}</Text>
-            </View>
+                >
+                    <Text
+                        style={{
+                        color:'#f2fdff',
+                        fontSize: 15,
+                        }}
+                    >Info</Text>
+                </View>
+            </TouchableWithoutFeedback>
+            <ModalAnimate
+                animationIn="bounceIn"
+                animationOut="bounceOut"
+                isVisible={this.state.isModalVisible}
+            >
+                <View
+                    style={{
+                        zIndex: 5,
+                        height: height * (8 / 10),
+                        alignItems: 'center', 
+                        borderColor: "#f2fdff",
+                        borderWidth: 3,
+                        backgroundColor: "#101935" 
+                    }}
+                >
+                        <Text
+                            style={{
+                                textAlign: 'center',
+                                color: '#f2fdff',
+                            }}
+                        >
+                            ROOM ID
+                        </Text>
+                        <Text 
+                            style={{
+                                width: width/1.4,
+                                height:height/23,
+                                paddingTop: 3,
+                                fontSize: 15,
+                                textAlign: "center",
+                                justifyContent: 'center',
+                                alignItems: 'center', 
+                                color: '#f2fdff',
+                                borderRadius: 10,
+                                borderColor: "#f2fdff",
+                                borderWidth: 2,
+                            }}
+                        >
+                            {roomId}
+                        </Text>
+                        <Text
+                            style={{
+                                width: 80, 
+                                height: height/25,
+                                fontSize: 15,
+                                margin: 5,
+                                paddingTop: 2,
+                                textAlign: 'center',
+                                borderRadius: 10,
+                                borderColor: "#f2fdff",
+                                borderWidth: 2,
+                                color: '#f2fdff',
+                            }}
+                            onPress={this.assignShare}
+                        >Share
+                        </Text>
+                    <FlatList
+                        data={data}
+                        renderItem={({item}) => {
+                            return <Text style={{marginBottom:10}}>{item.name}</Text>
+                        }}
+                    >
+                    </FlatList>
+                    <Text
+                        style={{
+                            width: 80, 
+                            height: height/25,
+                            fontSize: 15,
+                            margin: 5,
+                            paddingTop: 2,
+                            textAlign: 'center',
+                            borderRadius: 10,
+                            borderColor: "#f2fdff",
+                            borderWidth: 2,
+                            color: '#f2fdff',
+                        }}
+                        onPress={this.toggleModal}
+                    >CLOSE
+                    </Text>
+                </View>
+            </ModalAnimate>
+            </>
         );
     }
 }
@@ -322,6 +422,7 @@ class Result extends PureComponent {
         let role = this.props.role;
         let name = this.props.name;
         let rank = this.props.rank;
+        let laurel = this.props.rank === 1? <Laurel style={{ position: "absolute", width: 120, height: 120}}/>: null;
     
         return (
             <TouchableWithoutFeedback
@@ -376,12 +477,13 @@ class Result extends PureComponent {
                                 alignItems:'center',
                             }}
                         >
-                            <Laurel 
+                            {/* <Laurel 
                                 style={{
                                     position: "absolute",
                                     width: 120,
                                     height: 120,
-                                }}/>
+                                }}/> */}
+                            {laurel}
                             <Text
                                 style={{
                                     position: "absolute",

@@ -1,6 +1,11 @@
 $(function () {
 //======================================================================================================
 // 変数
+  let userName = undefined;
+  let icon;
+  let color;
+  let getRoomId;
+  let category = null;
   let roopID;
   let roopFlg  = false;
   let autoModeFlg = true;
@@ -45,19 +50,16 @@ $(function () {
   });
 
   $('#login').on('click', () => {
-    let userName = $('#userName').text();
-    let icon = $('option:selected').val();
-    let color = $('#colorSelect').val();
+    userName = $('#userName').text();
+    icon = $('option:selected').val();
+    color = $('#colorSelect').val();
+    category = null;
+    if(socket.connected){
+      socket.close();
+      return;
+    }
     socket.io.uri = 'http://localhost:8080';
     socket.open();
-    socket.emit('login', userName, icon, color);
-    if(!roopFlg){
-      updateRoop();
-      displayDelete();
-    };
-    roopFlg = true;
-    $('#login').hide();
-    $('#logout').show();
   });
 
   $('#logout').on('click', () => {
@@ -79,45 +81,39 @@ $(function () {
   });
 
   $('#createRoom').on('click', () => {
-    let userName = $('#userName').text();
-    let icon = $('option:selected').val();
-    let color = $('#colorSelect').val();
-    let roomId = $('#idResult').text();
-    if(!roomId){
+    userName = $('#userName').text();
+    icon = $('option:selected').val();
+    color = $('#colorSelect').val();
+    getRoomId = $('#idResult').text();
+    category = 'create';
+    if(!getRoomId){
       alert('RoomIDが作成されていません。');
       return;
     }
-    socket.io.url = 'http://localhost:8080';
-    socket.open();
-    socket.emit('createRoom', userName, icon, color, roomId, protect);
-    if(!roopFlg){
-      updateRoop();
-      displayDelete();
-    };
-    roopFlg = true;
-    $('#login').hide();
-    $('#logout').show();
-  });
-
-  $('#assignRoom').on('click', () => {
-    let userName = $('#userName').text();
-    let icon = $('option:selected').val();
-    let color = $('#colorSelect').val();
-    let roomId = $('#assignRoomId').val();
-    if(!roomId){
-      alert('RoomIDが入力されていません');
+    if(socket.connected){
+      socket.close();
       return;
     }
     socket.io.url = 'http://localhost:8080';
     socket.open();
-    socket.emit('assignRoom', userName, icon, color, roomId);
-    if(!roopFlg){
-      updateRoop();
-      displayDelete();
-    };
-    roopFlg = true;
-    $('#login').hide();
-    $('#logout').show();
+  });
+
+  $('#assignRoom').on('click', () => {
+    userName = $('#userName').text();
+    icon = $('option:selected').val();
+    color = $('#colorSelect').val();
+    getRoomId = $('#assignRoomId').val();
+    category = 'assign';
+    if(!getRoomId){
+      alert('RoomIDが入力されていません');
+      return;
+    }
+    if(socket.connected){
+      socket.close();
+      return;
+    }
+    socket.io.url = 'http://localhost:8080';
+    socket.open();
   });
 
   $('#protect').on('click', () => {
@@ -162,14 +158,43 @@ $(function () {
 
   socket.on('connect', () => {
     console.log('connect');
+      socket.emit('login_test', category, userName, icon, color, getRoomId, protect);
   });
 
   socket.on('disconnect', () =>{
     roopFlg = false;
     clearInterval(roopID);
+    displayDelete();
     roomId = undefined;
+    $('#login').show();
+    $('#logout').hide();
+  });
+
+  socket.on('success', () => {
+    if(!roopFlg){
+      updateRoop();
+      displayDelete();
+    };
+    roopFlg = true;
+    $('#login').hide();
+    $('#logout').show();
+  });
+
+  socket.on('connect_error', () => {
+    socket.close();
   })
 
+  socket.on('connect_timeout', () => {
+    socket.close();
+  })
+
+  socket.on('error', () => {
+    socket.close();
+  })
+
+  socket.on('loginError', () => {
+    socket.close();
+  })
 //======================================================================================================
 // ローカル関数
 

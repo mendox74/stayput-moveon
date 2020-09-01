@@ -225,6 +225,11 @@ const UpDate = (state) => {
 				}
 			}
 		}
+		// Infoへ反映
+		if(state.Info.roomId !== roomId){
+			state.Info.roomId = roomId;
+		}
+		state.Info.menberList = menberList;
 	}
 	// rank取得
 	let rankId = Object.keys(rank);

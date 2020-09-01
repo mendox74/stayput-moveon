@@ -15,6 +15,8 @@ import StartImage from '../assets/menus/start.svg';
 const { width, height } = Dimensions.get("window");
 const option = [{label: 'OPEN', value: false},{label: 'CLOSED', value: true}];
 let backgroundTimeOut;
+let category = null;
+let getRoomId = null;
 
 export default class Title extends PureComponent {
     constructor() {
@@ -32,6 +34,36 @@ export default class Title extends PureComponent {
             assignRoomId: null,
             protect: false,
         };
+        socket.on('connect', () => {
+            socket.emit('login_test', category, this.state.inputValue, this.state.iconName, this.state.color, getRoomId, this.state.protect);
+        });
+
+        socket.on('success', () => {
+            this.setState({
+                generateHostname:null,
+                generateRoomId:null,
+                sceneVisible: true,
+                scene: <RigidBodies
+                        unMountScene={this.unMountScene}
+                        name={this.state.inputValue}/>
+            });
+        });
+
+        socket.on('connect_error', () => {
+            socket.close();
+        })
+    
+        socket.on('connect_timeout', () => {
+            socket.close();
+        })
+    
+        socket.on('error', () => {
+            socket.close();
+        })
+    
+        socket.on('loginError', () => {
+            socket.close();
+        })
     }
 
     componentDidMount() {
@@ -60,38 +92,57 @@ export default class Title extends PureComponent {
     }
 
     openConnect = () => {
+        if(socket.connected){
+            socket.close();
+            return;
+        }
+        category = null;
         socket.open();
-        socket.emit('login', this.state.inputValue, this.state.iconName, this.state.color);
-        this.setState({
-            sceneVisible: true,
-            scene: <RigidBodies
-                    unMountScene={this.unMountScene}
-                    name={this.state.inputValue}/>
-        });
+        // socket.emit('login', this.state.inputValue, this.state.iconName, this.state.color);
+        // this.setState({
+        //     sceneVisible: true,
+        //     scene: <RigidBodies
+        //             unMountScene={this.unMountScene}
+        //             name={this.state.inputValue}/>
+        // });
     }
 
     generateConnect = () => {
         if(!this.state.generateRoomId)return;
+        if(socket.connected){
+            socket.close();
+            return;
+        }
+        category = 'create';
+        getRoomId = this.state.generateRoomId;
+        socket.io.url = 'http://192.168.11.7:8080';
         socket.open();
-        socket.emit('createRoom', this.state.inputValue, this.state.iconName, this.state.color, this.state.generateRoomId, this.state.protect);
-        this.setState({
-            sceneVisible: true,
-            scene: <RigidBodies
-                    unMountScene={this.unMountScene}
-                    name={this.state.inputValue}/>
-        });
+        // socket.emit('createRoom', this.state.inputValue, this.state.iconName, this.state.color, this.state.generateRoomId, this.state.protect);
+        // this.setState({
+        //     sceneVisible: true,
+        //     scene: <RigidBodies
+        //             unMountScene={this.unMountScene}
+        //             name={this.state.inputValue}/>
+        // });
     }
 
     assignConnect = () => {
         if(!this.state.assignRoomId)return;
+        if(socket.connected){
+            socket.close();
+            return;
+        }
+        category = 'assign';
+        getRoomId = this.state.assignRoomId;
+        socket.io.url = 'http://192.168.11.7:8080';
         socket.open();
-        socket.emit('assingRoom', this.state.inputValue, this.state.iconName,  this.state.assignRoomId, this.state.color);
-        this.setState({
-            sceneVisible: true,
-            scene: <RigidBodies
-                    unMountScene={this.unMountScene}
-                    name={this.state.inputValue}/>
-        });
+        // socket.emit('assingRoom', this.state.inputValue, this.state.iconName,  this.state.assignRoomId, this.state.color);
+        // this.setState({
+        //     sceneVisible: true,
+        //     scene: <RigidBodies
+        //             unMountScene={this.unMountScene}
+        //             name={this.state.inputValue}/>
+        // });
     }
 
     generateShare = () => {

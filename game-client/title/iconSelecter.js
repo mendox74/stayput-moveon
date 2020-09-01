@@ -1,5 +1,5 @@
 import React, { PureComponent } from "react";
-import { StyleSheet, View, Dimensions} from "react-native";
+import { Dimensions } from "react-native";
 import Butterfly_1 from "../assets/icons/butterfly_1.svg"
 import Butterfly_2 from "../assets/icons/butterfly_2.svg"
 import Butterfly_3 from "../assets/icons/butterfly_3.svg"
@@ -27,45 +27,47 @@ export default class IconSelecter extends PureComponent {
     }
 
     setIcon = () => {
+        let color = this.props.color || '#f2fdff';
+        let angle = this.props.angle || '0rad';
         switch (this.props.iconName){
             case 'bigAirplane':
-                this.setState({ icon: <BigAirplane style={{ fill: this.props.color || '#f2fdff',transform: [{rotate: this.props.angle || '0rad'}]}} />});
+                this.setState({ icon: <BigAirplane style={{ fill: color,transform: [{rotate: angle}]}} />});
                 break;
             case 'butterfly_1':
-                this.setState({ icon: <Butterfly_1 style={{ fill: this.props.color || '#f2fdff',transform: [{rotate: this.props.angle || '0rad'}]}} />});
+                this.setState({ icon: <Butterfly_1 style={{ fill: color,transform: [{rotate: angle}]}} />});
                 break;
             case 'butterfly_2':
-                this.setState({ icon: <Butterfly_2 style={{ fill: this.props.color || '#f2fdff',transform: [{rotate: this.props.angle || '0rad'}]}} />});
+                this.setState({ icon: <Butterfly_2 style={{ fill: color,transform: [{rotate: angle}]}} />});
                 break;
             case 'butterfly_3':
-                this.setState({ icon: <Butterfly_3 style={{ fill: this.props.color || '#f2fdff',transform: [{rotate: this.props.angle || '0rad'}]}} />});
+                this.setState({ icon: <Butterfly_3 style={{ fill: color,transform: [{rotate: angle}]}} />});
                 break;
             case 'cleaningRobot_1':
-                this.setState({ icon: <CleaningRobot_1 style={{ fill: this.props.color || '#f2fdff',transform: [{rotate: this.props.angle || '0rad'}]}} />});
+                this.setState({ icon: <CleaningRobot_1 style={{ fill: color,transform: [{rotate: angle}]}} />});
                 break;
             case 'cleaningRobot_2':
-                this.setState({ icon: <CleaningRobot_2 style={{ fill: this.props.color || '#f2fdff',transform: [{rotate: this.props.angle || '0rad'}]}} />});
+                this.setState({ icon: <CleaningRobot_2 style={{ fill: color,transform: [{rotate: angle}]}} />});
                 break;
             case 'cleaningRobot_3':
-                this.setState({ icon: <CleaningRobot_3 style={{ fill: this.props.color || '#f2fdff',transform: [{rotate: this.props.angle || '0rad'}]}} />});
+                this.setState({ icon: <CleaningRobot_3 style={{ fill: color,transform: [{rotate: angle}]}} />});
                 break;
             case 'squid_1':
-                this.setState({ icon: <Squid_1 style={{ fill: this.props.color || '#f2fdff',transform: [{rotate: this.props.angle || '0rad'}]}} />});
+                this.setState({ icon: <Squid_1 style={{ fill: color,transform: [{rotate: angle}]}} />});
                 break;
             case 'crab_1':
-                this.setState({ icon: <Crab_1 style={{ fill: this.props.color || '#f2fdff',transform: [{rotate: this.props.angle || '0rad'}]}} />});
+                this.setState({ icon: <Crab_1 style={{ fill: color,transform: [{rotate: angle}]}} />});
                 break;
             case 'turtle_1':
-                this.setState({ icon: <Turtle_1 style={{ fill: this.props.color || '#f2fdff',transform: [{rotate: this.props.angle || '0rad'}]}} />});
+                this.setState({ icon: <Turtle_1 style={{ fill: color,transform: [{rotate: angle}]}} />});
                 break;
             case 'beetle_1':
-                this.setState({ icon: <Beetle_1 style={{ fill: this.props.color || '#f2fdff',transform: [{rotate: this.props.angle || '0rad'}]}} />});
+                this.setState({ icon: <Beetle_1 style={{ fill: color,transform: [{rotate: angle}]}} />});
                 break;
             case 'beetle_2':
-                this.setState({ icon: <Beetle_2 style={{ fill: this.props.color || '#f2fdff',transform: [{rotate: this.props.angle || '0rad'}]}} />});
+                this.setState({ icon: <Beetle_2 style={{ fill: color,transform: [{rotate: angle}]}} />});
                 break;
             default:
-                this.setState({ icon: <CleaningRobot_1 style={{ fill: this.props.color || '#f2fdff',transform: [{rotate: this.props.angle || '0rad'}]}} />});
+                this.setState({ icon: <CleaningRobot_1 style={{ fill: color,transform: [{rotate: angle}]}} />});
                 break;
         }
     }
