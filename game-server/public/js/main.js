@@ -158,7 +158,7 @@ $(function () {
 
   socket.on('connect', () => {
     console.log('connect');
-      socket.emit('login_test', category, userName, icon, color, getRoomId, protect);
+      socket.emit('login', category, userName, icon, color, getRoomId, protect);
   });
 
   socket.on('disconnect', () =>{

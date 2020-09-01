@@ -29,7 +29,7 @@ export default class RigidBodies extends PureComponent {
                 logout: { body: logout, size: [width / 4, buttonSize / 2.5], close:this.props.unMountScene, renderer: Logout },
                 moveButton: { body: moveBody, size: [buttonSize, buttonSize], color: "#f2fdff", renderer: MoveButton },
                 watchCount: { body: watchCountBody, size: [buttonSize / 1.5, buttonSize / 1.5], text: 0, renderer: Number },
-                Info: { body: InfoBody, size: [width / 3, buttonSize / 2.5], menbetList: {name: ''}, renderer: Info },
+                Info: { body: InfoBody, size: [width / 4, buttonSize / 2.5], height: height, menbetList: {name: ''}, renderer: Info },
                 floor: { body: floor, size: [width, boxSize], color: "#f2fdff", hideTime: 0, renderer: Box },
                 ranking: {body: rankBody, size: [buttonSize, buttonSize], color: "#f2fdff", renderer: Ranking }
             }}

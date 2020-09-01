@@ -229,7 +229,7 @@ const UpDate = (state) => {
 		if(state.Info.roomId !== roomId){
 			state.Info.roomId = roomId;
 		}
-		state.Info.menberList = menberList;
+		// state.Info.menberList = menberList;
 	}
 	// rank取得
 	let rankId = Object.keys(rank);

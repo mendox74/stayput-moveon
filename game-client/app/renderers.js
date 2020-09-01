@@ -286,6 +286,7 @@ class Info extends PureComponent {
     render() {
         const width = this.props.size[0];
         const height = this.props.size[1];
+        const modalHeight = this.props.height;
         const x = this.props.body.position.x - width / 2;
         const y = this.props.body.position.y - height / 2;
         const data = [this.props.menberList] || [{name: ''}];
@@ -327,7 +328,7 @@ class Info extends PureComponent {
                 <View
                     style={{
                         zIndex: 5,
-                        height: height * (8 / 10),
+                        height: modalHeight * (8 / 10),
                         alignItems: 'center', 
                         borderColor: "#f2fdff",
                         borderWidth: 3,
@@ -344,8 +345,8 @@ class Info extends PureComponent {
                         </Text>
                         <Text 
                             style={{
-                                width: width/1.4,
-                                height:height/23,
+                                width: width,
+                                height:height,
                                 paddingTop: 3,
                                 fontSize: 15,
                                 textAlign: "center",
@@ -384,11 +385,11 @@ class Info extends PureComponent {
                     </FlatList>
                     <Text
                         style={{
-                            width: 80, 
-                            height: height/25,
+                            width: width, 
+                            height: height,
                             fontSize: 15,
                             margin: 5,
-                            paddingTop: 2,
+                            paddingTop: 3,
                             textAlign: 'center',
                             borderRadius: 10,
                             borderColor: "#f2fdff",

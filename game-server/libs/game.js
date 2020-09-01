@@ -20,7 +20,7 @@ module.exports = class Game {
                 console.log("disconnect", socket.id);
             });
 
-            socket.on('login_test', ( category, userName, icon, color, roomId, protect = false) => {
+            socket.on('login', ( category, userName, icon, color, roomId, protect = false) => {
                 if(socket.roomId)return;
                 switch(category){
                     case 'create':
@@ -72,68 +72,6 @@ module.exports = class Game {
 
                 rooms[socket.roomId].menberList[socket.id] = new Player(userName, icon, color);
                 console.log(socket.roomId, userName, rooms[socket.roomId].menberList, protect);
-                socket.emit('success');
-            });
-
-            socket.on('login', (userName, icon, color) => {
-                if(socket.roomId)return;
-                // 部屋の有無を判定
-                if(rooms.length >= 1){
-                    // フリーの待機中の部屋を検索
-                    socket.roomId = rooms.find(room => io.sockets.adapter.rooms[room].length < 101 && !rooms[room].protect);
-                }
-                if(!socket.roomId){
-                    // 新しい部屋を生成
-                    socket.roomId = this.makeKey();
-                    rooms.push(socket.roomId);
-                    rooms[socket.roomId] = new Room(io, socket.roomId);
-                }
-                socket.join(socket.roomId);
-
-                rooms[socket.roomId].menberList[socket.id] = new Player(userName, icon, color);
-                console.log(socket.roomId, userName, rooms[socket.roomId].menberList);
-                socket.emit('success');
-            });
-
-            socket.on('createRoom', (userName, icon, color, roomId, protect = false) => {
-                if(socket.roomId)return;
-                // 既にルームが存在するか検索
-                if(rooms.some(room => room === roomId))return;
-                // 指定roomIdの新しい部屋を生成
-                socket.roomId = roomId;
-                rooms.push(socket.roomId);
-                rooms[socket.roomId] = new Room(io, socket.roomId);
-                rooms[socket.roomId].protect = protect;
-                socket.join(socket.roomId);
-
-                rooms[socket.roomId].menberList[socket.id] = new Player(userName, icon, color);
-                console.log(socket.roomId, userName, rooms[socket.roomId].menberList, protect);
-                socket.emit('success');
-            });
-
-            socket.on('assignRoom', (userName, icon, color, roomId) => {
-                if(socket.roomId)return;
-                // 指定roomIdの部屋を検索、参加
-                if(rooms.length >= 1){
-                    if(rooms.some(room => room === roomId)){
-                        if(io.sockets.adapter.rooms[roomId].length < 101){
-                            socket.roomId = roomId;
-                        }else {
-                            console.log('full capacity the room');
-                            return;
-                        }
-                    } else {
-                        console.log('not found the room');
-                        return;
-                    }
-                } else {
-                    console.log('not create the room');
-                }
-                if(!socket.roomId){ return;}
-                socket.join(socket.roomId);
-
-                rooms[socket.roomId].menberList[socket.id] = new Player(userName, icon, color);
-                console.log(socket.roomId, userName, rooms[socket.roomId].menberList);
                 socket.emit('success');
             });
 

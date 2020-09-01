@@ -4,6 +4,7 @@ import * as Animatable from 'react-native-animatable';
 import SwitchSelector from "react-native-switch-selector";
 import ModalAnimate from "react-native-modal";
 import ScrollableTabView from "react-native-scrollable-tab-view";
+import { Audio } from "expo-av";
 import { AdMobBanner } from "expo-ads-admob";
 import { socket } from "../socket";
 import { storage } from "../storage"; 
@@ -13,10 +14,9 @@ import RigidBodies from "../app/index";
 import StartImage from '../assets/menus/start.svg';
 
 const { width, height } = Dimensions.get("window");
-const option = [{label: 'OPEN', value: false},{label: 'CLOSED', value: true}];
-let backgroundTimeOut;
-let category = null;
-let getRoomId = null;
+const bgmObject = new Audio.Sound();
+const decisionSound = new Audio.Sound();
+const cancelSound = new Audio.Sound();
 
 export default class Title extends PureComponent {
     constructor() {
@@ -26,16 +26,19 @@ export default class Title extends PureComponent {
             isMoadlVisible: false,
             sceneVisible: false,
             scene: null,
+            connecting: null,
             iconName: 'bigAirplane',
             color: '#f2fdff',
+            category: null,
             generateHostname: null,
             generateRoomId: null,
             assignHostname: null,
             assignRoomId: null,
+            getRoomId: null,
             protect: false,
         };
         socket.on('connect', () => {
-            socket.emit('login_test', category, this.state.inputValue, this.state.iconName, this.state.color, getRoomId, this.state.protect);
+            socket.emit('login', this.state.category, this.state.inputValue, this.state.iconName, this.state.color, this.state.getRoomId, this.state.protect);
         });
 
         socket.on('success', () => {
@@ -64,6 +67,7 @@ export default class Title extends PureComponent {
         socket.on('loginError', () => {
             socket.close();
         })
+        this.bgmObjectSet();
     }
 
     componentDidMount() {
@@ -72,7 +76,36 @@ export default class Title extends PureComponent {
     }
 
     componentWillUnmount() {
-        AppState.removeEventListener("change", this._handleAppStateChange);
+        this.bgmStop();
+        // AppState.removeEventListener("change", this._handleAppStateChange);
+    }
+
+    async bgmObjectSet () {
+        try{
+            await bgmObject.loadAsync(require('../assets/sounds/Lazzuli_luvs.mp3'))
+            await bgmObject.setIsLoopingAsync(true)
+            await bgmObject.setVolumeAsync(0.1)
+            await bgmObject.playAsync()
+            await decisionSound.loadAsync(require('../assets/sounds/decision.mp3'))
+            await decisionSound.setVolumeAsync(0.1)
+            await cancelSound.loadAsync(require('../assets/sounds/cancel.mp3'))
+            await cancelSound.setVolumeAsync(0.1)
+        } catch(e) {
+        
+        }        
+    }
+
+    async decisionSoundPlay () {
+        await decisionSound.replayAsync()
+    }
+
+    async cancelSoundPlay () {
+        await cancelSound.replayAsync()
+    }
+
+    async bgmStop () {
+        await bgmObject.stopAsync()
+        await bgmObject.unloadAsync()
     }
 
     _handleAppStateChange = nextAppState => {
@@ -83,66 +116,50 @@ export default class Title extends PureComponent {
           console.log("App has come to the foreground!");
           clearInterval(backgroundTimeOut);
         } else {
-            backgroundTimeOut = setTimeout(() => {
                 socket.close();
                 this.unMountScene();
-            },20000)
         }
         this.setState({ appState: nextAppState });
     }
 
     openConnect = () => {
+        this.decisionSoundPlay();
         if(socket.connected){
             socket.close();
             return;
         }
-        category = null;
+        this.setState({category:  null})
         socket.open();
-        // socket.emit('login', this.state.inputValue, this.state.iconName, this.state.color);
-        // this.setState({
-        //     sceneVisible: true,
-        //     scene: <RigidBodies
-        //             unMountScene={this.unMountScene}
-        //             name={this.state.inputValue}/>
-        // });
     }
 
     generateConnect = () => {
+        this.decisionSoundPlay();
         if(!this.state.generateRoomId)return;
         if(socket.connected){
             socket.close();
             return;
         }
-        category = 'create';
-        getRoomId = this.state.generateRoomId;
+        this.setState({
+            category: 'create',
+            getRoomId: this.state.generateRoomId
+        })
         socket.io.url = 'http://192.168.11.7:8080';
         socket.open();
-        // socket.emit('createRoom', this.state.inputValue, this.state.iconName, this.state.color, this.state.generateRoomId, this.state.protect);
-        // this.setState({
-        //     sceneVisible: true,
-        //     scene: <RigidBodies
-        //             unMountScene={this.unMountScene}
-        //             name={this.state.inputValue}/>
-        // });
     }
 
     assignConnect = () => {
+        this.decisionSoundPlay();
         if(!this.state.assignRoomId)return;
         if(socket.connected){
             socket.close();
             return;
         }
-        category = 'assign';
-        getRoomId = this.state.assignRoomId;
+        this.setState({
+            category: 'assign',
+            getRoomId: this.state.assignRoomId
+        })
         socket.io.url = 'http://192.168.11.7:8080';
         socket.open();
-        // socket.emit('assingRoom', this.state.inputValue, this.state.iconName,  this.state.assignRoomId, this.state.color);
-        // this.setState({
-        //     sceneVisible: true,
-        //     scene: <RigidBodies
-        //             unMountScene={this.unMountScene}
-        //             name={this.state.inputValue}/>
-        // });
     }
 
     generateShare = () => {
@@ -161,6 +178,7 @@ export default class Title extends PureComponent {
     }
 
     accountSave = () => {
+        this.decisionSoundPlay();
         storage.save({
             key: 'user',
             data: {
@@ -174,6 +192,7 @@ export default class Title extends PureComponent {
     }
 
     toggleModal = () => {
+        this.cancelSoundPlay();
         this.setState({ isModalVisible: !this.state.isModalVisible });
         this.storageLoad();
     };
@@ -336,7 +355,7 @@ export default class Title extends PureComponent {
                                 }}
                             >
                                 <SwitchSelector
-                                    options={option}
+                                    options={[{label: 'OPEN', value: false},{label: 'CLOSED', value: true}]}
                                     initial={0}
                                     onPress={value => this.setState({ protect: value})}
                                     textColor={'#f2fdff'}
