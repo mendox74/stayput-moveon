@@ -1,5 +1,5 @@
 import React, { PureComponent } from "react";
-import { StyleSheet, View, Text, TextInput, Modal, Dimensions, TouchableWithoutFeedback, AppState } from "react-native";
+import { StyleSheet, View, Text, TextInput, Modal, Dimensions, TouchableWithoutFeedback, AppState, Share } from "react-native";
 import * as Animatable from 'react-native-animatable';
 import SwitchSelector from "react-native-switch-selector";
 import ModalAnimate from "react-native-modal";
@@ -17,6 +17,7 @@ const { width, height } = Dimensions.get("window");
 const bgmObject = new Audio.Sound();
 const decisionSound = new Audio.Sound();
 const cancelSound = new Audio.Sound();
+const selectSound = new Audio.Sound();
 
 export default class Title extends PureComponent {
     constructor() {
@@ -82,7 +83,7 @@ export default class Title extends PureComponent {
 
     async bgmObjectSet () {
         try{
-            await bgmObject.loadAsync(require('../assets/sounds/Lazzuli_luvs.mp3'))
+            await bgmObject.loadAsync(require('../assets/sounds/bubble_bubble.mp3'))
             await bgmObject.setIsLoopingAsync(true)
             await bgmObject.setVolumeAsync(0.1)
             await bgmObject.playAsync()
@@ -90,6 +91,8 @@ export default class Title extends PureComponent {
             await decisionSound.setVolumeAsync(0.1)
             await cancelSound.loadAsync(require('../assets/sounds/cancel.mp3'))
             await cancelSound.setVolumeAsync(0.1)
+            // await selectSound.loadAsync(require('../assets/sounds/select.mp3'))
+            // await selectSound.setVolumeAsync(0.1)
         } catch(e) {
         
         }        
@@ -103,10 +106,25 @@ export default class Title extends PureComponent {
         await cancelSound.replayAsync()
     }
 
+    async selectSoundPlay () {
+        await selectSound.replayAsync()
+    }
+
     async bgmStop () {
         await bgmObject.stopAsync()
         await bgmObject.unloadAsync()
     }
+
+    onShare = async (host, Id) => {
+        try {
+          await Share.share({
+            message:
+              host + Id,
+          });
+        } catch (error) {
+          alert(error.message);
+        }
+    };
 
     _handleAppStateChange = nextAppState => {
         if (
@@ -164,10 +182,12 @@ export default class Title extends PureComponent {
 
     generateShare = () => {
         if(!this.state.generateRoomId)return;
+        this.onShare(this.state.generateHostname,this.state.generateRoomId);
     }
 
     assignShare = () => {
         if(!this.state.assignRoomId)return;
+        this.onShare(this.state.assignHostname,this.state.assignRoomId);
     }
   
     unMountScene = () => {

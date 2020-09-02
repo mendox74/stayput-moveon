@@ -137,7 +137,7 @@ const UpDate = (state) => {
 		let infoList = [];
 		for(let i = 0; i < currentId.length; i++){
 			let id = currentId[i];
-			infoList.push({name: menberList[id].name, icon: menberList[id].icon, color: menberList[id].color});
+			infoList.push({id: id, name: menberList[id].name, icon: menberList[id].icon, color: menberList[id].color});
 			if(menberList[id].join){
 				if(state[id]){
 					if(menberList[id].watcher){

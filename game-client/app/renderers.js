@@ -1,5 +1,5 @@
 import React, { PureComponent } from "react";
-import { StyleSheet, View, Text, TouchableWithoutFeedback, FlatList } from "react-native";
+import { StyleSheet, View, Text, TouchableWithoutFeedback, FlatList, Share } from "react-native";
 import * as Animatable from 'react-native-animatable';
 import ModalAnimate from "react-native-modal";
 import { AdMobBanner } from "expo-ads-admob";
@@ -256,12 +256,72 @@ class Number extends PureComponent {
                     justifyContent: 'center',
                 }}
             >
+                <View
+                    style={{flexDirection: 'row'}}
+                >
                 <Text
+                    style={{
+                        margin: 1,
+                        flex:1,
+                        backgroundColor:'green',
+                    }}
+                ></Text>
+                <Text
+                    style={{
+                        margin: 1,
+                        flex:1,
+                        backgroundColor:'green',
+                    }}
+                ></Text>
+                <Text
+                    style={{
+                        margin: 1,
+                        flex:1,
+                        backgroundColor:'green',
+                    }}
+                ></Text>
+                <Text
+                    style={{
+                        margin: 1,
+                        flex:1,
+                        backgroundColor:'green',
+                    }}
+                ></Text>
+                <Text
+                    style={{
+                        margin: 1,
+                        flex:1,
+                        backgroundColor:'green',
+                    }}
+                ></Text>
+                <Text
+                    style={{
+                        margin: 1,
+                        flex:1,
+                        backgroundColor:'green',
+                    }}
+                ></Text>
+                <Text
+                    style={{
+                        margin: 1,
+                        flex:1,
+                        backgroundColor:'green',
+                    }}
+                ></Text>
+                <Text
+                    style={{
+                        margin: 1,
+                        flex:1,
+                        backgroundColor:'green',
+                    }}
+                ></Text>
+                </View>
+                {/* <Text
                     style={{
                     color:'#f2fdff',
                     fontSize: 30,
                     }}
-                >{text}</Text>
+                >{text}</Text> */}
             </View>
         );
     }
@@ -279,8 +339,19 @@ class Info extends PureComponent {
         this.setState({ isModalVisible: !this.state.isModalVisible });
     };
 
-    assignShare = () => {
+    onShare = async (host, Id) => {
+        try {
+          await Share.share({
+            message:
+              host + Id,
+          });
+        } catch (error) {
+          alert(error.message);
+        }
+    };
 
+    assignShare = () => {
+        this.onShare('' ,this.props.roomId)
     }
 
     render() {
@@ -289,7 +360,7 @@ class Info extends PureComponent {
         const modalHeight = this.props.height;
         const x = this.props.body.position.x - width / 2;
         const y = this.props.body.position.y - height / 2;
-        const data = this.props.menberList || [{name: 'Empty', icon: null, color: null}];
+        const data = this.props.menberList || [{id: '999999999',name: 'Empty', icon: null, color: null}];
         const roomId = this.props.roomId || '';
         let text = this.props.text;
     
@@ -335,19 +406,25 @@ class Info extends PureComponent {
                         backgroundColor: "#101935" 
                     }}
                 >
-                        <Text
-                            style={{
-                                textAlign: 'center',
-                                color: '#f2fdff',
-                            }}
-                        >
-                            ROOM ID
-                        </Text>
+                    <Text
+                        style={{
+                            marginTop: 5,
+                            textAlign: 'center',
+                            color: '#f2fdff',
+                        }}
+                    >
+                        ROOM ID
+                    </Text>
+                    <View
+                        style={{
+                            flexDirection: 'row',
+                        }}
+                    >
                         <Text 
                             style={{
-                                width: width,
+                                width: width * 2,
                                 height:height,
-                                paddingTop: 3,
+                                paddingTop: 5,
                                 fontSize: 15,
                                 textAlign: "center",
                                 justifyContent: 'center',
@@ -363,10 +440,10 @@ class Info extends PureComponent {
                         <Text
                             style={{
                                 width: 80, 
-                                height: height/25,
+                                height: height,
                                 fontSize: 15,
-                                margin: 5,
-                                paddingTop: 2,
+                                marginLeft: 5,
+                                paddingTop: 5,
                                 textAlign: 'center',
                                 borderRadius: 10,
                                 borderColor: "#f2fdff",
@@ -376,11 +453,31 @@ class Info extends PureComponent {
                             onPress={this.assignShare}
                         >Share
                         </Text>
+                    </View>
                     <FlatList
                         data={data}
-                        renderItem={({item}) => {
-                            return <Text style={{marginBottom:10}}>{item.name}</Text>
+                        renderItem={({item, index}) => {
+                            return <View style={{
+                                            marginTop: 3,
+                                            width: width * 2,
+                                            height: height,
+                                            flexDirection:'row',
+                                            justifyContent: 'left',
+                                            alignItems: 'center', 
+                                        }}>
+                                        <Text style={{width: 40, textAlign: 'center',color:'#f2fdff'}}>{index + 1}</Text>
+                                        <View
+                                            style={{
+                                                width: 20,
+                                                marginRight: 5,
+                                            }}
+                                        >
+                                            <IconSelecter iconName={item.icon} color={item.color}/>
+                                        </View>
+                                        <Text style={{textAlign: 'left',color:'#f2fdff'}}>{item.name}</Text>
+                                    </View>
                         }}
+                        keyExtractor={item => item.id}
                     >
                     </FlatList>
                     <Text
@@ -389,7 +486,7 @@ class Info extends PureComponent {
                             height: height,
                             fontSize: 15,
                             margin: 5,
-                            paddingTop: 3,
+                            paddingTop: 5,
                             textAlign: 'center',
                             borderRadius: 10,
                             borderColor: "#f2fdff",
@@ -439,7 +536,7 @@ class Result extends PureComponent {
                             width: width,
                             height: height,
                             alignItems:'center',
-                            backgroundColor: '#FFFFBB'
+                            backgroundColor: "#f2fdff",
                         }}
                     >
                         <Text
