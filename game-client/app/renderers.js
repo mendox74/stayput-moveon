@@ -289,7 +289,7 @@ class Info extends PureComponent {
         const modalHeight = this.props.height;
         const x = this.props.body.position.x - width / 2;
         const y = this.props.body.position.y - height / 2;
-        const data = [this.props.menberList] || [{name: ''}];
+        const data = this.props.menberList || [{name: 'Empty', icon: null, color: null}];
         const roomId = this.props.roomId || '';
         let text = this.props.text;
     

@@ -57,7 +57,7 @@ const UpDate = (state) => {
 				text: "JOIN!",
 				renderer: Join, 
 			}
-		} else if(menberList){
+		} else if(menberList[socket.id]){
 			if(menberList[socket.id].join){
 				if(state.join.text === "JOIN!"){
 					state.join.text = "LEAVE?";
@@ -134,8 +134,10 @@ const UpDate = (state) => {
 	// updateループ処理
 	if(menberList){
 		let currentId = Object.keys(menberList);
+		let infoList = [];
 		for(let i = 0; i < currentId.length; i++){
 			let id = currentId[i];
+			infoList.push({name: menberList[id].name, icon: menberList[id].icon, color: menberList[id].color});
 			if(menberList[id].join){
 				if(state[id]){
 					if(menberList[id].watcher){
@@ -226,10 +228,13 @@ const UpDate = (state) => {
 			}
 		}
 		// Infoへ反映
-		if(state.Info.roomId !== roomId){
-			state.Info.roomId = roomId;
+		if(state.info.roomId !== roomId){
+			state.info.roomId = roomId;
 		}
-		// state.Info.menberList = menberList;
+		infoList = _.sortBy(infoList, 'name');
+		if(!_.isEqual(infoList, state.info.menberList)){
+			state.info.menberList = infoList;
+		}
 	}
 	// rank取得
 	let rankId = Object.keys(rank);
