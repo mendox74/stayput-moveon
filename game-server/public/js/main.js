@@ -5,6 +5,7 @@ $(function () {
   let icon;
   let color;
   let getRoomId;
+  let getServer;
   let category = null;
   let roopID;
   let roopFlg  = false;
@@ -13,7 +14,8 @@ $(function () {
   let autoMoveFlg = false;
   let autoBehavior = true;
   let protect = false;
-  let socket = io({autoConnect: false, reconnection: false});
+  let socket = io({transports: ['websocket'], autoConnect: false, reconnection: false});
+  const serverUrl = 'http://localhost:8080';
 
   let hide;
   let hidef;
@@ -25,6 +27,7 @@ $(function () {
   let stanbyCount;
   let autoFlg = false;
   let ranking = {};
+  let currentServer = '';
 
 //======================================================================================================
 // イベント
@@ -58,7 +61,8 @@ $(function () {
       socket.close();
       return;
     }
-    socket.io.uri = 'http://localhost:8080';
+    socket.io.uri = serverUrl;
+    socket.io.opts.query = null;
     socket.open();
   });
 
@@ -85,6 +89,7 @@ $(function () {
     icon = $('option:selected').val();
     color = $('#colorSelect').val();
     getRoomId = $('#idResult').text();
+    getServer = $('#server').text();
     category = 'create';
     if(!getRoomId){
       alert('RoomIDが作成されていません。');
@@ -94,7 +99,8 @@ $(function () {
       socket.close();
       return;
     }
-    socket.io.url = 'http://localhost:8080';
+    socket.io.url = serverUrl;
+    socket.io.opts.query = {server : getServer};
     socket.open();
   });
 
@@ -103,6 +109,7 @@ $(function () {
     icon = $('option:selected').val();
     color = $('#colorSelect').val();
     getRoomId = $('#assignRoomId').val();
+    getServer = $('#server').text();
     category = 'assign';
     if(!getRoomId){
       alert('RoomIDが入力されていません');
@@ -112,7 +119,8 @@ $(function () {
       socket.close();
       return;
     }
-    socket.io.url = 'http://localhost:8080';
+    socket.io.url = serverUrl;
+    socket.io.opts.query = {server : getServer};
     socket.open();
   });
 
@@ -142,7 +150,7 @@ $(function () {
 
 //======================================================================================================
 // 通信処理
-  socket.on('update', (hideTime, watchC , menbarList, hideFlg, id, end, win, stanbyF, stanbyC, autoF, rank) =>{
+  socket.on('update', (hideTime, watchC , menbarList, hideFlg, id, end, win, stanbyF, stanbyC, autoF, rank, server) =>{
     hide = hideTime;
     watchCount = watchC;
     list = menbarList;
@@ -154,6 +162,7 @@ $(function () {
     stanbyCount = stanbyC;
     autoFlg = autoF;
     ranking = rank? rank: {};
+    currentServer = server;
   })
 
   socket.on('connect', () => {
@@ -208,6 +217,9 @@ $(function () {
       }
       if($('#roomNumber').text() !== String(roomId)){
         $('#roomNumber').text(roomId);
+      }
+      if($('#currentServer').text() !== String(currentServer)){
+        $('#currentServer').text(currentServer);
       }
       if($('#autoFlg').text() !== String(autoFlg)){
         $('#autoFlg').text(autoFlg);
@@ -350,6 +362,7 @@ $(function () {
     $('#hideTime').text('');
     $('#winner').text('');
     $('#distance').text('');
+    $('#currentServer').text('');
     $('#roomNumber').text('');
     $('#roomMenber').text('');
     $('#player').empty()

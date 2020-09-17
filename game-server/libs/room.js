@@ -33,6 +33,7 @@ module.exports = class Room {
             this.stanbyCount,
             this.autoFlg,
             this.rank,
+            '1',
             );
         },1000/ 30);
 

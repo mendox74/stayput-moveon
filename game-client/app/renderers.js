@@ -351,7 +351,7 @@ class Info extends PureComponent {
     };
 
     assignShare = () => {
-        this.onShare('' ,this.props.roomId)
+        this.onShare(this.props.server ,this.props.roomId)
     }
 
     render() {
@@ -362,6 +362,7 @@ class Info extends PureComponent {
         const y = this.props.body.position.y - height / 2;
         const data = this.props.menberList || [{id: '999999999',name: 'Empty', icon: null, color: null}];
         const roomId = this.props.roomId || '';
+        const server = this.props.server || '';
         let text = this.props.text;
     
         return (
@@ -435,7 +436,7 @@ class Info extends PureComponent {
                                 borderWidth: 2,
                             }}
                         >
-                            {roomId}
+                            {server + roomId}
                         </Text>
                         <Text
                             style={{

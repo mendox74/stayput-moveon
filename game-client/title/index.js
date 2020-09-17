@@ -18,6 +18,7 @@ const bgmObject = new Audio.Sound();
 const decisionSound = new Audio.Sound();
 const cancelSound = new Audio.Sound();
 const selectSound = new Audio.Sound();
+const serverUrl = 'http://192.168.11.7:8080';
 
 export default class Title extends PureComponent {
     constructor() {
@@ -46,6 +47,8 @@ export default class Title extends PureComponent {
             this.setState({
                 generateHostname:null,
                 generateRoomId:null,
+                assignHostname: null,
+                assignRoomId: null,
                 sceneVisible: true,
                 scene: <RigidBodies
                         unMountScene={this.unMountScene}
@@ -147,6 +150,8 @@ export default class Title extends PureComponent {
             return;
         }
         this.setState({category:  null})
+        socket.io.url = serverUrl;
+        socket.io.opts.query = null;
         socket.open();
     }
 
@@ -161,7 +166,8 @@ export default class Title extends PureComponent {
             category: 'create',
             getRoomId: this.state.generateRoomId
         })
-        socket.io.url = 'http://192.168.11.7:8080';
+        socket.io.url = serverUrl;
+        socket.io.opts.query = {server: this.state.generateHostname};
         socket.open();
     }
 
@@ -176,7 +182,8 @@ export default class Title extends PureComponent {
             category: 'assign',
             getRoomId: this.state.assignRoomId
         })
-        socket.io.url = 'http://192.168.11.7:8080';
+        socket.io.url = serverUrl;
+        socket.io.opts.query = {server: this.state.assignHostname};
         socket.open();
     }
 
@@ -222,7 +229,7 @@ export default class Title extends PureComponent {
     };
 
     getRoomId = () => {
-        fetch('http://192.168.11.7:8080/generateRoomId')
+        fetch(serverUrl + '/generateRoomId')
         .then((response) => response.json())
         .then((data) => {
             this.setState({

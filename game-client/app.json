@@ -43,6 +43,7 @@
         "wasm",
         "svg"
       ]
-    }
+    },
+    "schema": "watch-or-touch"
   }
 }

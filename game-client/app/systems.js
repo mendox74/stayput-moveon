@@ -9,6 +9,7 @@ let menberList;
 let rank = {};
 let hideFlg;
 let roomId = undefined;
+let server = '';
 let endFlg;
 let winner = [];
 let stanbyFlg = false;
@@ -27,7 +28,7 @@ socket.on('connect', () => {
 	console.log( 'connect : socket.id = %s', socket.id );
 });
 
-socket.on('update',(ht,wc,ml,hf,ri,ef,wn,sf,sc,af,rk) => {
+socket.on('update',(ht,wc,ml,hf,ri,ef,wn,sf,sc,af,rk,sv) => {
 	hideTime = ht;
 	watchCount = wc;
 	menberList = ml;
@@ -39,6 +40,7 @@ socket.on('update',(ht,wc,ml,hf,ri,ef,wn,sf,sc,af,rk) => {
 	stanbyCount = sc;
 	autoFlg = af;
 	rank = rk;
+	server = sv;
 });
 
 const ResultClose = () => {
@@ -230,6 +232,9 @@ const UpDate = (state) => {
 		// Infoへ反映
 		if(state.info.roomId !== roomId){
 			state.info.roomId = roomId;
+		}
+		if(state.info.server !== server){
+			state.info.server = server;
 		}
 		infoList = _.sortBy(infoList, 'name');
 		if(!_.isEqual(infoList, state.info.menberList)){
