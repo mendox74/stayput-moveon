@@ -239,7 +239,20 @@ class Number extends PureComponent {
         const height = this.props.size[1];
         const x = this.props.body.position.x - width / 2;
         const y = this.props.body.position.y - height / 2;
+        const color = this.props.text > 4? 'green': this.props.text > 2? 'yellow': 'red';
         let text = this.props.text;
+        let amount = [];
+        for (let i = 0; i < this.props.text; i++){
+            amount.push(
+                <Text
+                    style={{
+                        margin: 1,
+                        flex:1,
+                        backgroundColor: color,
+                    }}
+                ></Text>
+            );
+        }
     
         return (
             <View
@@ -259,62 +272,7 @@ class Number extends PureComponent {
                 <View
                     style={{flexDirection: 'row'}}
                 >
-                <Text
-                    style={{
-                        margin: 1,
-                        flex:1,
-                        backgroundColor:'green',
-                    }}
-                ></Text>
-                <Text
-                    style={{
-                        margin: 1,
-                        flex:1,
-                        backgroundColor:'green',
-                    }}
-                ></Text>
-                <Text
-                    style={{
-                        margin: 1,
-                        flex:1,
-                        backgroundColor:'green',
-                    }}
-                ></Text>
-                <Text
-                    style={{
-                        margin: 1,
-                        flex:1,
-                        backgroundColor:'green',
-                    }}
-                ></Text>
-                <Text
-                    style={{
-                        margin: 1,
-                        flex:1,
-                        backgroundColor:'green',
-                    }}
-                ></Text>
-                <Text
-                    style={{
-                        margin: 1,
-                        flex:1,
-                        backgroundColor:'green',
-                    }}
-                ></Text>
-                <Text
-                    style={{
-                        margin: 1,
-                        flex:1,
-                        backgroundColor:'green',
-                    }}
-                ></Text>
-                <Text
-                    style={{
-                        margin: 1,
-                        flex:1,
-                        backgroundColor:'green',
-                    }}
-                ></Text>
+                    {amount}
                 </View>
                 {/* <Text
                     style={{

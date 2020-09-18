@@ -19,6 +19,8 @@ const decisionSound = new Audio.Sound();
 const cancelSound = new Audio.Sound();
 const selectSound = new Audio.Sound();
 const serverUrl = 'http://192.168.11.7:8080';
+let category;
+let getRoomId;
 
 export default class Title extends PureComponent {
     constructor() {
