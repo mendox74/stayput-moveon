@@ -2,6 +2,7 @@ import React, { PureComponent } from "react";
 import { StyleSheet, View, Text, TouchableWithoutFeedback, FlatList, Share } from "react-native";
 import * as Animatable from 'react-native-animatable';
 import ModalAnimate from "react-native-modal";
+import { Audio } from "expo-av";
 import { AdMobBanner } from "expo-ads-admob";
 import { socket } from "../socket";
 import IconSelecter from "../title/iconSelecter"
@@ -9,6 +10,11 @@ import IconSelecter from "../title/iconSelecter"
 import Entry from '../assets/menus/entry.svg' 
 import ExitImage from '../assets/menus/exit.svg';
 import Laurel from '../assets/menus/laurel.svg';
+
+const decisionSound = new Audio.Sound();
+const cancelSound = new Audio.Sound();
+const infoSound = new Audio.Sound();
+const exitSound = new Audio.Sound();
 
 class Box extends PureComponent {
     constructor(props) {
@@ -40,10 +46,35 @@ class Box extends PureComponent {
 class Join extends PureComponent {
     constructor(props) {
         super(props);
+        this.bgmObjectSet();
     }
 
     _onPress = () => {
         socket.emit('join');
+        if(this.props.text === 'JOIN!'){
+            this.decisionSoundPlay()
+        } else {
+            this.cancelSoundPlay();
+        }
+    }
+
+    async bgmObjectSet () {
+        try{
+            await decisionSound.loadAsync(require('../assets/sounds/decision.mp3'))
+            await decisionSound.setVolumeAsync(0.1)
+            await cancelSound.loadAsync(require('../assets/sounds/cancel.mp3'))
+            await cancelSound.setVolumeAsync(0.1)
+        } catch(e) {
+        
+        }        
+    }
+
+    async decisionSoundPlay () {
+        await decisionSound.replayAsync()
+    }
+
+    async cancelSoundPlay () {
+        await cancelSound.replayAsync()
     }
 
     render() {
@@ -92,12 +123,27 @@ class Join extends PureComponent {
 class Logout extends PureComponent {
     constructor(props) {
         super(props);
+        this.bgmObjectSet();
     }
 
     _onPress = () => {
         socket.emit('logout');
         socket.close();
         this.props.close();
+        this.exitSoundPlay();
+    }
+
+    async bgmObjectSet () {
+        try{
+            await exitSound.loadAsync(require('../assets/sounds/cancel.mp3'))
+            await exitSound.setVolumeAsync(0.1)
+        } catch(e) {
+        
+        }        
+    }
+
+    async exitSoundPlay () {
+        await exitSound.replayAsync()
     }
 
     render() {
@@ -178,7 +224,7 @@ class Animal extends PureComponent {
                 <Text 
                     style={{
                         color:'#f2fdff',
-                        width: width * 2,
+                        width: width * 2.5,
                         textAlign:'center',
                         fontSize: 10,
                     }} 
@@ -239,47 +285,36 @@ class Number extends PureComponent {
         const height = this.props.size[1];
         const x = this.props.body.position.x - width / 2;
         const y = this.props.body.position.y - height / 2;
-        const color = this.props.text > 4? 'green': this.props.text > 2? 'yellow': 'red';
-        let text = this.props.text;
+        const color = this.props.text > 4? 'limegreen': this.props.text > 2? 'yellow': 'red';
         let amount = [];
         for (let i = 0; i < this.props.text; i++){
             amount.push(
-                <Text
+                <View
+                    key={i}
                     style={{
-                        margin: 1,
-                        flex:1,
+                        width:10,
+                        height:30,
+                        margin: 2,
+                        borderRadius: 3,
                         backgroundColor: color,
                     }}
-                ></Text>
+                ></View>
             );
         }
     
         return (
             <View
                 style={{
+                    flexDirection: 'row',
                     position: "absolute",
                     left: x,
                     top: y,
                     width: width,
                     height: height,
-                    borderColor: "#f2fdff",
-                    borderWidth: 3,
-                    borderRadius: width / 20,
                     alignItems:'center',
-                    justifyContent: 'center',
                 }}
             >
-                <View
-                    style={{flexDirection: 'row'}}
-                >
                     {amount}
-                </View>
-                {/* <Text
-                    style={{
-                    color:'#f2fdff',
-                    fontSize: 30,
-                    }}
-                >{text}</Text> */}
             </View>
         );
     }
@@ -291,10 +326,12 @@ class Info extends PureComponent {
         this.state = {
             isMoadlVisible: false,
         }
+        this.bgmObjectSet();
     }
 
     toggleModal = () => {
         this.setState({ isModalVisible: !this.state.isModalVisible });
+        this.infoSoundPlay();
     };
 
     onShare = async (host, Id) => {
@@ -310,6 +347,20 @@ class Info extends PureComponent {
 
     assignShare = () => {
         this.onShare(this.props.server ,this.props.roomId)
+        this.infoSoundPlay();
+    }
+
+    async bgmObjectSet () {
+        try{
+            await infoSound.loadAsync(require('../assets/sounds/cancel.mp3'))
+            await infoSound.setVolumeAsync(0.1)
+        } catch(e) {
+        
+        }        
+    }
+
+    async infoSoundPlay () {
+        await infoSound.replayAsync()
     }
 
     render() {
@@ -534,12 +585,6 @@ class Result extends PureComponent {
                                 alignItems:'center',
                             }}
                         >
-                            {/* <Laurel 
-                                style={{
-                                    position: "absolute",
-                                    width: 120,
-                                    height: 120,
-                                }}/> */}
                             {laurel}
                             <Text
                                 style={{
@@ -562,8 +607,8 @@ class Result extends PureComponent {
                                 adUnitID={
                                     __DEV__ ? "ca-app-pub-3940256099942544/6300978111"
                                     : Platform.select({
-                                    ios: "" ,
-                                    android:"" ,
+                                    ios: "ca-app-pub-3476089354434972/8862410843" ,
+                                    android:"ca-app-pub-3476089354434972/7138265631" ,
                                     })
                                 }
                                 bannerSize="mediumRectangle"

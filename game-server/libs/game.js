@@ -40,7 +40,7 @@ module.exports = class Game {
                         // 指定roomIdの部屋を検索、参加
                         if(rooms.length >= 1){
                             if(rooms.some(room => room === roomId)){
-                                if(io.sockets.adapter.rooms[roomId].length < 101){
+                                if(io.sockets.adapter.rooms[roomId].length < 31){
                                     socket.roomId = roomId;
                                 } else {
                                     console.log('full capacity the room');
@@ -55,7 +55,7 @@ module.exports = class Game {
                     default:
                         if(rooms.length >= 1){
                             // フリーの待機中の部屋を検索
-                            socket.roomId = rooms.find(room => io.sockets.adapter.rooms[room].length < 101 && !rooms[room].protect);
+                            socket.roomId = rooms.find(room => io.sockets.adapter.rooms[room].length < 31 && !rooms[room].protect);
                         }
                         if(!socket.roomId){
                             // 新しい部屋を生成
@@ -71,7 +71,7 @@ module.exports = class Game {
                 socket.join(socket.roomId);
 
                 rooms[socket.roomId].menberList[socket.id] = new Player(userName, icon, color);
-                console.log(socket.roomId, userName, rooms[socket.roomId].menberList, protect);
+                console.log(socket.roomId, userName);
                 socket.emit('success');
             });
 
@@ -222,7 +222,6 @@ module.exports = class Game {
                     delete list[socket.id];
                 }
                 delete socket.roomId;
-                console.log(rooms)
             }
             
             function stanbyCount () {

@@ -1,5 +1,5 @@
 import React, { PureComponent } from "react";
-import { StyleSheet, View, Text, TextInput, Modal, Dimensions, TouchableWithoutFeedback, AppState, Share } from "react-native";
+import { StyleSheet, View, Text, TextInput, Modal, Dimensions, TouchableWithoutFeedback, AppState, Share, ScrollView } from "react-native";
 import * as Animatable from 'react-native-animatable';
 import SwitchSelector from "react-native-switch-selector";
 import ModalAnimate from "react-native-modal";
@@ -11,14 +11,11 @@ import { storage } from "../storage";
 import IconSelecter from "../title/iconSelecter"
 import RigidBodies from "../app/index";
 
-import StartImage from '../assets/menus/start.svg';
-
 const { width, height } = Dimensions.get("window");
 const bgmObject = new Audio.Sound();
 const decisionSound = new Audio.Sound();
 const cancelSound = new Audio.Sound();
 const selectSound = new Audio.Sound();
-const serverUrl = 'http://192.168.11.7:8080';
 let category;
 let getRoomId;
 
@@ -31,18 +28,16 @@ export default class Title extends PureComponent {
             sceneVisible: false,
             scene: null,
             connecting: null,
-            iconName: 'bigAirplane',
+            iconName: 'bigAirplane_1',
             color: '#f2fdff',
-            category: null,
             generateHostname: null,
             generateRoomId: null,
             assignHostname: null,
             assignRoomId: null,
-            getRoomId: null,
             protect: false,
         };
         socket.on('connect', () => {
-            socket.emit('login', this.state.category, this.state.inputValue, this.state.iconName, this.state.color, this.state.getRoomId, this.state.protect);
+            socket.emit('login', category, this.state.inputValue, this.state.iconName, this.state.color, getRoomId, this.state.protect);
         });
 
         socket.on('success', () => {
@@ -78,11 +73,12 @@ export default class Title extends PureComponent {
 
     componentDidMount() {
         this.storageLoad();
-        AppState.addEventListener("change", this._handleAppStateChange);
+        // AppState.addEventListener("change", this._handleAppStateChange);
     }
 
-    componentWillUnmount() {
-        this.bgmStop();
+    async componentWillUnmount () {
+        await bgmObject.stopAsync()
+        await bgmObject.unloadAsync()
         // AppState.removeEventListener("change", this._handleAppStateChange);
     }
 
@@ -96,8 +92,8 @@ export default class Title extends PureComponent {
             await decisionSound.setVolumeAsync(0.1)
             await cancelSound.loadAsync(require('../assets/sounds/cancel.mp3'))
             await cancelSound.setVolumeAsync(0.1)
-            // await selectSound.loadAsync(require('../assets/sounds/select.mp3'))
-            // await selectSound.setVolumeAsync(0.1)
+            await selectSound.loadAsync(require('../assets/sounds/select.mp3'))
+            await selectSound.setVolumeAsync(0.1)
         } catch(e) {
         
         }        
@@ -113,11 +109,6 @@ export default class Title extends PureComponent {
 
     async selectSoundPlay () {
         await selectSound.replayAsync()
-    }
-
-    async bgmStop () {
-        await bgmObject.stopAsync()
-        await bgmObject.unloadAsync()
     }
 
     onShare = async (host, Id) => {
@@ -151,8 +142,7 @@ export default class Title extends PureComponent {
             socket.close();
             return;
         }
-        this.setState({category:  null})
-        socket.io.url = serverUrl;
+        category = null;
         socket.io.opts.query = null;
         socket.open();
     }
@@ -164,11 +154,8 @@ export default class Title extends PureComponent {
             socket.close();
             return;
         }
-        this.setState({
-            category: 'create',
-            getRoomId: this.state.generateRoomId
-        })
-        socket.io.url = serverUrl;
+        category = 'create';
+        getRoomId = this.state.generateRoomId;
         socket.io.opts.query = {server: this.state.generateHostname};
         socket.open();
     }
@@ -180,11 +167,8 @@ export default class Title extends PureComponent {
             socket.close();
             return;
         }
-        this.setState({
-            category: 'assign',
-            getRoomId: this.state.assignRoomId
-        })
-        socket.io.url = serverUrl;
+        category = 'assign';
+        getRoomId = this.state.assignRoomId;
         socket.io.opts.query = {server: this.state.assignHostname};
         socket.open();
     }
@@ -227,11 +211,15 @@ export default class Title extends PureComponent {
     };
   
     _handleTextChange = inputValue => {
-        this.setState({ inputValue });
+        if(inputValue === null){
+            this.setState({ inputValue: 'unknown' });
+        } else {
+            this.setState({ inputValue: String(inputValue).substr(0, 10) });
+        }
     };
 
     getRoomId = () => {
-        fetch(serverUrl + '/generateRoomId')
+        fetch('http://192.168.11.7:8080/generateRoomId')
         .then((response) => response.json())
         .then((data) => {
             this.setState({
@@ -254,13 +242,13 @@ export default class Title extends PureComponent {
         }).then(data => {
             this.setState({ 
                 inputValue: data.name || 'unknown',
-                iconName: data.iconName || 'bigAirplane',
+                iconName: data.iconName || 'bigAirplane_1',
                 color: data.color || '#f2fdff',
             });
         }).catch(err => {
             this.setState({ 
                 inputValue: 'unknown',
-                iconName: 'bigAirplane',
+                iconName: 'bigAirplane_1',
                 color: '#f2fdff',
             });
         })
@@ -509,8 +497,8 @@ export default class Title extends PureComponent {
                         adUnitID={
                             __DEV__ ? "ca-app-pub-3940256099942544/6300978111"
                             : Platform.select({
-                            ios: "" ,
-                            android:"" ,
+                            ios: "ca-app-pub-3476089354434972/9836597073" ,
+                            android:"ca-app-pub-3476089354434972/7521409015" ,
                             })
                         }
                         bannerSize="smartBannerPortrait"
@@ -606,84 +594,151 @@ export default class Title extends PureComponent {
                         >
                             ICON SELECT
                         </Text>
-                        <View
-                            style={{
-                                flexDirection: 'row',
-                            }}
-                        >
-                            <TouchableWithoutFeedback onPress={() => {this.setState({iconName: 'bigAirplane'})}}>
+                        <ScrollView>
+                            <View
+                                style={{
+                                    flexDirection: 'row',
+                                }}
+                            >
+                                <TouchableWithoutFeedback onPress={() => {this.setState({iconName: 'cursor_1'})}}>
+                                    <View style={styles.iconSelect}>
+                                        <IconSelecter iconName={'cursor_1'}/>
+                                    </View>
+                                </TouchableWithoutFeedback>
+                                <TouchableWithoutFeedback onPress={() => {this.setState({iconName: 'cursor_2'})}}>
+                                    <View style={styles.iconSelect}>
+                                        <IconSelecter iconName={'cursor_2'}/>
+                                    </View>
+                                </TouchableWithoutFeedback>
+                                <TouchableWithoutFeedback onPress={() => {this.setState({iconName: 'arrow_2'})}}>
                                 <View style={styles.iconSelect}>
-                                    <IconSelecter iconName={'bigAirplane'}/>
+                                    <IconSelecter iconName={'arrow_2'}/>
                                 </View>
-                            </TouchableWithoutFeedback>
-                            <TouchableWithoutFeedback onPress={() => {this.setState({iconName: 'beetle_1'})}}>
+                                </TouchableWithoutFeedback>
+                                <TouchableWithoutFeedback onPress={() => {this.setState({iconName: 'arrow_1'})}}>
                                 <View style={styles.iconSelect}>
-                                    <IconSelecter iconName={'beetle_1'}/>
+                                    <IconSelecter iconName={'arrow_1'}/>
                                 </View>
-                            </TouchableWithoutFeedback>
-                            <TouchableWithoutFeedback onPress={() => {this.setState({iconName: 'beetle_2'})}}>
-                            <View style={styles.iconSelect}>
-                                <IconSelecter iconName={'beetle_2'}/>
+                                </TouchableWithoutFeedback>
                             </View>
-                            </TouchableWithoutFeedback>
-                            <TouchableWithoutFeedback onPress={() => {this.setState({iconName: 'turtle_1'})}}>
-                            <View style={styles.iconSelect}>
-                                <IconSelecter iconName={'turtle_1'}/>
+                            <View
+                                style={{
+                                    flexDirection: 'row',
+                                }}
+                            >
+                                <TouchableWithoutFeedback onPress={() => {this.setState({iconName: 'hand_1'})}}>
+                                    <View style={styles.iconSelect}>
+                                        <IconSelecter iconName={'hand_1'}/>
+                                    </View>
+                                </TouchableWithoutFeedback>
+                                <TouchableWithoutFeedback onPress={() => {this.setState({iconName: 'hand_2'})}}>
+                                    <View style={styles.iconSelect}>
+                                        <IconSelecter iconName={'hand_2'}/>
+                                    </View>
+                                </TouchableWithoutFeedback>
+                                <TouchableWithoutFeedback onPress={() => {this.setState({iconName: 'mouse_1'})}}>
+                                <View style={styles.iconSelect}>
+                                    <IconSelecter iconName={'mouse_1'}/>
+                                </View>
+                                </TouchableWithoutFeedback>
+                                <TouchableWithoutFeedback onPress={() => {this.setState({iconName: 'pencil_1'})}}>
+                                <View style={styles.iconSelect}>
+                                    <IconSelecter iconName={'pencil_1'}/>
+                                </View>
+                                </TouchableWithoutFeedback>
                             </View>
-                            </TouchableWithoutFeedback>
-                        </View>
-                        <View
-                            style={{
-                                flexDirection: 'row',
-                            }}
-                        >
-                            <TouchableWithoutFeedback onPress={() => {this.setState({iconName: 'cleaningRobot_1'})}}>
-                            <View style={styles.iconSelect}>
-                                <IconSelecter iconName={'cleaningRobot_1'}/>
+                            <View
+                                style={{
+                                    flexDirection: 'row',
+                                }}
+                            >
+                                <TouchableWithoutFeedback onPress={() => {this.setState({iconName: 'bigAirplane_2'})}}>
+                                    <View style={styles.iconSelect}>
+                                        <IconSelecter iconName={'bigAirplane_2'}/>
+                                    </View>
+                                </TouchableWithoutFeedback>
+                                <TouchableWithoutFeedback onPress={() => {this.setState({iconName: 'bigAirplane_1'})}}>
+                                    <View style={styles.iconSelect}>
+                                        <IconSelecter iconName={'bigAirplane_1'}/>
+                                    </View>
+                                </TouchableWithoutFeedback>
+                                <TouchableWithoutFeedback onPress={() => {this.setState({iconName: 'cleaningRobot_2'})}}>
+                                <View style={styles.iconSelect}>
+                                    <IconSelecter iconName={'cleaningRobot_2'}/>
+                                </View>
+                                </TouchableWithoutFeedback>
+                                <TouchableWithoutFeedback onPress={() => {this.setState({iconName: 'cleaningRobot_1'})}}>
+                                <View style={styles.iconSelect}>
+                                    <IconSelecter iconName={'cleaningRobot_1'}/>
+                                </View>
+                                </TouchableWithoutFeedback>
                             </View>
-                            </TouchableWithoutFeedback>
-                            <TouchableWithoutFeedback onPress={() => {this.setState({iconName: 'cleaningRobot_2'})}}>
-                            <View style={styles.iconSelect}>
-                                <IconSelecter iconName={'cleaningRobot_2'}/>
+                            <View>
+                                <AdMobBanner
+                                    adUnitID={
+                                        __DEV__ ? "ca-app-pub-3940256099942544/6300978111"
+                                        : Platform.select({
+                                        ios: "ca-app-pub-3476089354434972/5210940443" ,
+                                        android:"ca-app-pub-3476089354434972/9179967432" ,
+                                        })
+                                    }
+                                    bannerSize="mediumRectangle"
+                                    onDidFailToReceiveAdWithError={this.bannerError} 
+                                />
                             </View>
-                            </TouchableWithoutFeedback>
-                            <TouchableWithoutFeedback onPress={() => {this.setState({iconName: 'cleaningRobot_3'})}}>
-                            <View style={styles.iconSelect}>
-                                <IconSelecter iconName={'cleaningRobot_3'}/>
+                            <View
+                                style={{
+                                    flexDirection: 'row',
+                                }}
+                            >
+                                <TouchableWithoutFeedback onPress={() => {this.setState({iconName: 'beetle_2'})}}>
+                                <View style={styles.iconSelect}>
+                                    <IconSelecter iconName={'beetle_2'}/>
+                                </View>
+                                </TouchableWithoutFeedback>
+                                <TouchableWithoutFeedback onPress={() => {this.setState({iconName: 'spider_1'})}}>
+                                <View style={styles.iconSelect}>
+                                    <IconSelecter iconName={'spider_1'}/>
+                                </View>
+                                </TouchableWithoutFeedback>
+                                <TouchableWithoutFeedback onPress={() => {this.setState({iconName: 'firefly_1'})}}>
+                                <View style={styles.iconSelect}>
+                                    <IconSelecter iconName={'firefly_1'}/>
+                                </View>
+                                </TouchableWithoutFeedback>
+                                <TouchableWithoutFeedback onPress={() => {this.setState({iconName: 'butterfly_2'})}}>
+                                <View style={styles.iconSelect}>
+                                    <IconSelecter iconName={'butterfly_2'}/>
+                                </View>
+                                </TouchableWithoutFeedback>
                             </View>
-                            </TouchableWithoutFeedback>
-                            <TouchableWithoutFeedback onPress={() => {this.setState({iconName: 'crab_1'})}}>
-                            <View style={styles.iconSelect}>
-                                <IconSelecter iconName={'crab_1'}/>
+                            <View
+                                style={{
+                                    flexDirection: 'row',
+                                }}
+                            >
+                                <TouchableWithoutFeedback onPress={() => {this.setState({iconName: 'squid_1'})}}>
+                                <View style={styles.iconSelect}>
+                                    <IconSelecter iconName={'squid_1'}/>
+                                </View>
+                                </TouchableWithoutFeedback>
+                                <TouchableWithoutFeedback onPress={() => {this.setState({iconName: 'squid_2'})}}>
+                                <View style={styles.iconSelect}>
+                                    <IconSelecter iconName={'squid_2'}/>
+                                </View>
+                                </TouchableWithoutFeedback>
+                                <TouchableWithoutFeedback onPress={() => {this.setState({iconName: 'turtle_1'})}}>
+                                <View style={styles.iconSelect}>
+                                    <IconSelecter iconName={'turtle_1'}/>
+                                </View>
+                                </TouchableWithoutFeedback>
+                                <TouchableWithoutFeedback onPress={() => {this.setState({iconName: 'crab_1'})}}>
+                                <View style={styles.iconSelect}>
+                                    <IconSelecter iconName={'crab_1'}/>
+                                </View>
+                                </TouchableWithoutFeedback>
                             </View>
-                            </TouchableWithoutFeedback>
-                        </View>
-                        <View
-                            style={{
-                                flexDirection: 'row',
-                            }}
-                        >
-                            <TouchableWithoutFeedback onPress={() => {this.setState({iconName: 'butterfly_1'})}}>
-                            <View style={styles.iconSelect}>
-                                <IconSelecter iconName={'butterfly_1'}/>
-                            </View>
-                            </TouchableWithoutFeedback>
-                            <TouchableWithoutFeedback onPress={() => {this.setState({iconName: 'butterfly_2'})}}>
-                            <View style={styles.iconSelect}>
-                                <IconSelecter iconName={'butterfly_2'}/>
-                            </View>
-                            </TouchableWithoutFeedback>
-                            <TouchableWithoutFeedback onPress={() => {this.setState({iconName: 'butterfly_3'})}}>
-                            <View style={styles.iconSelect}>
-                                <IconSelecter iconName={'butterfly_3'}/>
-                            </View>
-                            </TouchableWithoutFeedback>
-                            <TouchableWithoutFeedback onPress={() => {this.setState({iconName: 'squid_1'})}}>
-                            <View style={styles.iconSelect}>
-                                <IconSelecter iconName={'squid_1'}/>
-                            </View>
-                            </TouchableWithoutFeedback>
-                        </View>
+                        </ScrollView>
                     </View>
                 </ModalAnimate>
                 <Modal

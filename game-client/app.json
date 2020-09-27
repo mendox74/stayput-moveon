@@ -13,7 +13,7 @@
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#101935"
     },
     "updates": {
       "fallbackToCacheTimeout": 0
@@ -22,11 +22,28 @@
       "**/*"
     ],
     "android": {
-      "config": {"googleMobileAdsAppId": "ca-app-pub-3940256099942544~3347511713" }
+      "config": {"googleMobileAdsAppId": "ca-app-pub-3476089354434972~6026951837" },
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "data": [
+            {
+              "scheme": "https",
+              "host": "https://watchortouch.page.link",
+              "pathPrefix": "/"
+            }
+          ],
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
+        }
+      ]
     },
     "ios": {
       "supportsTablet": true,
-      "config": { "googleMobileAdsAppId": "ca-app-pub-3940256099942544~1458002511" }
+      "config": { "googleMobileAdsAppId": "ca-app-pub-3476089354434972~5315068609" },
+      "associatedDomains": ["applinks:https://watchortouch.page.link"]
     },
     "packagerOpts": {
       "config": "metro.config.js",
@@ -43,7 +60,6 @@
         "wasm",
         "svg"
       ]
-    },
-    "schema": "watch-or-touch"
+    }
   }
 }
