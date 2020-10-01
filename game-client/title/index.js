@@ -1,5 +1,5 @@
 import React, { PureComponent } from "react";
-import { StyleSheet, View, Text, TextInput, Modal, Dimensions, TouchableWithoutFeedback, AppState, Share, ScrollView } from "react-native";
+import { StyleSheet, View, Text, TextInput, Modal, Dimensions, TouchableWithoutFeedback, AppState, Share, ScrollView, Platform } from "react-native";
 import * as Animatable from 'react-native-animatable';
 import SwitchSelector from "react-native-switch-selector";
 import ModalAnimate from "react-native-modal";
@@ -20,8 +20,8 @@ let category;
 let getRoomId;
 
 export default class Title extends PureComponent {
-    constructor() {
-        super();
+    constructor(props) {
+        super(props);
         this.state = {
             appState: AppState.currentState,
             isMoadlVisible: false,
@@ -32,8 +32,8 @@ export default class Title extends PureComponent {
             color: '#f2fdff',
             generateHostname: null,
             generateRoomId: null,
-            assignHostname: null,
-            assignRoomId: null,
+            assignHostname: this.props.reqServer || null,
+            assignRoomId: this.props.reqRoomId || null,
             protect: false,
         };
         socket.on('connect', () => {

@@ -1,5 +1,5 @@
 import React, { PureComponent } from "react";
-import { StyleSheet, View, Text, TouchableWithoutFeedback, FlatList, Share } from "react-native";
+import { StyleSheet, View, Text, TouchableWithoutFeedback, FlatList, Share, Platform } from "react-native";
 import * as Animatable from 'react-native-animatable';
 import ModalAnimate from "react-native-modal";
 import { Audio } from "expo-av";
