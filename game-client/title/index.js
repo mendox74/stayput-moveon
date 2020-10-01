@@ -1,5 +1,6 @@
 import React, { PureComponent } from "react";
 import { StyleSheet, View, Text, TextInput, Modal, Dimensions, TouchableWithoutFeedback, AppState, Share, ScrollView, Platform } from "react-native";
+import * as Linking from 'expo-linking';
 import * as Animatable from 'react-native-animatable';
 import SwitchSelector from "react-native-switch-selector";
 import ModalAnimate from "react-native-modal";
@@ -44,8 +45,6 @@ export default class Title extends PureComponent {
             this.setState({
                 generateHostname:null,
                 generateRoomId:null,
-                assignHostname: null,
-                assignRoomId: null,
                 sceneVisible: true,
                 scene: <RigidBodies
                         unMountScene={this.unMountScene}
@@ -65,7 +64,8 @@ export default class Title extends PureComponent {
             socket.close();
         })
     
-        socket.on('loginError', () => {
+        socket.on('loginError', (msg) => {
+            alert(msg);
             socket.close();
         })
         this.bgmObjectSet();
@@ -74,6 +74,16 @@ export default class Title extends PureComponent {
     componentDidMount() {
         this.storageLoad();
         // AppState.addEventListener("change", this._handleAppStateChange);
+    }
+
+    componentDidUpdate(prevProps) {
+        if(this.props.reqRoomId !== prevProps.reqRoomId){
+            this.setState({
+                assignHostname: this.props.reqServer || null,
+                assignRoomId: this.props.reqRoomId || null,
+            })
+            if(this.tabView){this.tabView.goToPage(2)}
+        }
     }
 
     async componentWillUnmount () {
@@ -112,10 +122,11 @@ export default class Title extends PureComponent {
     }
 
     onShare = async (host, Id) => {
+        let url = Linking.makeUrl("", {server: host,roomId: Id});
         try {
           await Share.share({
-            message:
-              host + Id,
+              title: url,
+              url:url,
           });
         } catch (error) {
           alert(error.message);
@@ -307,6 +318,7 @@ export default class Title extends PureComponent {
                     style={styles.createRoom}
                 >
                     <ScrollableTabView
+                        ref={(tabView) => {this.tabView = tabView}}
                         tabBarTextStyle={{
                             color: '#f2fdff',
                         }}

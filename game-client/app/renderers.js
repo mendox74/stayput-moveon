@@ -1,5 +1,6 @@
 import React, { PureComponent } from "react";
 import { StyleSheet, View, Text, TouchableWithoutFeedback, FlatList, Share, Platform } from "react-native";
+import * as Linking from 'expo-linking';
 import * as Animatable from 'react-native-animatable';
 import ModalAnimate from "react-native-modal";
 import { Audio } from "expo-av";
@@ -335,10 +336,11 @@ class Info extends PureComponent {
     };
 
     onShare = async (host, Id) => {
+        let url = Linking.makeUrl("", {server: host, roomId: Id})
         try {
           await Share.share({
-            message:
-              host + Id,
+            title: url,
+            url: url,
           });
         } catch (error) {
           alert(error.message);

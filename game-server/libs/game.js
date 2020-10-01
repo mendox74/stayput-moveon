@@ -22,19 +22,19 @@ module.exports = class Game {
 
             socket.on('login', ( category, userName, icon, color, roomId, protect = false) => {
                 if(socket.roomId)return;
+                let msg;
                 switch(category){
                     case 'create':
                         // 既にルームが存在するか検索
                         if(rooms.some(room => room === roomId)){
-                            console.log('already have the room');
-                            socket.emit('loginError');
-                            return;
+                            msg = 'already have the room';
+                        } else {
+                            // 指定roomIdの新しい部屋を生成
+                            socket.roomId = roomId;
+                            rooms.push(socket.roomId);
+                            rooms[socket.roomId] = new Room(io, socket.roomId);
+                            rooms[socket.roomId].protect = protect;
                         }
-                        // 指定roomIdの新しい部屋を生成
-                        socket.roomId = roomId;
-                        rooms.push(socket.roomId);
-                        rooms[socket.roomId] = new Room(io, socket.roomId);
-                        rooms[socket.roomId].protect = protect;
                         break;
                     case 'assign':
                         // 指定roomIdの部屋を検索、参加
@@ -44,12 +44,15 @@ module.exports = class Game {
                                     socket.roomId = roomId;
                                 } else {
                                     console.log('full capacity the room');
+                                    msg = 'full capacity the room';
                                 }
                             } else {
                                 console.log('not found the room');
+                                msg = 'not found the room';
                             }
                         } else {
-                            console.log('not create the room');
+                            console.log('not generated the room');
+                            msg = 'not found the room';
                         }
                         break;
                     default:
@@ -65,7 +68,7 @@ module.exports = class Game {
                         }
                 }
                 if(!socket.roomId){
-                    socket.emit('loginError');
+                    socket.emit('loginError', msg);
                     return;
                 }
                 socket.join(socket.roomId);

@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "game-client",
-    "slug": "game-client",
+    "name": "WATCH or TOUCH",
+    "slug": "watch-ot-touch-001",
     "platforms": [
       "ios",
       "android",
@@ -22,6 +22,7 @@
       "**/*"
     ],
     "android": {
+      "versionCode": 1,
       "config": {"googleMobileAdsAppId": "ca-app-pub-3476089354434972~6026951837" },
       "intentFilters": [
         {
@@ -41,6 +42,8 @@
       ]
     },
     "ios": {
+      "bundleIdentifier": "net.watch-or-touch",
+      "buildNumber": "1.0.0",
       "supportsTablet": true,
       "config": { "googleMobileAdsAppId": "ca-app-pub-3476089354434972~5315068609" },
       "associatedDomains": ["applinks:https://watchortouch.page.link"]
@@ -60,6 +63,7 @@
         "wasm",
         "svg"
       ]
-    }
+    },
+    "scheme": "net.watch-or-touch"
   }
 }

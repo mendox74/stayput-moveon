@@ -41,10 +41,12 @@ export default class Game extends PureComponent {
       openFromUrlScheme = url => {
         console.log(url)
         const { path, queryParams } = Linking.parse(url)
-        this.setState({ 
-            server : queryParams.server,
-            roomId : queryParams.roomId
-        })
+        if(queryParams.server){
+          this.setState({ 
+              server : queryParams.server,
+              roomId : queryParams.roomId
+          })
+        }
       }    
  
     render() {
