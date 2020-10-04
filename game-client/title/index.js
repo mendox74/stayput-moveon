@@ -230,7 +230,7 @@ export default class Title extends PureComponent {
     };
 
     getRoomId = () => {
-        fetch('http://192.168.11.7:8080/generateRoomId')
+        fetch('http://watch-or-touch-alb-627500481.ap-northeast-1.elb.amazonaws.com/generateRoomId')
         .then((response) => response.json())
         .then((data) => {
             this.setState({
