@@ -82,7 +82,7 @@ const UpDate = (state) => {
 		if(!state.stanby){
 			state.stanby = {
 				body: {position: { x: width / 2, y: height / 3 }},
-				size: [width, buttonSize],
+				size: [width, buttonSize * 1.1],
 				count: stanbyCount,
 				animation: 'bounceIn',
 				renderer: Stanby,

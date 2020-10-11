@@ -125,8 +125,7 @@ export default class Title extends PureComponent {
         let url = Linking.makeUrl("", {server: host,roomId: Id});
         try {
           await Share.share({
-              title: url,
-              url:url,
+              message: "let's play「WAWTCH or TOUCH」with me?\n" + url + "\n If you haven't installed it, click here\n https://watchortouch.page.link/DQbR",
           });
         } catch (error) {
           alert(error.message);
@@ -154,7 +153,7 @@ export default class Title extends PureComponent {
             return;
         }
         category = null;
-        socket.io.opts.query = null;
+        socket.io.opts.query = {server: 'open'};
         socket.open();
     }
 
@@ -303,6 +302,7 @@ export default class Title extends PureComponent {
                                 style={{
                                     color: '#f2fdff',
                                     textAlign: 'center',
+                                    fontSize: width * (0.4 / 10),
                                 }}
                             >
                                 NAME</Text>
@@ -320,6 +320,7 @@ export default class Title extends PureComponent {
                     <ScrollableTabView
                         ref={(tabView) => {this.tabView = tabView}}
                         tabBarTextStyle={{
+                            fontSize: width * (0.4 / 10),
                             color: '#f2fdff',
                         }}
                     >
@@ -327,7 +328,7 @@ export default class Title extends PureComponent {
                             style={{
                                 alignItems: 'center',
                                 justifyContent: 'center',
-                                height: height/2.5,
+                                height: height / 2.5,
                             }}
                         >
                             <TouchableWithoutFeedback
@@ -337,9 +338,9 @@ export default class Title extends PureComponent {
                                     animation = "pulse"
                                     iterationCount = {"infinite"}
                                     style={{
-                                        width: width/1.3,
-                                        height: width/4.5,
-                                        borderRadius: width / 20,
+                                        width: width / 1.3,
+                                        height: height / 8,
+                                        borderRadius: (height / 8) / 3,
                                         borderWidth: 6,
                                         borderColor: '#f2fdff',
                                         backgroundColor: '#dc143c',
@@ -350,7 +351,7 @@ export default class Title extends PureComponent {
                                         <Text
                                             style={{
                                                 color: '#f2fdff',
-                                                fontSize: 30,
+                                                fontSize: width * (1 / 10),
                                             }}
                                         >CONNECT</Text>
                                 </Animatable.View>
@@ -361,13 +362,14 @@ export default class Title extends PureComponent {
                             style={{
                                 alignItems: 'center',
                                 justifyContent: 'center',
-                                height: width/2,
+                                height: height / 3.4,
                             }}
                         >
                             <Text
                                 style={{
                                     textAlign: 'center',
                                     color: '#f2fdff',
+                                    fontSize: width * (0.4 / 10),
                                 }}
                             >
                                 ROOM ID
@@ -392,11 +394,11 @@ export default class Title extends PureComponent {
                                     buttonColor={'#f2fdff'}
                                     backgroundColor={'#101935'}
                                     borderWidth= {5}
-                                    fontSize={13}
-                                    height={30}
+                                    fontSize={width * (0.35 / 10)}
+                                    height={height * (0.5 / 10)}
                                     style={{
                                         marginTop: 3,
-                                        width: 120,
+                                        width: width * (3 / 10),
                                     }}
                                 />
                                 <Text
@@ -418,9 +420,9 @@ export default class Title extends PureComponent {
                                     iterationCount = {"infinite"}
                                     style={{
                                         marginTop: 30,
-                                        width: width/1.3,
-                                        height: width/6,
-                                        borderRadius: width / 20,
+                                        width: width / 1.3,
+                                        height: height / 12,
+                                        borderRadius: (height / 12) / 3,
                                         borderWidth: 6,
                                         borderColor: '#f2fdff',
                                         backgroundColor: '#dc143c',
@@ -431,7 +433,7 @@ export default class Title extends PureComponent {
                                         <Text
                                             style={{
                                                 color: '#f2fdff',
-                                                fontSize: 20,
+                                                fontSize: width * (0.8 / 10),
                                             }}
                                         >CONNECT</Text>
                                 </Animatable.View>
@@ -441,13 +443,14 @@ export default class Title extends PureComponent {
                             style={{
                                 alignItems: 'center',
                                 justifyContent: 'center',
-                                height: width/2,
+                                height: height / 3.4,
                             }}
                         >
                             <Text
                                 style={{
                                     textAlign: 'center',
                                     color: '#f2fdff',
+                                    fontSize: width * (0.4 / 10),
                                 }}
                             >
                                 ROOM ID
@@ -477,9 +480,9 @@ export default class Title extends PureComponent {
                                     iterationCount = {"infinite"}
                                     style={{
                                         marginTop: 30,
-                                        width: width/1.3,
-                                        height: width/6,
-                                        borderRadius: width / 20,
+                                        width: width / 1.3,
+                                        height: height / 12,
+                                        borderRadius: (height / 12) / 3,
                                         borderWidth: 6,
                                         borderColor: '#f2fdff',
                                         backgroundColor: '#dc143c',
@@ -490,7 +493,7 @@ export default class Title extends PureComponent {
                                         <Text
                                             style={{
                                                 color: '#f2fdff',
-                                                fontSize: 20,
+                                                fontSize: width * (0.8 / 10),
                                             }}
                                         >CONNECT</Text>
                                 </Animatable.View>
@@ -537,6 +540,7 @@ export default class Title extends PureComponent {
                                     style={{
                                         textAlign: 'center',
                                         color: '#f2fdff',
+                                        fontSize: width * (0.4 / 10),
                                     }}
                                 >
                                     NAME
@@ -572,6 +576,7 @@ export default class Title extends PureComponent {
                                 margin: 5,
                                 textAlign: 'center',
                                 color: '#f2fdff',
+                                fontSize: width * (0.4 / 10),
                             }}
                         >
                             COLOR SELECT
@@ -602,6 +607,7 @@ export default class Title extends PureComponent {
                                 margin: 5,
                                 textAlign: 'center',
                                 color: '#f2fdff',
+                                fontSize: width * (0.4 / 10),
                             }}
                         >
                             ICON SELECT
@@ -780,21 +786,21 @@ const styles = StyleSheet.create({
     },
     watch: {
         margin: 2,
-        fontSize: 35,
+        fontSize: width * (0.9 / 10),
         fontWeight: 'bold',
         textAlign: 'left',
         color: '#f2fdff',
     },
     touch: {
         margin: 2,
-        fontSize: 35,
+        fontSize: width * (0.9 / 10),
         fontWeight: 'bold',
         textAlign: 'right',
         color: '#f2fdff',
     },
     or: {
         margin: 3,
-        fontSize: 28,
+        fontSize: width * (0.8 / 10),
         fontWeight: 'bold',
         textAlign: 'center',
         color: '#f2fdff',
@@ -802,14 +808,14 @@ const styles = StyleSheet.create({
     name: {
         paddingTop: 9,
         marginLeft: -2,
-        width: width/1.8,
-        height:height/15,
-        fontSize: 20,
+        width: width / 1.8,
+        height: height / 15,
+        fontSize: width * (0.6 / 10),
         textAlign: "center",
         justifyContent: 'center',
         alignItems: 'center', 
         color: '#f2fdff',
-        borderRadius: width / 20,
+        borderRadius: (height / 15) / 3,
         borderColor: "#f2fdff",
         borderWidth: 3,
     },
@@ -822,7 +828,7 @@ const styles = StyleSheet.create({
         position: "absolute",
         top: height * (5 / 10),
         margin: 2,
-        fontSize: 28,
+        fontSize: width * (0.6 / 10),
         fontWeight: 'bold',
         textAlign: 'center',
         color: '#34495e',
@@ -835,11 +841,11 @@ const styles = StyleSheet.create({
         backgroundColor: "#101935" 
     },
     textInput: {
-        width: 200, 
-        height: 44, 
-        fontSize: 20,
+        width: width * (5.3 / 10), 
+        height: height * (0.6 / 10), 
+        fontSize: width * (0.6 / 10),
         textAlign: 'center',
-        borderRadius: width / 20,
+        borderRadius: (height * (0.6 / 10)) / 3,
         borderColor: "#f2fdff",
         borderWidth: 3,
         color: '#f2fdff',
@@ -848,7 +854,7 @@ const styles = StyleSheet.create({
         width: width / 5,
         height: width / 5,
         padding: 6,
-        borderRadius: width / 2,
+        borderRadius: (width / 5) / 2,
         borderColor: "#f2fdff",
         borderWidth:3,
     },
@@ -861,36 +867,36 @@ const styles = StyleSheet.create({
     colorSelect: {
         width: width / 10,
         height: width / 10,
-        borderRadius: width / 2,
+        borderRadius: (width / 10) / 2,
         padding: 4,
         margin: 10,
     },
     button: {
-        width: 80, 
-        height: height/25,
-        fontSize: 15,
+        width: width * (2.1 / 10),
+        height: height / 25,
+        fontSize: width * (0.4 / 10),
         margin: 5,
         paddingTop: 2,
         textAlign: 'center',
-        borderRadius: 10,
+        borderRadius: (height / 25) / 3,
         borderColor: "#f2fdff",
         borderWidth: 2,
         color: '#f2fdff',
     },
     createRoom: {
         position: "absolute",
-        top: height * (5 / 10),
+        top: height * (5.5 / 10),
     },
     roomId: {
-        width: width/1.4,
-        height:height/23,
+        width: width / 1.5,
+        height: height / 23,
         paddingTop: 3,
-        fontSize: 15,
+        fontSize: width * (0.4 / 10),
         textAlign: "center",
         justifyContent: 'center',
         alignItems: 'center', 
         color: '#f2fdff',
-        borderRadius: 10,
+        borderRadius: (height / 23) / 3,
         borderColor: "#f2fdff",
         borderWidth: 2,
     },

@@ -110,7 +110,7 @@ class Join extends PureComponent {
                     <Text
                         style={{
                             color:'#f2fdff',
-                            fontSize: width/5,
+                            fontSize: width / 5,
                         }}
                     >
                         {text}
@@ -166,7 +166,7 @@ class Logout extends PureComponent {
                         height: height,
                         borderColor: "#f2fdff",
                         borderWidth: 3,
-                        borderRadius: width / 20,
+                        borderRadius: height / 3,
                     }}
                 >
                     <ExitImage />
@@ -227,7 +227,7 @@ class Animal extends PureComponent {
                         color:'#f2fdff',
                         width: width * 2.5,
                         textAlign:'center',
-                        fontSize: 10,
+                        fontSize: width * (2 / 10),
                     }} 
                 >
                     {text}</Text>
@@ -293,10 +293,10 @@ class Number extends PureComponent {
                 <View
                     key={i}
                     style={{
-                        width:10,
-                        height:30,
+                        width: width / 11,
+                        height: height / 1.1,
                         margin: 2,
-                        borderRadius: 3,
+                        borderRadius: (width / 11) /3,
                         backgroundColor: color,
                     }}
                 ></View>
@@ -339,8 +339,7 @@ class Info extends PureComponent {
         let url = Linking.makeUrl("", {server: host, roomId: Id})
         try {
           await Share.share({
-            title: url,
-            url: url,
+            message: "let's play「WAWTCH or TOUCH」with me?\n" + url + "\n If you haven't installed it, click here\n https://watchortouch.page.link/DQbR",
           });
         } catch (error) {
           alert(error.message);
@@ -390,7 +389,7 @@ class Info extends PureComponent {
                         height: height,
                         borderColor: "#f2fdff",
                         borderWidth: 3,
-                        borderRadius: width / 20,
+                        borderRadius: height / 3,
                         alignItems:'center',
                         justifyContent: 'center',
                     }}
@@ -398,7 +397,7 @@ class Info extends PureComponent {
                     <Text
                         style={{
                         color:'#f2fdff',
-                        fontSize: 15,
+                        fontSize: width * (1.9 / 10),
                         }}
                     >Info</Text>
                 </View>
@@ -423,6 +422,7 @@ class Info extends PureComponent {
                             marginTop: 5,
                             textAlign: 'center',
                             color: '#f2fdff',
+                            fontSize: width * (1.5 / 10),
                         }}
                     >
                         ROOM ID
@@ -435,14 +435,14 @@ class Info extends PureComponent {
                         <Text 
                             style={{
                                 width: width * 2,
-                                height:height,
+                                height: height,
                                 paddingTop: 5,
-                                fontSize: 15,
+                                fontSize: width * (1.6 / 10),
                                 textAlign: "center",
                                 justifyContent: 'center',
                                 alignItems: 'center', 
                                 color: '#f2fdff',
-                                borderRadius: 10,
+                                borderRadius: height / 3,
                                 borderColor: "#f2fdff",
                                 borderWidth: 2,
                             }}
@@ -451,13 +451,13 @@ class Info extends PureComponent {
                         </Text>
                         <Text
                             style={{
-                                width: 80, 
+                                width: width * (9 / 10), 
                                 height: height,
-                                fontSize: 15,
+                                fontSize: width * (1.6 / 10),
                                 marginLeft: 5,
                                 paddingTop: 5,
                                 textAlign: 'center',
-                                borderRadius: 10,
+                                borderRadius: height / 3,
                                 borderColor: "#f2fdff",
                                 borderWidth: 2,
                                 color: '#f2fdff',
@@ -477,16 +477,29 @@ class Info extends PureComponent {
                                             justifyContent: 'left',
                                             alignItems: 'center', 
                                         }}>
-                                        <Text style={{width: 40, textAlign: 'center',color:'#f2fdff'}}>{index + 1}</Text>
+                                        <Text 
+                                            style={{
+                                                width: width / 2, 
+                                                textAlign: 'center',
+                                                color:'#f2fdff',
+                                                fontSize: width * (1.8 / 10),
+                                                }}
+                                        >{index + 1}</Text>
                                         <View
                                             style={{
-                                                width: 20,
+                                                width: width / 4,
                                                 marginRight: 5,
                                             }}
                                         >
                                             <IconSelecter iconName={item.icon} color={item.color}/>
                                         </View>
-                                        <Text style={{textAlign: 'left',color:'#f2fdff'}}>{item.name}</Text>
+                                        <Text 
+                                            style={{
+                                                textAlign: 'left',
+                                                color:'#f2fdff',
+                                                fontSize: width * (1.8 / 10),
+                                            }}
+                                        >{item.name}</Text>
                                     </View>
                         }}
                         keyExtractor={item => item.id}
@@ -496,11 +509,11 @@ class Info extends PureComponent {
                         style={{
                             width: width, 
                             height: height,
-                            fontSize: 15,
+                            fontSize: width * (1.6 / 10),
                             margin: 5,
                             paddingTop: 5,
                             textAlign: 'center',
-                            borderRadius: 10,
+                            borderRadius: height / 3,
                             borderColor: "#f2fdff",
                             borderWidth: 2,
                             color: '#f2fdff',
@@ -532,7 +545,7 @@ class Result extends PureComponent {
         let role = this.props.role;
         let name = this.props.name;
         let rank = this.props.rank;
-        let laurel = this.props.rank === 1? <Laurel style={{ position: "absolute", width: 120, height: 120}}/>: null;
+        let laurel = this.props.rank === 1? <Laurel style={{ position: "absolute", width: width / 3.4, height: width / 3.4}}/>: null;
     
         return (
             <TouchableWithoutFeedback
@@ -556,7 +569,7 @@ class Result extends PureComponent {
                             margin: 10,
                             width: width,
                             textAlign: 'center',
-                            fontSize: 20,
+                            fontSize: width / 14,
                             }}
                         >WINNER
                         </Text>
@@ -564,13 +577,13 @@ class Result extends PureComponent {
                             style={{
                             width: width,
                             textAlign: 'center',
-                            fontSize: 30,
+                            fontSize: width / 20,
                             }}
                         >{role}
                         </Text>
                         <Text
                             style={{
-                            fontSize: 40,
+                                fontSize: width / 8,
                             }}
                         >{name}
                         </Text>
@@ -578,7 +591,7 @@ class Result extends PureComponent {
                             style={{
                             marginTop: 10,
                             marginBottom: -10,
-                            fontSize: 20,
+                            fontSize: width / 14,
                             }}
                         >RANK
                         </Text>
@@ -591,10 +604,10 @@ class Result extends PureComponent {
                             <Text
                                 style={{
                                     position: "absolute",
-                                    width: 120,
-                                    height: 120,
-                                    marginTop: 25,
-                                    fontSize: 50,
+                                    width: width / 3.4,
+                                    height: width / 3.4,
+                                    marginTop: height / 22,
+                                    fontSize: width / 8,
                                     textAlign: 'center',
                                 }}
                             >{rank}
@@ -602,7 +615,7 @@ class Result extends PureComponent {
                         </View>
                         <View
                             style={{
-                                marginTop: 140
+                                marginTop: width / 3.4
                             }}
                         >
                             <AdMobBanner
@@ -645,17 +658,14 @@ class Stanby extends PureComponent {
                     top: y,
                     width: width,
                     height: height,
-                    // borderColor: "#FFF",
-                    // borderWidth: 2,
                     alignItems:'center',
                     justifyContent: 'center',
-                    // backgroundColor: 'pink',
                 }}
             >
                 <Text
                     style={{
                     color:'#f2fdff',
-                    fontSize: 110,
+                    fontSize: width / 3.5,
                     }}
                 >{count}
                 </Text>
@@ -687,7 +697,7 @@ class Ranking extends PureComponent {
                     width: width * 1.4,
                     color:'#f2fdff',
                     textAlign: 'center',
-                    fontSize: 50,
+                    fontSize: width / 1.6,
                     }}
                 >{rank}
                 </Text>
@@ -711,7 +721,7 @@ class Ranking extends PureComponent {
                     width: width * 1.3,
                     color:'#f2fdff',
                     textAlign: 'center',
-                    fontSize: 30,
+                    fontSize: width / 2.6,
                     }}
                 >{entry}
                 </Text>
